@@ -31,7 +31,7 @@ Workshop materials and relevant links can be found on the [**Resources**](https:
 
 BYO coffee :)
 
-### Schedule
+### Schedule - Day 1
 
 ```{r, echo=FALSE, message=FALSE}
 library(knitr)
@@ -41,7 +41,7 @@ library(downlit)
 library(dplyr)
 library(lubridate)
 
-start_time <- ymd_hm("2025-11-13 10:00")  # anchors the day
+start_time <- ymd_hm("2026-08-12 09:00") # anchors the day
 
 schedule <- tibble::tibble(
   Instructor = c(
@@ -60,7 +60,9 @@ schedule <- tibble::tibble(
     # GI - 2
     "GI",
     # SA
-    "SA"
+    "SA",
+    # Day 2 prep (new)
+    ""
   ),
   Activity = c(
     "Welcome and housekeeping",
@@ -72,31 +74,72 @@ schedule <- tibble::tibble(
     "STRING",
     "Lunch break",
     "GSEA",
-    "Reactome"
+    "Reactome",
+    "Software installation & preparation for Day 2"
   ),
   `Time (mins)` = c(
-    10,     # LP
-    35,10,15,  # HK before break
-    10,     # Morning break (new)
-    40,     # HK: gProfiler (resumes at 11:20)
-    40,     # GI - 1: STRING
-    20,     # Lunch reduced from 30 -> 20
-    60,     # GI - 2: GSEA
-    60      # SA: Reactome
+    10, # LP
+    35, 10, 15, # HK before break
+    10, # Morning break
+    40, # HK: gProfiler
+    40, # GI - 1: STRING
+    45, # Lunch break (extended from 20 -> 45)
+    60, # GI - 2: GSEA
+    60, # SA: Reactome
+    35 # Day 2 prep (new, fills day out to 15:00)
   )
 ) %>%
   mutate(
     Start = start_time + minutes(c(0, head(cumsum(`Time (mins)`), -1))),
     End   = start_time + minutes(cumsum(`Time (mins)`)),
     Start = format(Start, "%I:%M %p"),
-    End   = format(End,   "%I:%M %p")
+    End   = format(End, "%I:%M %p")
   )
 
-# Sanity check: still a 300-min day (10:00–15:00)
-stopifnot(sum(schedule$`Time (mins)`) == 300)
+# Sanity check: full 360-min day (9:00–15:00)
+stopifnot(sum(schedule$`Time (mins)`) == 360)
 
 # Render the table
 kable(schedule, "html", escape = FALSE) %>%
+  kable_styling(full_width = FALSE, position = "center") %>%
+  column_spec(1, width = "10em", bold = TRUE) %>%
+  column_spec(3, width = "8em")
+```
+
+### Schedule - Day 2
+
+```{r, echo=FALSE, message=FALSE}
+start_time_day2 <- ymd_hm("2026-08-13 09:00") # anchors day 2
+
+schedule_day2 <- tibble::tibble(
+  Instructor = c(
+    "", # Topic TBD - 1
+    "", # Morning break
+    ""  # Topic TBD - 2
+  ),
+  Activity = c(
+    "Topic TBD",
+    "Morning break",
+    "Topic TBD"
+  ),
+  `Time (mins)` = c(
+    80, # Topic TBD - 1
+    15, # Morning break
+    85  # Topic TBD - 2
+  )
+) %>%
+  mutate(
+    Start = start_time_day2 + minutes(c(0, head(cumsum(`Time (mins)`), -1))),
+    End   = start_time_day2 + minutes(cumsum(`Time (mins)`)),
+    Start = format(Start, "%I:%M %p"),
+    End   = format(End, "%I:%M %p")
+  )
+
+# Sanity check: full 180-min morning (9:00-12:00)
+stopifnot(sum(schedule_day2$`Time (mins)`) == 180)
+
+# Render the table
+kable(schedule_day2, "html", escape = FALSE) %>%
   kable_styling(full_width = FALSE, position = "center") %>%
   column_spec(1, width = "10em", bold = TRUE) %>%
   column_spec(3, width = "8em")
