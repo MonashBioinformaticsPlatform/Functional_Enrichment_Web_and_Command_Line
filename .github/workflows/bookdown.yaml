@@ -47,27 +47,6 @@ jobs:
         with:
           path: 'docs'
 
-      # This makes a commit of the changed files in 'docs' to the main branch
-      # Not really what we want
-      # - uses: EndBug/add-and-commit@v9
-      #   with:
-      #     add: 'docs'
-      #     message: 'Rebuild html (Github Actions)'
-      #     push: true
-
-      - name: Checkout gh-pages branch
-        #run: git checkout gh-pages
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-
-      - name: Push docs to gh-pages branch
-        uses: EndBug/add-and-commit@v9
-        with:
-          add: 'docs -f'
-          message: 'Rebuild html (Github Actions)'
-          push: 'origin gh-pages --set-upstream --force'
-          
   deploy:
     needs: bookdown-render
 
