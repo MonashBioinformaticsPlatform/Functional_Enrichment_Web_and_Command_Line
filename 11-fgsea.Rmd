@@ -1,0 +1,199 @@
+# FGSEA
+
+```{r fgsea-echo-setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[fgsea](https://bioconductor.org/packages/release/bioc/html/fgsea.html) ("fast gene set enrichment analysis") is an R/Bioconductor package for running pre-ranked GSEA. Rather than testing a fixed list of "interesting" genes as ORA does, GSEA uses the ranks (or ranking statistic, e.g. log2 fold change or t-statistic) of **all** measured genes to ask whether a gene set is skewed towards the top or bottom of that ranking.
+
+`fgsea` implements the same underlying pre-ranked GSEA method as the `GSEA Desktop`/`MSigDB` web tool you used earlier in this workshop, but as a fast, scriptable R function, using an adaptive multi-level Monte-Carlo scheme that lets it accurately estimate very small p-values without needing a large number of permutations. See the [fgsea preprint](https://www.biorxiv.org/content/10.1101/060012v3) for algorithmic detail, and the [package vignette](https://bioconductor.org/packages/release/bioc/vignettes/fgsea/inst/doc/fgsea-tutorial.html) for the full reference this chapter is based on.
+
+We will re-run pre-ranked GSEA against the MSigDB Hallmark gene sets, using the **same pre-ranked gene list** you used earlier in the GSEA Desktop tool (`Pre_Ranked_List_logFC_SYMBOL`), so we can compare the R output directly against what you saw on the web tool, including the `HALLMARK_CHOLESTEROL_HOMEOSTASIS` gene set discussed in the earlier challenge question.
+
+<p> </p>
+
+**In this chapter we will:**
+
+1.  Load the pre-ranked gene list used in the earlier GSEA Desktop activity
+2.  Prepare the ranked statistics vector required by `fgsea`
+3.  Retrieve the MSigDB Hallmark gene sets with `msigdbr`
+4.  Run pre-ranked GSEA with the `fgsea` function
+5.  Save the tabular results to a file
+6.  Visualise an individual gene set with `plotEnrichment`
+7.  Visualise many gene sets at once with `plotGseaTable`
+8.  Collapse redundant/overlapping gene sets with `collapsePathways`
+9.  Run an over-representation test with `fora` for comparison against ORA
+
+All of the data used in this chapter is provided in the `data/` folder of this workshop's materials, so there's nothing extra to download - just read on and run the code chunks below in order (in RStudio, open this same `.Rmd` file directly to run and edit the code yourself).
+
+<p> </p>
+
+## Load R packages
+
+```{r fgsea-packages, message=FALSE}
+library(readr)
+library(dplyr)
+library(fgsea)
+library(data.table)
+library(ggplot2)
+library(msigdbr)
+library(BiocParallel)
+
+register(SerialParam())
+```
+
+## 1. Load input data
+
+Earlier, we used a pre-ranked gene list derived from the [Pezzini et al. 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) SH-SY5Y neuronal differentiation dataset: genes ranked by their log2 fold change between differentiated and undifferentiated cells (`Pre_Ranked_List_logFC_SYMBOL`).
+
+We load that same file here so that our `fgsea` results are directly comparable to what you saw on the web tools.
+
+```{r fgsea-load-pre-ranked}
+ranks_df <- read_csv("data/STRING/Pre_Ranked_List_logFC_SYMBOL", show_col_types = FALSE)
+head(ranks_df)
+```
+
+The file has one row per gene, with `Gene_Symbol` and `logFC` columns, already sorted from most strongly up-regulated to most strongly down-regulated in the differentiated condition.
+
+## 2. Prepare the ranked statistics vector
+
+`fgsea` requires the ranking statistics as a single **named numeric vector** (gene symbol -\> statistic), rather than a data frame. A small number of gene symbols in the table are duplicated (for example where multiple probes/transcripts map to the same gene symbol); for these we keep the value with the largest absolute log fold change.
+
+```{r fgsea-build-ranks}
+ranks_df <- ranks_df %>%
+  group_by(Gene_Symbol) %>%
+  slice_max(abs(logFC), n = 1, with_ties = FALSE) %>%
+  ungroup()
+
+ranks <- setNames(ranks_df$logFC, ranks_df$Gene_Symbol)
+
+# fgsea expects the vector sorted, largest to smallest
+ranks <- sort(ranks, decreasing = TRUE)
+
+str(ranks)
+```
+
+## 3. Get MSigDB Hallmark gene sets
+
+Earlier, the GSEA Desktop and STRING GSEA activities queried the [MSigDB](https://www.gsea-msigdb.org/gsea/msigdb) Hallmark gene set collection. The [`msigdbr`](https://cran.r-project.org/web/packages/msigdbr/index.html) package provides convenient, versioned, tidy access to MSigDB collections directly in R, without needing to download `.gmt` files by hand.
+
+```{r fgsea-get-hallmark}
+hallmark_df <- msigdbr(species = "Homo sapiens", category = "H")
+head(hallmark_df)
+```
+
+`fgsea` expects pathways as a **named list** of character vectors (gene set name -\> genes), so we reshape the `msigdbr` table into that format:
+
+```{r fgsea-reshape-pathways}
+pathways <- split(hallmark_df$gene_symbol, hallmark_df$gs_name)
+str(head(pathways, 2))
+```
+
+## 4. Run fgsea
+
+Before running the below code chunk, review the parameters for the `fgsea` function using the `Help` pane of RStudio (`?fgsea::fgsea`). Note the similarities to the parameters you saw in the GSEA Desktop tool, e.g. `minSize`/`maxSize` (gene set size filters).
+
+```{r fgsea-help, eval=FALSE}
+?fgsea::fgsea
+```
+
+```{r fgsea-run}
+set.seed(42)
+
+fgseaRes <- fgsea(pathways = pathways,
+                   stats    = ranks,
+                   minSize  = 15,
+                   maxSize  = 500)
+```
+
+`fgsea` has a default lower bound (`eps = 1e-10`) on the p-values it estimates, for speed. If a gene set could plausibly have an even smaller p-value than this, you will see a warning. To estimate p-values more precisely (at the cost of a slower run), set `eps = 0`:
+
+```{r fgsea-run-eps0}
+fgseaRes <- fgsea(pathways = pathways,
+                   stats    = ranks,
+                   eps      = 0,
+                   minSize  = 15,
+                   maxSize  = 500)
+
+head(fgseaRes[order(pval), ])
+```
+
+The result table contains, per gene set: the enrichment score (`ES`), normalised enrichment score (`NES`), raw and adjusted p-values, and the `leadingEdge` genes driving the enrichment.
+
+Let's check whether `HALLMARK_CHOLESTEROL_HOMEOSTASIS` (discussed in the earlier challenge question) shows up as significantly enriched here too:
+
+```{r fgsea-check-cholesterol}
+fgseaRes[pathway == "HALLMARK_CHOLESTEROL_HOMEOSTASIS"]
+```
+
+## 5. Save the results to a file
+
+`data.table::fwrite` handles the list-column (`leadingEdge`) automatically, unlike `write.csv`/`write.table`.
+
+```{r fgsea-write-results}
+title <- "fgsea_Hallmark_results.txt"
+fwrite(fgseaRes, file = title, sep = "\t", sep2 = c("", " ", ""))
+cat("Table saved to", title, "\n")
+```
+
+## 6. Visualise a single gene set
+
+`plotEnrichment` reproduces the classic GSEA "running enrichment score" plot for one gene set, the same style of plot produced by the GSEA Desktop tool:
+
+```{r fgsea-plot-enrichment-cholesterol, fig.width=7, fig.height=4}
+plotEnrichment(pathways[["HALLMARK_CHOLESTEROL_HOMEOSTASIS"]], ranks) +
+  labs(title = "HALLMARK_CHOLESTEROL_HOMEOSTASIS")
+```
+
+## 7. Visualise the top gene sets as a table plot
+
+`plotGseaTable` draws a compact summary of many gene sets at once, showing each gene set's ranked-list position, running score trace, and NES/p-value.
+
+```{r fgsea-select-top-pathways}
+topPathwaysUp <- fgseaRes[ES > 0][head(order(pval), n = 10), pathway]
+topPathwaysDown <- fgseaRes[ES < 0][head(order(pval), n = 10), pathway]
+topPathways <- c(topPathwaysUp, rev(topPathwaysDown))
+```
+
+```{r fgsea-plot-gsea-table, fig.width=10, fig.height=8, fig.retina=2}
+plotGseaTable(pathways[topPathways], ranks, fgseaRes, gseaParam = 0.5)
+```
+
+## 8. Collapse redundant gene sets
+
+Hallmark gene sets are curated to minimise overlap, but many gene set collections (e.g. GO, Reactome) contain highly overlapping terms. `collapsePathways` identifies a smaller, largely independent subset of the significant gene sets whose leading-edge genes are not already explained by another, more significant gene set:
+
+```{r fgsea-collapse-pathways, fig.width=10, fig.height=8, fig.retina=2, warning=FALSE}
+collapsedPathways <- collapsePathways(fgseaRes[order(pval)][padj < 0.05],
+                                       pathways, ranks)
+mainPathways <- fgseaRes[pathway %in% collapsedPathways$mainPathways][
+  order(-NES), pathway]
+
+plotGseaTable(pathways[mainPathways], ranks, fgseaRes, gseaParam = 0.5)
+```
+
+## 9. Over-representation test with fora
+
+`fgsea` also includes `fora`, a fast implementation of a classic hypergeometric over-representation test (like the ORA you ran earlier with `g:Profiler` and `STRING`). It requires a foreground gene list, a background/universe gene list, and a set of pathways.
+
+We reuse the same `DE_198set_Gene_Symbols.txt` gene list you used for ORA in `g:Profiler` and `STRING` earlier as our foreground, and all genes measured in the experiment as our background, so we can compare the GSEA and ORA results for this dataset directly.
+
+```{r fgsea-fora}
+fg <- read_lines("data/STRING/DE_198set_Gene_Symbols.txt")
+bg <- names(ranks)
+
+foraRes <- fora(genes = fg, universe = bg, pathways = pathways)
+head(foraRes[order(pval), ])
+```
+
+<p style="color:#006400;">
+
+**Question:** Do the top gene sets from `fora` (ORA) match the top gene sets from `fgsea` (GSEA)? Why might they differ, given that ORA only sees the 198 significant genes while GSEA uses the ranking of all \~14,000 genes?
+
+</p>
+
+## Performance considerations
+
+`fgsea` is parallelised via the `BiocParallel` package. By default, the first registered backend returned by `bpparam()` is used (above we explicitly registered `SerialParam()` for reproducibility). To use multiple cores, set the `nproc` argument of `fgsea()`, or supply your own `BPPARAM`, e.g. `BPPARAM = MulticoreParam(workers = 4)`.
+
+<p> </p>
