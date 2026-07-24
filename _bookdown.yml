@@ -18,6 +18,8 @@ rmd_files:
   - 08-resources.Rmd
   - 09-gprofiler2.Rmd
   - 10-clusterprofiler.Rmd
+  - 11-fgsea.Rmd
+  - 12-stringdb.Rmd
 
 
 copy_resources:
