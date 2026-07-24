@@ -1,7 +1,7 @@
 # FGSEA
 
 ```{r fgsea-echo-setup, include=FALSE}
-knitr::opts_chunk$set(eval = TRUE)
+knitr::opts_chunk$set(eval = FALSE)
 ```
 
 [fgsea](https://bioconductor.org/packages/release/bioc/html/fgsea.html) ("fast gene set enrichment analysis") is an R/Bioconductor package for running pre-ranked GSEA. Rather than testing a fixed list of "interesting" genes as ORA does, GSEA uses the ranks (or ranking statistic, e.g. log2 fold change or t-statistic) of **all** measured genes to ask whether a gene set is skewed towards the top or bottom of that ranking.
