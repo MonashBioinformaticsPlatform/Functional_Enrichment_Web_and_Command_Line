@@ -1,7 +1,10 @@
-# (PART) Day 2 {-}
-
-# gprofiler2
-
+---
+title: "ORA with gprofiler2"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
 
 ```{r Load R packages, include=FALSE}
 library(readr)
@@ -11,7 +14,7 @@ library(ggplot2)
 library(tidyr)
 ```
 
-## 0. Working directory
+# 0. Working directory
 
 Ensure the 'workshop' directory is your current working directory:
 
@@ -19,12 +22,12 @@ Ensure the 'workshop' directory is your current working directory:
 ```{r working directory, include=FALSE}
 getwd()
 # Set the working directory for notebook
-knitr::opts_knit$set(root.dir = "day2_inputData")
+knitr::opts_knit$set(root.dir = "Functional_Enrichment_Web_and_Command_Line/day2_inputData")
 getwd()
 ```
 
 
-## 1. Load input data
+# 1. Load input data
 
 Raw data from [Pezzini et al 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) was subjected to differential gene expression analysis with [Degust](https://degust.erc.monash.edu/) and the results file saved to `Pezzini_DE.txt`.
 
@@ -43,7 +46,7 @@ The dataframe shows genes with fold change and FDR values, along with some norma
 
 Look on the environment pane of RStudio, and you can see a description '14420 obs. of 10 variables' - this shows your dataframe consists of 10 columns and 14,420 genes. 
 
-## 2. Get ORA gene list
+# 2. Get ORA gene list
 
 Now we need to filter for differentially expressed genes (DEGs), and we will apply the thresholds adjusted P values/FDR < 0.01, and log2fold change of 2. 
 
@@ -65,7 +68,7 @@ cat("Table saved to", title, "\n")
 
 We have 792 genes passing our filters. 
 
-## 3. Get background gene list
+# 3. Get background gene list
 
 Recall from the webinar and day 1 of the workshop that an experimental background gene list is crucial to avoiding false positives and minimising tissue bias with ORA. 
 
@@ -84,7 +87,7 @@ write.table(background, title, row.names = FALSE, col.names = FALSE, quote = FAL
 cat("Table saved to", title, "\n")
 ```
 
-## 4. Run ORA with `gost` function
+# 4. Run ORA with `gost` function
 
 Before running the below code chunk, review the parameters for the `gost` ORA function. We can do this easily by bringing up the help page for the function in the `Help` pane of RStudio. This is the same information that is displayed in the [gprofiler2](https://cran.r-project.org/web/packages/gprofiler2/gprofiler2.pdf) user guide. 
 
@@ -176,7 +179,7 @@ Same as the web tool, we have enrichment results for GP (BP, CC, MF), HP (human 
 
 
 
-## 5. Save the results to a file
+# 5. Save the results to a file
 
 Let's save the results file to disk. This is handy when you want to export results elsewhere for further analysis, for example Excel. 
 
@@ -225,9 +228,9 @@ publish_gosttable(ora,
 
 
 
-## 6. Visualise the results 
+# 6. Visualise the results 
 
-### Manhattan plots 
+## Manhattan plots 
 
 The `gostplot` function creates a Manhattan plot similar to the one shown on the web tool. By applying the parameter `interactive=TRUE` we can hover over the data points to see enriched term details.
 
@@ -358,7 +361,7 @@ publish_gostplot(plot,
 
 
 
-### Dotplots
+## Dotplots
 
 One of the advantages of working in R is flexibility with visualisations. While the interactive Manhattan plots and `publish_gostplot` options are nice, it can also be useful to visualise P values against all term descriptions. 
 
@@ -433,7 +436,7 @@ Open this plot by clicking it from the 'Files' pane of RStudio. Notice how the t
 
 
 
-## 7. Run a gost multi-query 
+# 7. Run a gost multi-query 
 
 By providing more than one gene list and setting `multi_query = TRUE`, results from all of the gene lists are grouped by term IDs for easier comparison. This can be handy when you have multiple comparisons within an experiment, or when you want to investigate enrichments within the up and down regulated genes separately.  
 
@@ -554,7 +557,7 @@ cat("ORA multi-query results written to", title, "\n")
 
 
 
-## 8. Compare gprofiler2 R results to g:Profiler web results
+# 8. Compare gprofiler2 R results to g:Profiler web results
 
 In day 1 of the workshop, you ran ORA with g:Profiler web tool and saved the results to a CSV. Let's compare the results to those we have generated in R. Do we expect the results to be identical or differ slightly? 
 
@@ -637,9 +640,9 @@ print(ggplot(comparison_data_long, aes(x = term_name, y = -log10(p_value), fill 
 
 Great! We know we applied the same parameters, and used the same input gene lists. The identical results must mean that gprofiler2 is using the same database version as g:Profiler web. 
 
-## 9. Save versions and session details 
+# 9. Save versions and session details 
 
-### gProfiler database version
+## gProfiler database version
 
 Let's check: yesterday when you ran ORA on the web, hopefully you saved your 'query parameters' as well as your results. 
 
@@ -652,7 +655,7 @@ paste0("g:Profiler database version: ", ora$meta$version)
 paste0("gprofiler2 package version: ", packageVersion("gprofiler2"))
 ```
 
-### R version and R package versions 
+## R version and R package versions 
 
 We can also capture the version of R and other session details including all loaded packages and versions with the `sessionInfo()` function: 
 
@@ -660,7 +663,7 @@ We can also capture the version of R and other session details including all loa
 sessionInfo()
 ```
 
-### RStudio version
+## RStudio version
 
 Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the notebook. 
 
@@ -684,7 +687,7 @@ rstudio_version_str <- paste(
 writeLines(rstudio_version_str, "rstudio_version.txt")
 ```
 
-```{r rstudio version saved from text, eval=FALSE}
+```{r rstudio version saved from text}
 # Read the saved version information from the file
 rstudio_version_text <- readLines("rstudio_version.txt")
 
@@ -692,7 +695,7 @@ rstudio_version_text <- readLines("rstudio_version.txt")
 rstudio_version_text
 ```
 
-## 10.  Knit workbook to HTML
+# 10.  Knit workbook to HTML
 
 Make sure your document is saved if you have made any changes! (there will be an asterisk next to the filename on editor pane if unsaved changes are present).
 
