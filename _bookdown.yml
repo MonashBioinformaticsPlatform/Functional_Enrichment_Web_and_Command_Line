@@ -16,6 +16,9 @@ rmd_files:
   - 06-web-tools.Rmd
   - 07-reporting.Rmd
   - 08-resources.Rmd
+  - 09-gprofiler2.Rmd
+  - 10-clusterprofiler.Rmd
+
 
 copy_resources:
   - files/
