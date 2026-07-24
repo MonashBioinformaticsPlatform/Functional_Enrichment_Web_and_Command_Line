@@ -1,0 +1,90 @@
+# clusterProfiler and enrichplot
+
+
+[clusterProfiler](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html) is a comprehensive suite of enrichment tools. It has functions to run ORA or GSEA over commonly used databases (GO, KEGG, KEGG Modules, DAVID, Pathway Commons, WikiPathways) as well as universal enrichment functions to perform ORA or GSEA with novel species or custom gene sets. We will use these universal tools in the final activity of this workshop, focusing on the supported organisms and datbases for the present activity. 
+
+One of the key advantages of using R over web tools is flexibility with visualisations. 
+
+The same authors have released a plotting package [enrichplot](https://www.bioconductor.org/packages/release/bioc/html/enrichplot.html) dedicated to plotting enrichment results. In this activity, we will perform GSEA with `clusterProfiler` then explore many different visualisation options. At the end of the activity, we will have a poll to see which of the many plot types are the favourites! 😁
+
+ 
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## Supported databases, species and namespaces
+
+One of the challenges when working with `clusterProfiler` for FEA is that each enrichment function has different supported organisms and different namespace requirements, so you can not necessarily use all of the functions over the same gene list. In this activity, we will review the FEA functions and investigate their requirements, before performing a gene ID conversion with the `bitr` function to enable compatability with our [Pezzini et al 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) dataset. 
+
+Let's start by reviewing the dedicated database enrichment functions and what inbuilt support they have. 
+
+| Database             | GO                                              | KEGG                                                                            | KEGG Modules                                                                    | Pathway Commons                   | WikiPathways | DAVID                    |
+|----------------------|-------------------------------------------------|---------------------------------------------------------------------------------|---------------------------------------------------------------------------------|-----------------------------------|--------------|--------------------------|
+| GSEA function        | gseGO                                           | gseKEGG                                                                         | gseMKEGG                                                                        | gsePC                             | gseWP        | NA                       |
+| ORA function         | enrichGO                                        | enrichKEGG                                                                      | enrichMKEGG                                                                     | enrichPC                          | enrichWP     | enrichDAVID              |
+| Supported species    | Those with Bioconductor annotation package (20) | KEGG Organisms (thousands)                                                      | KEGG Organisms (thousands)                                                      | Human (or convert to UniProt IDs) | entrez       | Those supported by DAVID |
+| Supported namespaces | differs depending on species                    | 'kegg' (compatible with entrez), 'ncbi-geneid', 'ncib-proteinid' or   'uniprot' | 'kegg' (compatible with entrez), 'ncbi-geneid', 'ncib-proteinid' or   'uniprot' | 'hgnc' or 'uniprot                | entrez       | Those supported by DAVID |
+
+
+
+To obtain this information, 3 sources were required: 
+
+1. The [clusterProfiler user guide](https://bioconductor.org/packages/devel/bioc/manuals/clusterProfiler/man/clusterProfiler.pdf)
+2. External websites ([Bioconductor](https://bioconductor.org/packages/3.20/data/annotation/) and [KEGG Organisms](https://www.genome.jp/kegg/catalog/org_list.html))
+3. `clusterProfiler` functions (eg `get_wp_organisms()`, `keytypes(org.Hs.eg.db)`)
+
+This highlights the need to carefully review the tool you are using and explore the user guide and functionality. 
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## Activity overview
+
+
+Since we have covered ORA with `gprofiler`, we will perform a GSEA with `clusterProfiler` using `gseKEGG`.  
+
+1. Explore the functions of `clusterProfiler` including which FEA functions support which organisms and which namespaces
+2. Load input dataset (a gene matrix with adjusted P values and log2 fold change values) 
+3. Extract the gene IDs and sort by log2 fold change to create the GSEA ranked gene list R object
+4. Use `bitr` to convert gene IDs from ENSEMBL to ENTREZ for compatability with `gseKEGG`
+5. Perform GSEA with `gseKEGG`
+6. Visualise results with many different plot types from `enrichplot`
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+Let's head over to RStudio now and try out some functions! 🏃
+
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+&#x27A4; Go back to your RStudio interface and clear your environment by selecting `Session` &rarr; `Quit session` &rarr; `Dont save` &rarr; `Start new session`
+
+
+
+&#x27A4; Open the `clusterProfiler.Rmd` notebook
+ 
+
+**<span style="color: #006400;">Instructions for the analysis will continue from the R notebook.</span>**
+
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## End of activity summary
+
+- We have explored the supported organisms, namespaces and databases of the `clusterProfiler` enrichment functions 
+- We have extracted a ranked gene list for GSEA and converted the gene IDs for compatability with `gseKEGG`
+- We have performed GSEA on the KEGG database with `gseKEGG` and visualised the results with multiple plot types 
+- We have captured all version details relevant to the session within the R notebook and knit the file to HTML for record keeping
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## Poll
+
+❓What was your favourite R plot from this activity? 🤔
+
+This may be the one you found most informative, easiest to interpret, most eye-catching... 
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+<img src="images/poll-favourite-plot-type.png" style="border: none; box-shadow: none; background: none; width: 100%;">
+
+
+
