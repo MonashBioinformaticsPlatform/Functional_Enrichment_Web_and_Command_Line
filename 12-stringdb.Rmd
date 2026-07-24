@@ -1,7 +1,7 @@
 # STRINGdb
 
 ```{r stringdb-echo-setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(eval = FALSE)
 ```
 
 [STRING](https://string-db.org) is a database of known and predicted protein-protein interactions, including both direct (physical) and indirect (functional) associations, drawn from experimental repositories, computational prediction methods, and text-mined publications. Each interaction is given a combined confidence score integrating all of the underlying evidence. STRING v12.0 covers over 59 million proteins from more than 12,500 organisms.
