@@ -55,6 +55,11 @@ Bookdown evaluates relative file paths from the book project directory. Confirm 
 # Bookdown evaluates relative file paths from the book project directory.
 # Confirm the directory from which the book is being rendered.
 getwd()
+# root.dir is a book-wide knitr option, not scoped to this chapter, so we
+# save it here and restore it at the end of the chapter (see "Restore
+# working directory" below) - otherwise every later chapter would inherit
+# this chapter's working directory, breaking their relative file paths.
+gprofiler2_book_root_dir <- getwd()
 knitr::opts_knit$set(root.dir = "day2_inputData")
 getwd()
 ```
@@ -726,6 +731,13 @@ rstudio_version_text <- readLines("rstudio_version.txt")
 
 # Print the version information to the document
 rstudio_version_text
+```
+
+```{r restore working directory, include=FALSE}
+# Restore the book's working directory so later chapters (and their
+# before_chapter_script, which re-reads _bookdown.yml) resolve their own
+# relative paths correctly.
+knitr::opts_knit$set(root.dir = gprofiler2_book_root_dir)
 ```
 
 ## Build the Bookdown output
