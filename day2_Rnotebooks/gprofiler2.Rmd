@@ -20,9 +20,8 @@ Ensure the 'workshop' directory is your current working directory:
 
 
 ```{r working directory, include=FALSE}
-getwd()
 # Set the working directory for notebook
-knitr::opts_knit$set(root.dir = "Functional_Enrichment_Web_and_Command_Line/day2_inputData")
+knitr::opts_knit$set(root.dir = "~/Documents/LEARNINGs/WORKSHOPS/Functional_Enrichment_Workshops/Functional_Enrichment_Web_and_Command_Line/day2_inputData")
 getwd()
 ```
 
@@ -93,7 +92,7 @@ Before running the below code chunk, review the parameters for the `gost` ORA fu
 
 
 ```{r gost help}
-?gprofiler2::gost
+# ?gprofiler2::gost
 ```
 
 
@@ -687,7 +686,7 @@ rstudio_version_str <- paste(
 writeLines(rstudio_version_str, "rstudio_version.txt")
 ```
 
-```{r rstudio version saved from text}
+```{r rstudio version saved from text, eval=FALSE}
 # Read the saved version information from the file
 rstudio_version_text <- readLines("rstudio_version.txt")
 
