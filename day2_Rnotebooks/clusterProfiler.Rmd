@@ -23,6 +23,8 @@ Ensure the 'workshop' directory is your current working directory:
 
 ```{r check notebook workdir}
 getwd()
+knitr::opts_knit$set(root.dir = "~/Documents/LEARNINGs/WORKSHOPS/Functional_Enrichment_Workshops/Functional_Enrichment_Web_and_Command_Line/day2_inputData")
+getwd()
 ```
 
 # 1. Load input data and extract ranked gene list
@@ -30,7 +32,6 @@ getwd()
 We will once again load the Pezzini RNAseq dataset.
 
 ```{r load input data}
-
 data <- read_tsv("Pezzini_DE.txt", col_names = TRUE, show_col_types = FALSE)
 head(data)
 ```
@@ -41,7 +42,7 @@ This time, instead of filtering for DEGs, we will extract all genes, and sort th
 What class of R object does our ranked gene list need to be in?
 
 ```{r help gseKEGG}
-?gseKEGG
+# ?gseKEGG
 ```
 
 We can see `geneList = order ranked geneList`. Not informative!
@@ -50,14 +51,12 @@ Unfortunately, the required type of object is detailed under the `enrichKEGG` fu
 
 
 ```{r extract ranked list}
-
 # Ranked gene list vector for GSEA
 ranked <- setNames(data$Log2FC[order(-data$Log2FC)], data$Gene.ID[order(-data$Log2FC)])
 
-# Inspect the vector				
+# Inspect the vector
 head(ranked)
 tail(ranked)
-
 ```
 
 
@@ -66,7 +65,7 @@ tail(ranked)
 Review the parameters:
 
 ```{r help gsekegg}
-?gseKEGG
+# ?gseKEGG
 ```
 
 
@@ -79,7 +78,7 @@ Pick your favourite species and search for the KEGG organism code by editing the
 ```{r check kegg orgs}
 fave <- "horse"
 
-# search by common_name or scientific_name or kegg.code 
+# search by common_name or scientific_name or kegg.code
 search_kegg_organism(fave, by = "common_name")
 ```
 
@@ -100,7 +99,7 @@ Since our input data does not match any of the valid namespaces, we need to conv
 Check the usage for the `bitr` function:
 
 ```{r help bitr}
-?bitr
+# ?bitr
 ```
 
 We need to understand what the valid `fromType` and `toType` values are, and it turns out we need an Org.db to use `bitr`! This is a Bioconductor annotation package, of which there are currently only 20. So while the `gseKEGG` function supports all organisms in KEGG, performing gene ID conversion within `clusterProfiler` may not be possible for non-model species and you would need to seek a different method.  
@@ -121,11 +120,12 @@ First, convert the ENSEMBL gene IDs from our 'ranked' list to ENTREZ gene IDs:
 
 ```{r convert gene IDs}
 # Convert the Ensembl IDs to Entrez IDs, dropping NAs
-converted_ids <- bitr(names(ranked), 
-                      fromType = "ENSEMBL", 
-                      toType = "ENTREZID", 
-                      OrgDb = org.Hs.eg.db, 
-                      drop = TRUE)
+converted_ids <- bitr(names(ranked),
+  fromType = "ENSEMBL",
+  toType = "ENTREZID",
+  OrgDb = org.Hs.eg.db,
+  drop = TRUE
+)
 ```
 <1% failing to map is pretty good. 
 
@@ -134,7 +134,6 @@ The 1:many mappings warning means that some of our gene IDs matched more than 1 
 The below code does this by selecting the first of each set of duplicates. This is not ideal. In a real experiment, you should print out the duplicates and directly manage how to handle them by reviewing the gene IDs involved and deciding whether it is valid to select one ID over another, or at times you may choose to merge the values for duplicate genes.   
 
 ```{r filter converted ids }
-
 # Handle any `1:many mapping` (ENSEMBL ID matches >1 ENTREZID) by keeping only the first Entrez ID for each Ensembl ID (not ideal, see note above)
 converted_ids <- converted_ids[!duplicated(converted_ids$ENSEMBL), ]
 
@@ -147,13 +146,12 @@ ranked_entrez <- ranked[names(ranked) %in% converted_ids$ENSEMBL]
 # Replace the Ensembl IDs with the corresponding Entrez IDs in the ranked vector
 names(ranked_entrez) <- converted_ids$ENTREZID[match(names(ranked_entrez), converted_ids$ENSEMBL)]
 
-# Remove duplicates from the vector by keeping only the first occurrence of each Entrez IDs (not ideal, see note above) 
+# Remove duplicates from the vector by keeping only the first occurrence of each Entrez IDs (not ideal, see note above)
 ranked_entrez <- ranked_entrez[!duplicated(names(ranked_entrez))]
 
-# Inspect the vector					
+# Inspect the vector
 head(ranked_entrez)
 tail(ranked_entrez)
-
 ```
 
 Looks good! Now we are ready to enrich!
@@ -164,7 +162,7 @@ Now run GSEA over the KEGG database with `gseKEGG` function, setting a `seed` va
 
 
 ```{r gseKEGG}
-gsea_kegg <- gseKEGG( 
+gsea_kegg <- gseKEGG(
   ranked_entrez, # ranked gene list vector object
   organism = "hsa", # species
   keyType = "kegg", # gene ID type/namespace
@@ -173,14 +171,12 @@ gsea_kegg <- gseKEGG(
   maxGSSize = 500, # maximum gene set size
   eps = 1e-10, # sets the boundary for calculating the p value
   pvalueCutoff = 0.05, # adjusted P value cutoff for enriched terms
-  pAdjustMethod = "BH", # multiple testing correction with BH method 
+  pAdjustMethod = "BH", # multiple testing correction with BH method
   verbose = TRUE, # print output as it runs
   use_internal_data = FALSE, # use latest online KEGG data not local data
-  seed = 123, # set seed for random number generation, for reproducibility 
-  by = "fgsea" # GSEA algorithm 
+  seed = 123, # set seed for random number generation, for reproducibility
+  by = "fgsea" # GSEA algorithm
 )
-
-
 ```
 
 We have 3 warnings, one about ties in the ranked list, which we could resolve manually by reviewing the raw data, or just ignore it as it is only 0.01% of the list.
@@ -190,23 +186,22 @@ The second warning may be resolved by following the suggestion to set `nPermSimp
 Let's rerun following both suggestions, to use permutations (`nPermSimple = 1000`) and set `eps = 0`. We will keep the rest of the arguments the same as before.    
 
 ```{r gseKEGG perms}
-gsea_kegg <- gseKEGG( 
-  ranked_entrez, 
-  organism = "hsa", 
-  keyType = "kegg", 
-  exponent = 1, 
-  minGSSize = 10, 
-  maxGSSize = 500, 
-  eps = 0, # changed to zero 
-  pvalueCutoff = 0.05, 
+gsea_kegg <- gseKEGG(
+  ranked_entrez,
+  organism = "hsa",
+  keyType = "kegg",
+  exponent = 1,
+  minGSSize = 10,
+  maxGSSize = 500,
+  eps = 0, # changed to zero
+  pvalueCutoff = 0.05,
   pAdjustMethod = "BH",
-  verbose = TRUE, 
-  use_internal_data = FALSE, 
-  seed = 123, 
+  verbose = TRUE,
+  use_internal_data = FALSE,
+  seed = 123,
   by = "fgsea",
   nPermSimple = 10000 # added permutations
 )
-
 ```
 
 Great, those last 2 warnings have resolved and we only have the expected one about tied rankings. 
@@ -222,7 +217,6 @@ First, let's preview the results.
 
 ```{r preview gsea results}
 print(gsea_kegg)
-
 ```
 
 
@@ -232,9 +226,7 @@ At the line `## 'data.frame':    43 obs. of  11 variables`, 43 is the number of 
 Extract results to a TSV file. This will print the significant enrichments, sorted by adjusted P value. 
 
 ```{r print GSEA results table }
-
 write.table(gsea_kegg, file = "clusterProfiler_gseKEGG_results.tsv", sep = "\t", quote = FALSE, row.names = FALSE)
-
 ```
 
 You can view the table in the `editor` pane by clicking on it from the `Files` pane.  
@@ -250,16 +242,14 @@ To determine which plot functions are compatible with which FEA results type, yo
 Review the help menu for the `dotplot` function, which can plot both ORA and GSEA:
 
 ```{r dotplot help}
-?enrichplot::dotplot
-
+# ?enrichplot::dotplot
 ```
 
 
 And review the help menu for `ridgeplot` which can only plot GSEA results:
 
 ```{r ridgeplot help}
-?enrichplot::ridgeplot
-
+# ?enrichplot::ridgeplot
 ```
 
 Unfortunately, `enrichplot` is only compatible with the enrichment results from the packages produced by this development team, although the desire to use `enrichplot` with the output of other tools is widespread. The R package `multienrichjam` has a function `enrichDF2enrichResult` that converts ORA dataframe results from other FEA tools to the format required for `enrichplot`. 
@@ -269,15 +259,15 @@ Unfortunately, `enrichplot` is only compatible with the enrichment results from 
  
 ```{r install multienrichjam}
 # github remotes package required:
-#install.packages("remotes")
-#library(remotes)
+# install.packages("remotes")
+# library(remotes)
 
 # install multienrichjam:
-#remotes::install_github("jmw86069/multienrichjam", dependencies=TRUE)
-#library(multienrichjam)
+# remotes::install_github("jmw86069/multienrichjam", dependencies=TRUE)
+# library(multienrichjam)
 
-# check function help: 
-#?enrichDF2enrichResult
+# check function help:
+# ?enrichDF2enrichResult
 ```
 
 
@@ -288,7 +278,6 @@ A dotplot is an easy to interpret plot. The size of the dot is proportional to t
 We can change the number of top terms that are plotted with the `showCategory` parameter. 
 
 ```{r GSEA KEGG dotplot }
-
 enrichplot::dotplot(
   gsea_kegg,
   x = "geneRatio",
@@ -296,9 +285,8 @@ enrichplot::dotplot(
   orderBy = "x",
   showCategory = 15,
   font.size = 8
-  ) +
+) +
   ggtitle("GSEA KEGG")
-
 ```
 
 
@@ -314,10 +302,8 @@ For GSEA, the plot includess fold change distributions on the Y axis.
 
 
 ```{r GSEA KEGG upset plot, fig.width = 10 }
-
 # n = the number of top enrichments to plot
 enrichplot::upsetplot(gsea_kegg, n = 15)
-
 ```
 
 
@@ -339,7 +325,6 @@ gsea_kegg <- enrichplot::pairwise_termsim(gsea_kegg)
 
 # plot
 enrichplot::emapplot(gsea_kegg, showCategory = 25)
-
 ```
 
 ### treeplot
@@ -357,9 +342,10 @@ Plot view within the notebook affects the clarity of the cluster tags, however p
 
 ```{r treeplot GSEA KEGG, fig.width=12}
 # calculate pairwise similarities between the enriched terms
-#gsea_kegg <- enrichplot::pairwise_termsim(gsea_kegg)
+# gsea_kegg <- enrichplot::pairwise_termsim(gsea_kegg)
 
-enrichplot::treeplot(gsea_kegg, showCategory = 15, color = "p.adjust", cluster.params = list(label_words_n = 5))
+# enrichplot::treeplot(gsea_kegg, showCategory = 15, color = "p.adjust", cluster.params = list(label_words_n = 5))
+enrichplot::treeplot(gsea_kegg, showCategory = 15, color = "p.adjust", nCluster = 5)
 ```
 
 ### cnetplot
@@ -378,13 +364,28 @@ Since the information that is attempted to be plotted is complex, having a large
 
 
 ```{r GSEA KEGG cnetplot}
-
 # cex_label_gene to reduce the font size for gene ID
 # node_label = one of ’all’, ’none’, ’category’ and ’item’
 # showCategory = number of terms to plot
 
-enrichplot::cnetplot(gsea_kegg, showCategory = 8, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE, node_label = "category")
+# enrichplot::cnetplot(gsea_kegg, showCategory = 8, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE, node_label = "category")
 
+p <- enrichplot::cnetplot(
+  gsea_kegg,
+  showCategory = 8,
+  color_edge = "category",
+  node_label = "none"
+) +
+  ggtangle::geom_cnet_label(
+    node_label = "category",
+    size = 3.2
+  ) +
+  ggtangle::geom_cnet_label(
+    node_label = "item",
+    size = 2
+  )
+
+p
 ```
 
 With 8 terms and no gene IDs, we don't get any more detail than from the treeplot or emapplot. 
@@ -398,8 +399,8 @@ The 3 terms listed below are for 'IL-17 signaling pathway', 'Viral protein inter
 Run the code below or select a handful of terms of your choosing from the results table we printed earlier. We need the KEGG ID (column 1).  
 
 ```{r cnetplot custom terms}
-# Select terms of interest 
-select_terms <- c("hsa04657", "hsa04061", "hsa04062") 
+# Select terms of interest
+select_terms <- c("hsa04657", "hsa04061", "hsa04062")
 
 # Filter the gseaResult object based on the term IDs
 # must keep it as a gsea result type and not as a dataframe when filtering
@@ -407,9 +408,23 @@ gsea_kegg_select <- gsea_kegg
 gsea_kegg_select@result <- gsea_kegg@result[gsea_kegg@result$ID %in% select_terms, ]
 
 # Plot with cnetplot
-enrichplot::cnetplot(gsea_kegg_select, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE, node_label = "all")
+# enrichplot::cnetplot(gsea_kegg_select, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE, node_label = "all")
 
+p <- enrichplot::cnetplot(
+  gsea_kegg_select,
+  color_edge = "category",
+  node_label = "none"
+) +
+  ggtangle::geom_cnet_label(
+    node_label = "item",
+    size = 2
+  ) +
+  ggtangle::geom_cnet_label(
+    node_label = "category",
+    size = 3.2
+  )
 
+p
 ```
 
 Now we can clearly see the gene IDs for this network. 
@@ -437,23 +452,20 @@ So we can extract those and provide these to the heatmap to try to improve clari
 
 
 ```{r heatplot GSEA KEGG core genes}
-
-# create an object that contains the core genes grouped by term and their fold change values 
+# create an object that contains the core genes grouped by term and their fold change values
 ranked_core_genes <- ranked[names(ranked) %in% gsea_kegg$core_enrichment]
 
 # Plot with just core genes
 enrichplot::heatplot(gsea_kegg, foldChange = ranked_core_genes, showCategory = 3)
-
 ```
 
 Saving to a file only improves things slightly. 
 
 ```{r}
 png("clusterprofiler_gseKEGG_heatplot.png", width = 11.7, height = 8.3, units = "in", res = 300)
-#enrichplot::heatplot(gsea_kegg, showCategory = 3)
+# enrichplot::heatplot(gsea_kegg, showCategory = 3)
 enrichplot::heatplot(gsea_kegg, foldChange = ranked_core_genes, showCategory = 3)
 dev.off()
-
 ```
 
 
@@ -470,13 +482,14 @@ Higher peaks and more concentrated areas under the curve at the top of the list 
 
 
 ```{r ridgeplot  gsea KEGG, fig.height=7, fig.width=7}
-enrichplot::ridgeplot(gsea_kegg, 
-  showCategory = 15, 
-  fill = "p.adjust", 
-  core_enrichment = TRUE, 
-  label_format = 30, 
-  orderBy = "NES", 
-  decreasing = FALSE )
+enrichplot::ridgeplot(gsea_kegg,
+  showCategory = 15,
+  fill = "p.adjust",
+  core_enrichment = TRUE,
+  label_format = 30,
+  orderBy = "NES",
+  decreasing = FALSE
+)
 ```
 
 ### gseaplot
@@ -489,55 +502,47 @@ The term 'hsa04020' (Calcium signaling pathway) has a positive NES, an adjusted 
 
 
 ```{r gseaplot GSEA KEGG upreg, fig.width=10 }
-
 gene_set_id <- "hsa04020"
 
-enrichplot::gseaplot( gsea_kegg,
-  gene_set_id, 
-  by = "all", 
+enrichplot::gseaplot(gsea_kegg,
+  gene_set_id,
+  by = "all",
   title = paste("GSEA KEGG result:", gene_set_id),
-  color = "black", 
-  color.line = "green", 
+  color = "black",
+  color.line = "green",
   color.vline = "#FA5860"
 )
-
 ```
 
 The term 'hsa04062' (Chemokine signaling pathway) has a negative NE, a highly significant adjusted P value of 1.11E-06 and a set size of 129. 
 
 ```{r gseaplot GSEA KEGG downreg, fig.width=10 }
-
 gene_set_id <- "hsa04062"
 
-enrichplot::gseaplot( gsea_kegg,
-  gene_set_id, 
-  by = "all", 
+enrichplot::gseaplot(gsea_kegg,
+  gene_set_id,
+  by = "all",
   title = paste("GSEA KEGG result:", gene_set_id),
-  color = "black", 
-  color.line = "green", 
+  color = "black",
+  color.line = "green",
   color.vline = "#FA5860"
 )
-
-
 ```
 
 
 The term 'hsa05163' has a slightly negative NES and a borderline adjusted P value of 0.046.
 
 ```{r gseaplot GSEA KEGG nonsignif, fig.width=10 }
-
 gene_set_id <- "hsa05163"
 
-enrichplot::gseaplot( gsea_kegg,
-  gene_set_id, 
-  by = "all", 
+enrichplot::gseaplot(gsea_kegg,
+  gene_set_id,
+  by = "all",
   title = paste("GSEA KEGG result:", gene_set_id),
-  color = "black", 
-  color.line = "green", 
+  color = "black",
+  color.line = "green",
   color.vline = "#FA5860"
 )
-
-
 ```
 
 ### volcano plot
@@ -551,23 +556,25 @@ The volcano plot has the advantage of showing whether the genes in the enriched 
 
 ```{r gsea volcano plot}
 ggplot2::ggplot(gsea_kegg@result, aes(x = enrichmentScore, y = -log10(p.adjust), color = p.adjust)) +
-  geom_point(alpha = 0.7, size = 2) +  # Adjust point size
-  scale_color_gradient(low = "blue", high = "red") +  # Color by p.adjust values
+  geom_point(alpha = 0.7, size = 2) + # Adjust point size
+  scale_color_gradient(low = "blue", high = "red") + # Color by p.adjust values
   theme_minimal() +
-  labs(title = "GSEA KEGG",
-       x = "Enrichment Score (NES)",
-       y = "-log10(Adjusted P-value)",
-       color = "Adjusted P-value") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels for readability
-  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +  # Add vertical line at x=0
-  geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "black") +  # Add horizontal line at p=0.05 cutoff
+  labs(
+    title = "GSEA KEGG",
+    x = "Enrichment Score (NES)",
+    y = "-log10(Adjusted P-value)",
+    color = "Adjusted P-value"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + # Rotate x-axis labels for readability
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") + # Add vertical line at x=0
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "black") + # Add horizontal line at p=0.05 cutoff
   geom_text(aes(label = Description),
-            hjust = 0.5,
-            vjust = -0.5,  # Move labels higher off the points
-            size = 3,
-            check_overlap = TRUE,
-            alpha = 0.7)  # Add labels for each pathway term
-
+    hjust = 0.5,
+    vjust = -0.5, # Move labels higher off the points
+    size = 3,
+    check_overlap = TRUE,
+    alpha = 0.7
+  ) # Add labels for each pathway term
 ```
 
 
@@ -582,7 +589,6 @@ For this reason, we will save the analysis date to our rendered notebook, so the
 ```{r date}
 cat("Date of analysis:\n")
 print(Sys.Date())
-
 ```
 
 ## R version and R package versions
@@ -613,17 +619,14 @@ rstudio_version_str <- paste(
 
 # Write the output to a text file
 writeLines(rstudio_version_str, "rstudio_version.txt")
-
 ```
 
-```{r rstudio version saved from text}
-
+```{r rstudio version saved from text, eval = FALSE}
 # Read the saved version information from the file
 rstudio_version_text <- readLines("rstudio_version.txt")
 
 # Print the version information to the document
 rstudio_version_text
-
 ```
 
 
