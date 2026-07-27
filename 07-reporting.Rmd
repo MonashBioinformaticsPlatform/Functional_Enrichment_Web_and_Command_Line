@@ -43,7 +43,7 @@ For instance, the following figure is taken from the [(Pezzini et al. 2017)](htt
 Note that this figure shows two specific categories from the IPA (Ingenuity Pathway Analysis) database using the IPA tool (not covered here), so the terms differ.
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/NegLogPvalPlot_Pezzini2017.png) -->
-```{r, out.width="90%", fig.align='center'}
+```{r, echo=FALSE, out.width="90%", fig.align='center'}
 # knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/NegLogPvalPlot_Pezzini2017.png")
 knitr::include_graphics("images/NegLogPvalPlot_Pezzini2017.png")
 ```
