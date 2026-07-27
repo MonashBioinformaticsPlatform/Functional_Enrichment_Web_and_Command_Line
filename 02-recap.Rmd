@@ -66,7 +66,7 @@ An annotation database is a curated collection of biological data that links gen
 
 Khatri et al. (2012) nicely explained different types of enrichment analysis, as shown below.
 
-```{r, out.width='100%', fig.align='center', fig.cap='Types of  of functional enrichment analysis'}
+```{r, echo=FALSE, out.width='100%', fig.align='center', fig.cap='Types of  of functional enrichment analysis'}
 knitr::include_graphics("images/fea_types.jpg")
 ```
 
@@ -126,7 +126,7 @@ Functional annotation databases are curated collections of biological data that 
 ### [GO: Gene Ontology](https://geneontology.org/)
 "The goal of the Gene Ontology Consortium is to produce a dynamic, controlled vocabulary that can be applied to all eukaryotes even as knowledge of gene and protein roles in cells is accumulating and changing." (Ashburner et al. 2000)
 
-```{r, out.width='100%', fig.align='center', fig.cap='The structure of gene ontology.'}
+```{r, echo=FALSE, out.width='100%', fig.align='center', fig.cap='The structure of gene ontology.'}
 knitr::include_graphics("images/go_structure.png")
 ```
 *Imagen source [The Gene Ontology Handbook](https://link.springer.com/book/10.1007/978-1-4939-3743-1)*
@@ -148,21 +148,21 @@ In practice, GO terms and annotations allow researchers to describe gene functio
 Kyoto Encyclopedia of Genes and Genomes (KEGG) is a curated database that integrates genomic, chemical, and systemic information to represent biological systems and their interactions. It allows users to map molecular data (such as genes, proteins, and small molecules) to biological pathways, enabling a better understanding of how different components interact within an organism.
 
 
-```{r, out.width='100%', fig.align='center', fig.cap='NOTCH Signaling Pathway by KEGG'}
+```{r, echo=FALSE, out.width='100%', fig.align='center', fig.cap='NOTCH Signaling Pathway by KEGG'}
 knitr::include_graphics("images/NOTCH_signaling_pathway_kegg.png")
 ```
 
 ### [Reactome](https://reactome.org/)
 Reactome pathway knowledgebase is an open-access, manually curated database that captures molecular details of biological processes such as signal transduction, DNA replication, metabolism, and more, using a consistent data model across different domains of biology. This makes it particularly well-suited for functional enrichment analysis, where understanding the relationships between gene expression data and biological pathways is crucial.
 
-```{r, out.width='100%', fig.align='center', fig.cap='NOTCH Signaling Pathway by Reactome'}
+```{r, echo=FALSE, out.width='100%', fig.align='center', fig.cap='NOTCH Signaling Pathway by Reactome'}
 knitr::include_graphics("images/NOTCH_signaling_pathway_reactome.png")
 ```
 
 ### [MSigDB](https://www.gsea-msigdb.org/)
 Molecular Signatures Database (MSigDB) is a comprehensive resource for gene set enrichment analysis. It offers a comprehensive collection of gene sets that represent biological processes, molecular pathways, and other biologically relevant information. MSigDB is integrated with the Gene Set Enrichment Analysis (GSEA) tool, which is commonly used to determine if predefined sets of genes show statistically significant differences between two biological states (e.g., diseased vs. healthy samples).
 
-```{r, out.width='100%', fig.align='center', fig.cap='GSEA Workflow'}
+```{r, echo=FALSE, out.width='100%', fig.align='center', fig.cap='GSEA Workflow'}
 knitr::include_graphics("images/GSEA-homegraphic.gif")
 ```
 

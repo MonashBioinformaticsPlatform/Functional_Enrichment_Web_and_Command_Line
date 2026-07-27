@@ -2,10 +2,12 @@
 options(width = 100)
 
 # example chunk options set globally
+# echo = TRUE so the workshop's R code is visible to readers by default;
+# chunks that only embed a screenshot set echo=FALSE individually.
 knitr::opts_chunk$set(
   comment = "#>",
   collapse = TRUE,
-  echo=FALSE
+  echo = TRUE
 )
 
 
