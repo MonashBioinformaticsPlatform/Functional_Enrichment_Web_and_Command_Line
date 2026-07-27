@@ -7,16 +7,16 @@ output: bookdown::bs4_book
 documentclass: book
 bibliography: [book.bib, packages.bib]
 description: |
-  A comprehensive guide to functional enrichment analysis using web-based platforms.
+  A comprehensive guide to functional enrichment analysis using both web-based and command-line tools.
 link-citations: yes
-github-repo: "https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools"
+github-repo: "https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Web_and_Command_Line"
 always_allow_html: true
 # cover-image: Sydney_informatics_hub_logo.png
 ---
 
 # Functional Enrichment Workshop
 
-**Welcome to the Functional Enrichment Workshop!** This resource is designed to guide you through the process of performing functional enrichment analysis using a variety of web-based tools.
+**Welcome to the Functional Enrichment Workshop!** This resource is designed to guide you through the process of performing functional enrichment analysis using a variety of web-based and command-line tools.
 
 ### Instructors
 
@@ -32,7 +32,7 @@ always_allow_html: true
 
 ### Important Links
 
-- **Workshop Page:** [Functional Enrichment - Web-based Tools](https://monashbioinformaticsplatform.github.io/Functional_Enrichment_Online_Tools/)
+- **Workshop Page:** [Functional Enrichment - Web and Command-Line Tools](https://monashbioinformaticsplatform.github.io/Functional_Enrichment_Web_and_Command_Line/)
 - **Related Publication:** [NeuroMolecular Medicine Article](https://link.springer.com/article/10.1007%2Fs10571-016-0403-y)
 - **Degust Tool:** [Degust Comparative Analysis](https://degust.erc.monash.edu/degust/compare.html?code=5b2c7805ab8f8c5f2dc8c72e61b049b0#/?plot=mds)
 
@@ -40,6 +40,6 @@ always_allow_html: true
 
 ### Getting Started
 
-To begin, we recommend reviewing the [workshop page](https://monashbioinformaticsplatform.github.io/Functional_Enrichment_Online_Tools/) for an overview of the content and tools covered. This workshop is structured to progressively build your skills, starting with the basics of functional enrichment analysis and moving towards more complex applications.
+To begin, we recommend reviewing the [workshop page](https://monashbioinformaticsplatform.github.io/Functional_Enrichment_Web_and_Command_Line/) for an overview of the content and tools covered. This workshop is structured to progressively build your skills, starting with the basics of functional enrichment analysis and moving towards more complex applications.
 
 Happy learning!
