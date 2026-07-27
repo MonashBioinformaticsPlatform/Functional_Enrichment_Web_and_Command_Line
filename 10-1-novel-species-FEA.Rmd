@@ -1,10 +1,10 @@
 # Novel species FEA
 
-FEA can be easily performed for many non-model species with user friendly web tools or R packages. [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) web currently supports 984 species, and [STRING](https://string-db.org/) currently supports over 12 thousand species. 
+FEA can be easily performed for many non-model species with user friendly web tools or R packages. [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) web currently supports 984 species, and [STRING](https://string-db.org/) currently supports over 12 thousand species.
 
-Since many non-model species are supported by some FEA tools, today I am using the term **novel species** to describe a species that is not currently supported by any FEA tool. 
+Since many non-model species are supported by some FEA tools, today I am using the term **novel species** to describe a species that is not currently supported by any FEA tool.
 
-Novel species FEA is possible with `clusterProfiler` or `WebGestaltR` in R, or using web tools `WebGestalt` or `STRING`. The requirements for each tool are slightly different, however at minimum a predicted proteome fasta is necessary. If you do not have a predicted proteome for your species, you would need to perform gene prediction, for which there are a number of *in silico* tools available. It must be kept in mind that *in silico* predicted proteomes can vary greatly in quality. Those that include multiple data sources such as polished genome assemblies generated with both short and long read shotgun sequencing and gene prediction that includes RNAseq data are likely to produce better gene predictions than those that are based only on for example short read sequencing. 
+Novel species FEA is possible with `clusterProfiler` or `WebGestaltR` in R, or using web tools `WebGestalt` or `STRING`. The requirements for each tool are slightly different, however at minimum a predicted proteome fasta is necessary. If you do not have a predicted proteome for your species, you would need to perform gene prediction, for which there are a number of *in silico* tools available. It must be kept in mind that *in silico* predicted proteomes can vary greatly in quality. Those that include multiple data sources such as polished genome assemblies generated with both short and long read shotgun sequencing and gene prediction that includes RNAseq data are likely to produce better gene predictions than those that are based only on for example short read sequencing.
 
 **Workflow overview of novel species annotation**
 
@@ -12,35 +12,35 @@ Novel species FEA is possible with `clusterProfiler` or `WebGestaltR` in R, or u
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-In this activity, we will use all three tools to perform FEA on a species that has a publicly available reference genome and gene predictions, but is not currently supported by any web-based FEA tool. 
+In this activity, we will use all three tools to perform FEA on a species that has a publicly available reference genome and gene predictions, but is not currently supported by any web-based FEA tool.
 
-For `clusterProfiler` and `WebGestaltR`, we will import and reformat an annotation text file to match the requirements of the tools. 
+For `clusterProfiler` and `WebGestaltR`, we will import and reformat an annotation text file to match the requirements of the tools.
 
-For `STRING`, we will use a STRING annotation on the web tool. 
+For `STRING`, we will use a STRING annotation on the web tool.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 ## Axolotl functional enrichment analysis
 
-### Background 
+### Background
 
 The axolotl (*Ambystoma mexicanum*) is a salamander with some very cool abilities: it can regenerate damaged or amputated tissue, including spinal cord and some brain regions. While this species has reference genome on NCBI, it is not annotated. There is no axolotl Org.db [Bioconductor annotation package](https://bioconductor.org/packages/3.20/data/annotation/) available nor does this species exist in [KEGG Organisms](https://www.genome.jp/kegg/tables/br08606.html). There is however an [axolotl genome browser](https://www.axolotl-omics.org/) where you can download a (slightly less contiguous than the NCBI version) reference genome plus a (non-curated) GTF file.
 
 Despite the lack of quality resources, there is much 'omics work conducted in axolotl due to its regenerative capabilities.
 
-Today we will use [public RNAseq data](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5419050/#SD7) from axolotl, comparing gene expression in the blastema after proximal (at the shoulder) and distal (at the hand) limb amputation. The blastema is a collection of undifferentiated progenitor cells that give rise to the regenerated limb. Maybe our functional enrichment analysis of differentially expressed genes can help us understand processes that cause the blastema to grow into a full limb or just a hand! 
+Today we will use [public RNAseq data](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5419050/#SD7) from axolotl, comparing gene expression in the blastema after proximal (at the shoulder) and distal (at the hand) limb amputation. The blastema is a collection of undifferentiated progenitor cells that give rise to the regenerated limb. Maybe our functional enrichment analysis of differentially expressed genes can help us understand processes that cause the blastema to grow into a full limb or just a hand!
 
 ## Caveat!
 
-This is not a real experiment! It was tricky to find a novel species that had: 
+This is not a real experiment! It was tricky to find a novel species that had:
 
 A) a reference genome
 B) a GTF
 C) was not natively supported by any FEA tool
 D) had publicly available RNAseq data
-E) FEA described in a peer-reviewed study 
+E) FEA described in a peer-reviewed study
 
-This axolotl data ticked A through D yet not E (RNA from various tissues were sequenced to aid a genome assembly project rather than for a valid biological experiment). Please keep this in mind when reviewing the results of the FEA we perform 😉 The goal of the session is not *really* to uncover how a blastema differentiates into a hand or an arm, but to demonstrate to you how you can apply this method to your own novel species. 
+This axolotl data ticked A through D yet not E (RNA from various tissues were sequenced to aid a genome assembly project rather than for a valid biological experiment). Please keep this in mind when reviewing the results of the FEA we perform 😉 The goal of the session is not *really* to uncover how a blastema differentiates into a hand or an arm, but to demonstrate to you how you can apply this method to your own novel species.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -56,7 +56,7 @@ This axolotl data ticked A through D yet not E (RNA from various tissues were se
 
 ### Data preparation
 
-#### Annotation files 
+#### Annotation files
 
 The [reference genome](https://www.axolotl-omics.org/dl/AmexG_v6.0-DD.fa.gz) and [GTF gene prediction file](https://www.axolotl-omics.org/dl/AmexT_v47-AmexG_v6.0-DD.gtf.gz) were downloaded from www.axolotl-omics.org. A proteome was created by extracting the predicted peptide sequences from the GTF then retaining the longest isoform per gene with `AGAT` v 1.4.0. The predicated proteome was then annotated with `eggNOG emapper` v 2.1.12.
 
@@ -67,9 +67,9 @@ The predicted proteome was also annotated with [STRING](https://string-db.org/) 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 #### Reads processing and differential expression analysis
-Broadly following https://github.com/Sydney-Informatics-Hub/RNASeq-DE, The [raw RNAseq fastq](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA300706) were downloaded from Bioproject, quality trimmed and adapters removed with `BBtools bbduk` v 39.01, then aligned to the reference genome with `STAR` v 2.7.11b. Feature counting was performed with `HTSeq-counts` v 2.0.3 and formatted into a counts matrix. Differential gene expression analysis was performed in R with `DESeq2` v 1.46.0, filtering for genes with at least a count of 10 in at least 2 samples. The data comprises 2 groups (proximal blastema and distal blastema) and 2 replicates per group. 
+Broadly following https://github.com/Sydney-Informatics-Hub/RNASeq-DE, The [raw RNAseq fastq](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA300706) were downloaded from Bioproject, quality trimmed and adapters removed with `BBtools bbduk` v 39.01, then aligned to the reference genome with `STAR` v 2.7.11b. Feature counting was performed with `HTSeq-counts` v 2.0.3 and formatted into a counts matrix. Differential gene expression analysis was performed in R with `DESeq2` v 1.46.0, filtering for genes with at least a count of 10 in at least 2 samples. The data comprises 2 groups (proximal blastema and distal blastema) and 2 replicates per group.
 
-The DE results file has been provided to you, and we will import this into R to extract our gene lists. 
+The DE results file has been provided to you, and we will import this into R to extract our gene lists.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -82,11 +82,11 @@ The DE results file has been provided to you, and we will import this into R to 
 5. Reformat annotation files for `WebGestaltR` GO and KEGG analysis
 6. Run `WebGestaltR` ORA and GSEA and visualise results in the interactive HTML report
 7. Run ORA with `STRING` online using custom axolotl annotation
-8. Compare `STRING` ORA web results to those generated using the `emapper` annotations in R 
+8. Compare `STRING` ORA web results to those generated using the `emapper` annotations in R
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-Before heading over to RStudio, we will briefly review the annotation requirements for the R tools. At the end of the R-based analysis, we will return here for the web-based analysis with `STRING`.  
+Before heading over to RStudio, we will briefly review the annotation requirements for the R tools. At the end of the R-based analysis, we will return here for the web-based analysis with `STRING`.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -94,34 +94,34 @@ Before heading over to RStudio, we will briefly review the annotation requiremen
 
 ### clusterProfiler
 
-This tool can perform ORA or GSEA for any organism with the provision of custom `TERM2GENE` and `TERM2NAME` files.  `TERM2GENE` maps the species gene ID to database (eg GO, KEGG) terms, and `TERM2NAME` maps the terms to their descriptive names. The gene IDs for our axolotl annotation are prefixed with `AMEX60DD`.  
+This tool can perform ORA or GSEA for any organism with the provision of custom `TERM2GENE` and `TERM2NAME` files.  `TERM2GENE` maps the species gene ID to database (eg GO, KEGG) terms, and `TERM2NAME` maps the terms to their descriptive names. The gene IDs for our axolotl annotation are prefixed with `AMEX60DD`.
 
 
-**Example TERM2GENE format:** 
+**Example TERM2GENE format:**
 
 <img src="images/axolotl-term2gene.png" style="border: none; box-shadow: none; background: none;">
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-**Example TERM2NAME format:** 
+**Example TERM2NAME format:**
 
 <img src="images/axolotl-term2name.png" style="border: none; box-shadow: none; background: none;">
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-These are then provided to the universal enrichment functions `GSEA` and `enricher` (ORA). It is essential that the gene lists provided have the same gene IDs as those in the `TERM2GENE` file. 
+These are then provided to the universal enrichment functions `GSEA` and `enricher` (ORA). It is essential that the gene lists provided have the same gene IDs as those in the `TERM2GENE` file.
 
-In RStudio, we will extract these file formats from the `emapper` annotations file for axolotl and proceed with FEA. 
+In RStudio, we will extract these file formats from the `emapper` annotations file for axolotl and proceed with FEA.
 
-We are using GO and KEGG today, however you can use any database, provided you first annotate your proteome to the database in order to obtain the term to name mappings. 
+We are using GO and KEGG today, however you can use any database, provided you first annotate your proteome to the database in order to obtain the term to name mappings.
 
-Acknowledgement to [Armin Dadras](https://github.com/dadrasarmin) for sharing his [code](https://github.com/dadrasarmin/enrichment_analysis_for_non_model_organism]) to extract `TERM2GENE` and `TERM2NAME` from `emapper` output. 
+Acknowledgement to [Armin Dadras](https://github.com/dadrasarmin) for sharing his [code](https://github.com/dadrasarmin/enrichment_analysis_for_non_model_organism]) to extract `TERM2GENE` and `TERM2NAME` from `emapper` output.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 ### WebGestaltR
 
-This tool can perform ORA or GSEA for any organism with the provision of custom `GMT` and `description` files. 
+This tool can perform ORA or GSEA for any organism with the provision of custom `GMT` and `description` files.
 
 The `GMT` file format is slightly different than the typical `gene set matrix transposed file format` you may have seen before, which typically has the gene set description in the second column. For `WebGestaltR`, the description is in a separate file, and the tab-delimited GMT file with `.gmt` suffix has these 3 columns:
 
@@ -129,7 +129,7 @@ The `GMT` file format is slightly different than the typical `gene set matrix tr
 2. Web link for gene set
 3. Third and subsequent columns are genes belonging to the gene set
 
-**Example .gmt format:** 
+**Example .gmt format:**
 
 <img src="images/webgr-gmt-file.png" style="border: none; box-shadow: none; background: none; width: 100%;">
 
@@ -146,9 +146,9 @@ The `WebGestaltR` tab delimited `description` file with `.des` suffix has these 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-These files are then provided to the single FEA function within the package. The function has the same name as the package - `WebGestaltR`. Users control the analysis type by providing one of `ORA`, `GSEA` or `NTA` arguments to the parameter `enrichMethod`. 
+These files are then provided to the single FEA function within the package. The function has the same name as the package - `WebGestaltR`. Users control the analysis type by providing one of `ORA`, `GSEA` or `NTA` arguments to the parameter `enrichMethod`.
 
-The `.gmt` file is provided to the parameter `enrichDatabaseFile` and the `.des` file is provided to the parameter `enrichDatabaseDescriptionFile`. Specifying `organism = "others"` is also required to run the FEA analysis with the custom databse files. It is essential that the `.gmt` file has the same gene IDs as those in query gene list. 
+The `.gmt` file is provided to the parameter `enrichDatabaseFile` and the `.des` file is provided to the parameter `enrichDatabaseDescriptionFile`. Specifying `organism = "others"` is also required to run the FEA analysis with the custom databse files. It is essential that the `.gmt` file has the same gene IDs as those in query gene list.
 
 <img src="images/webgestaltr-others-organisms.png" style="border: none; box-shadow: none; background: none; width: 100%;">
 
@@ -157,9 +157,9 @@ The `.gmt` file is provided to the parameter `enrichDatabaseFile` and the `.des`
 
 ### Mapping database terms to descriptions
 
-Annotating a proteome with a tool such as `emapper` provides a connection between your novel species gene IDs and term IDs. To add the term description, we need a database file. In this analysis, we will use the [GO 'core' ontology file](https://purl.obolibrary.org/obo/go.obo) and the [KEGG Pathways file](https://www.pathway.jp/en/academic.html). These files were downloaded to the `workshop` folder of the VMs during our setup session. 
+Annotating a proteome with a tool such as `emapper` provides a connection between your novel species gene IDs and term IDs. To add the term description, we need a database file. In this analysis, we will use the [GO 'core' ontology file](https://purl.obolibrary.org/obo/go.obo) and the [KEGG Pathways file](https://www.pathway.jp/en/academic.html). These files were downloaded to the `workshop` folder of the VMs during our setup session.
 
-The GO `go.obo` is a text file (>600K lines) with details for all terms in GO at the time of download. The second line of the file contains the GO database version, in this case: `data-version: releases/2024-06-17`. 
+The GO `go.obo` is a text file (>600K lines) with details for all terms in GO at the time of download. The second line of the file contains the GO database version, in this case: `data-version: releases/2024-06-17`.
 
 **go.obo term information is structured like this:**
 
@@ -174,30 +174,913 @@ The KEGG Pathways file is identical in format to what is required for both the `
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
+## Analysis workflow
 
-## RNotebook novel species FEA
+The complete executable analysis is included below. Run the code chunks interactively while working through the chapter, or render the full Bookdown project to execute the analysis and retain the code, parameters, results, figures, and software-version information in the book output.
 
-&#x27A4; Go back to your RStudio interface and clear your environment by selecting `Session` &rarr; `Quit session` &rarr; `Dont save` &rarr; `Start new session`
+```{r  Load libraries, include=FALSE }
+library(readr)
+library(dplyr)
+library(ontologyIndex)
+library(tidyverse)
+library(clusterProfiler)
+library(WebGestaltR)
+library(enrichplot)
+```
 
-&#x27A4; Open the notebook `novel_species.Rmd`.
+## 0. Working directory
 
-**We will now continue with the activity in RStudio, before returning here to finish up with STRING web-based analysis.**
+Ensure the 'workshop' directory is your current working directory:
+
+```{r check notebook workdir novel species}
+# Bookdown evaluates relative file paths from the book project directory.
+# Confirm the directory from which the book is being rendered.
+getwd()
+# root.dir is a book-wide knitr option, not scoped to this chapter, so we
+# save it here and restore it at the end of the chapter (see "Restore
+# working directory" below) - otherwise every later chapter would inherit
+# this chapter's working directory, breaking their relative file paths.
+novel_species_book_root_dir <- getwd()
+knitr::opts_knit$set(root.dir = "day2_inputData")
+getwd()
+```
+
+## 1. Import `emapper` axolotl annotation file, GO ontology file and KEGG Pathways file
+
+### 1.1 Public data sources used for this notebook
+
+- [Reference genome](https://www.axolotl-omics.org/dl/AmexG_v6.0-DD.fa.gz)
+- [GTF file](https://www.axolotl-omics.org/dl/AmexT_v47-AmexG_v6.0-DD.gtf.gz)
+- [Raw fastq](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA300706)
+- [GO 'core' ontology file](https://purl.obolibrary.org/obo/go.obo)
+
+
+### 1.2 Data processing
+
+The raw reads were processed to counts matrix and DE results broadly following https://github.com/Sydney-Informatics-Hub/RNASeq-DE using the reference genome from www.axolotl-omics.org. Differential gene expression analysis was performed in R with `DESeq2` v 1.46.0, filtering for genes with at least a count of 10 in at least 2 samples. The data comprises 2 groups (proximal blastema and distal blastema) and 2 replicates per group.
+
+A predicted proteome was created by extracting the predicted peptide sequences from the GTF file from www.axolotl-omics.org then filtering for longest isoform per gene with `AGAT` v 1.4.0. The predicated proteome was annotated against GO and KEGG with `eggNOG emapper` v 2.1.12.
+
+### 1.3 Import annotation files
+
+#### 1.3.1 emapper proteome annotation
+
+The `emapper` annotation output contains results against a number of databases including GO and KEGG, which we will focus on today.
+
+```{r Load eggnog annotation}
+eggnog_anno <- read_tsv("AmexG_v6.0-DD.emapper.annotations.txt", show_col_types = FALSE)
+head(eggnog_anno)
+```
+
+The raw annotation file provides us with 'term ID to gene ID' mappings for our species. We also need 'term ID to term description' mappings. These files are not organisms specific: we will extract only the terms that are found within our custom species annotation, to make our organism specific version.
+
+#### 1.3.2 GO Core Ontology
+
+For GO, we will use the GO 'core' ontology file, downloaded from https://purl.obolibrary.org/obo/go.obo and included in the data files you downloaded to `workshop` directory earlier.
+
+We will use the `ontologyIndex` package to retrieve ontology info and save to an object named `ontology` for later use creating the required custom database files for `clusterProfiler` and `WebGestaltR`.
+
+
+```{r Extract GO ontology}
+ontology <- ontologyIndex::get_ontology(
+  file = "go.obo",
+  propagate_relationships = "is_a", # propagates relationships from parent terms to children
+  extract_tags = "everything", # retrieve all available details for each term
+  merge_equivalent_terms = TRUE
+) # avoid unecessary redundancy
+```
+
+
+
+#### 1.3.3 KEGG Pathways
+
+For KEGG, we have both `map` and `ko` IDs in our `emapper` annotation.
+
+`ko` terms (https://www.genome.jp/kegg/ko.html) represent orthologous groups of genes, which are assigned based on evolutionary relationships and functional similarity, so can provide more precise functional categorisation which can be particularly useful when working with novel species which lack curate dpathway information.
+
+`map` terms (https://www.genome.jp/kegg/pathway.html) are manually drawn pathway maps representing KEGG database of molecular interaction, reaction and relation networks for: Metabolism, Genetic Information Processing, Environmental Information Processing, Cellular Processes, Organismal Systems, Human Diseases, and Drug Development.
+
+Today we will be working with the `map` terms due to database download restrictions.
+
+Free access to the KEGG FTP downloads requires an academic subscription, to which you must confirm to be the  "only user of the KEGG FTP Data". The pathways list was available freely. As a single user, you can request academic access here https://www.pathway.jp/en/academic.html.
+
+There is an alternate method for using `ko` IDs, which uses the KEGG ontology information available through the `clusterProfiler` functions `enrichKEGG` and `gseKEGG`. An example of the R code can be found here https://github.com/dadrasarmin/enrichment_analysis_for_non_model_organism.  However, this poses a problem: as the novel species gene IDs are assigned to KEGG terms, gene:name duplicate records are identified, and duplicates must be removed in order to avoid errors running the enrichment. This loss of data will have a real impact on the results, with the importance of some terms being underestimated.
+
+Given these considerations, we will proceed with `map` pathway terms :-)
+
+The KEGG `map` pathway list was downloaded from https://rest.kegg.jp/list/pathway and downloaded to your `workshop` directory.
+
+
+```{r import KEGG pathways}
+kegg_pathways <- read.table("kegg_pathways_2024-11-13.txt", header = FALSE, sep = "\t", col.names = c("term", "name"))
+head(kegg_pathways)
+```
+
+
+
+## 2. Import axolotl DE results file and extract gene lists for ORA and GSEA
+
+### 2.1 Import axolotl DE data
+
+Load the DE results file for axolotl:
+
+```{r load input DE matrix}
+de_matrix <- read_tsv("axolotl_DE_results.txt", col_names = TRUE, show_col_types = FALSE)
+head(de_matrix)
+```
+
+
+### 2.2 Create the ranked gene list for GSEA
+
+Recall from the last 2 activities that `clusterProfiler` requires a vector object for GSEA, while `WebGestaltR` requires a 2-column dataframe. Since we intend to use both tools, let's create both now:
+
+
+```{r create ranked gene vector }
+# Create ranked vector for clusterProfiler GSEA
+ranked_vector <- setNames(de_matrix$log2FoldChange, de_matrix$geneID) %>% sort(decreasing = TRUE) # Named vector
+
+# check
+head(ranked_vector)
+tail(ranked_vector)
+```
+
+
+```{r created ranked gene dataframe}
+# Create ranked dataframe for WebGestaltR GSEA# extract ranked dataframe
+ranked_df <- de_matrix %>%
+  arrange(desc(log2FoldChange)) %>%
+  dplyr::select(geneID, log2FoldChange)
+
+# check
+head(ranked_df)
+tail(ranked_df)
+```
+
+### 2.3 Create gene lists for ORA
+
+For ORA, both tools require vector class gene lists. We will filter for adjusted P value < 0.01 and absolute log2 fold change greater than 1.5.
+
+The matrix has already filtered out genes with very low counts so we take all genes present as the background.
+
+```{r create ORA vector gene lists}
+# Filter for DEGs and save gene IDs as vector
+degs <- de_matrix %>%
+  filter(padj <= 0.01 & abs(log2FoldChange) >= 1.5) %>%
+  pull(geneID) # Extract
+
+# Extract the background gene list vector
+background <- de_matrix %>%
+  pull(geneID)
+
+# Check number of genes:
+cat("Number of DEGs:", length(degs), "\n") # Number of DEGs
+cat("Number of background genes:", length(background), "\n") # Number of background genes
+
+# Check format:
+head(degs)
+head(background)
+```
+
+Note the large drop in gene numbers: 100K in GTF, 48K in predicted proteome, 24K expressed in the blastema! By reducing the number of background genes to what are expressed in the studied tissue, we can reduce falsely inflated P values and false positives within our list of enriched terms.
+
+
+### 2.4 Save gene lists
+
+Saving any outputs generated from R code is vital to reproducibility! You should include all analysed gene lists within the supplementary materials of your manuscript.
+
+```{r save gene lists to file}
+# Save DEGs
+write.table(degs, file = "Axolotl_DEGs.txt", quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t")
+# Save background
+write.table(background, file = "Axolotl_background.txt", quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t")
+# Save ranked
+write.table(ranked_df, file = "Axolotl_rankedFC.txt", sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+```
+
+
+## 3. Reformat annotation files for `clusterProfiler` GO and KEGG analysis
+
+Now we have annotation files and gene lists, we will bring those together to create the custom database files required for R FEA!
+
+### 3.1 Create TERM2GENE files
+
+These are 2 column text files with the term ID (one per line) alongside the ID of the gene that maps to the term. A gene can map to many terms and thus be present on multiple lines. A term can be mapped to more than one gene and thus be present on many lines.
+
+Check the column names of the `emapper` annotation file so we know which are the GO and KEGG column names:
+
+```{r colnames anno}
+colnames(eggnog_anno)
+```
+
+We need `GOs` and `KEGG_Pathway` columns.
+
+#### 3.1.1 GO TERM2GENE
+
+Next, we will extract the GO IDs from the `emapper` annotation file, and wrangle into the correct format for `clusterProfiler` `TERM2GENE`.
+
+There are several steps to this - comments have been included to outline what each step is doing.
+
+```{r GO TERM2GENE}
+go_term2gene <- eggnog_anno %>%
+  dplyr::select(GOs, `#query`) %>% # select the GO column and the query column (axolotl gene ID)
+  dplyr::filter(GOs != "-") %>% # filter out rows where the GO ID is "-" ie no GO annotation for this gene
+  separate_rows(GOs, sep = ",") %>% # split comma-delimited list of many GO terms for a gene into separate rows
+  dplyr::select(GOs, `#query`) %>% # keep the GO and query columns
+  distinct() %>% # remove any duplicate rows
+  drop_na() # remove rows with missing values
+
+# Rename columns to match desired output format
+colnames(go_term2gene) <- c("term", "gene")
+
+# Save to file
+write.table(go_term2gene, file = "Axolotl_GO_term2gene.txt", sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+
+# Number of rows:
+cat("Number of GO term2gene rows:", nrow(go_term2gene), "\n")
+```
+
+```{r view go term2gene}
+# Check first few rows
+head(go_term2gene)
+```
+
+
+#### 3.1.2 KEGG TERM2GENE
+
+Here we use the same process as we did above for GO (colum name `GOs`), selecting a different column name for KEGG (`KEGG_Pathway`).
+
+```{r KEGG TERM2GENE}
+kegg_term2gene <- eggnog_anno %>%
+  dplyr::select(KEGG_Pathway, `#query`) %>% # Select the relevant columns
+  dplyr::filter(grepl("map", KEGG_Pathway)) %>% # Keep only rows where KEGG_Pathway contains 'map'
+  separate_rows(KEGG_Pathway, sep = ",") %>% # Split multiple pathways into separate rows
+  dplyr::mutate(term = gsub("map:", "", KEGG_Pathway)) %>% # Remove the "map:" prefix
+  dplyr::filter(grepl("^map", term)) %>% # Filter again to make sure we only have map pathways (after removing "map:")
+  dplyr::select(term, `#query`) %>% # Select the pathway (term) and gene columns
+  distinct() %>% # Remove duplicate rows
+  drop_na() # Remove rows with missing values
+
+
+# Rename columns to match desired output format
+colnames(kegg_term2gene) <- c("term", "gene")
+
+# Save to file
+write.table(kegg_term2gene, file = "Axolotl_KEGG-Pathways_term2gene.txt", sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+
+cat("Number of KEGG term2gene rows:", nrow(kegg_term2gene), "\n")
+```
+
+
+```{r view kegg term2gene}
+# View result to check
+head(kegg_term2gene)
+```
+
+### 3.2 TERM2NAME
+
+#### 3.2.1 GO
+
+Now we will assign term descriptions to term IDs and create our `TERM2NAME` files.
+
+This may take a few moments to run. It will use the `ontology` object we created earlier from the `go.obo` file.
+
+```{r GO TERM2NAME}
+# Create term to name table, removing duplicates, missing values and obsolete terms
+go_term2name <- go_term2gene %>% # only keep terms that are in our term2gene object (ie, mapped to axolotl)
+  mutate(name = ontology$name[term]) %>%
+  dplyr::select(term, name) %>%
+  distinct() %>%
+  drop_na() %>%
+  filter(!grepl("obsolete", name))
+
+# Save to file
+write.table(go_term2name, file = "Axolotl_GO_term2name.txt", sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+
+# Show the first few lines
+head(go_term2name)
+```
+
+
+
+#### 3.2.2 KEGG
+
+The KEGG Pathways file was available for download in the correct format for `TERM2NAME`.
+
+```{r view kegg pathways file}
+head(kegg_pathways)
+```
+
+Let's restrict it to include the terms relevant to our analysis, and then print that to a file for reproducibility.
+
+
+```{r KEGG TERM2NAME}
+kegg_term2name <- kegg_pathways %>%
+  dplyr::filter(term %in% kegg_term2gene$term) %>% # Only keep terms that are in kegg_term2gene
+  distinct() %>% # Remove duplicate entries
+  drop_na() # Remove rows with missing values
+
+# Save the result to a file
+write.table(kegg_term2name, file = "Axolotl_KEGG_term2name.txt", sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+
+# Check first few rows
+head(kegg_term2name)
+```
+
+
+
+### 3.3 Count annotations
+
+How much of our proteome was annotated? What about our DEGs and background?
+
+Genes that do not have any annotation are excluded from enrichment analysis, so having an understanding of the extent of annotation for your novel species is very important when interpreting results!
+
+
+Count the number of GO terms found within the genome, and the number of genes with GO annotations:
+
+```{r report GO annotation counts}
+go_total_terms <- nrow(go_term2gene)
+print(paste("Total annotations to GO:", go_total_terms))
+
+go_unique_genes <- length(unique(go_term2gene$gene))
+print(paste("Number of unique genes with 1 or more annotation terms:", go_unique_genes))
+```
+
+And for KEGG:
+
+```{r report KEGG annotation counts}
+kegg_total_terms <- nrow(kegg_term2gene)
+print(paste("Total annotations to KEGG Pathways:", kegg_total_terms))
+
+kegg_unique_genes <- length(unique(kegg_term2gene$gene))
+print(paste("Number of unique genes with 1 or more annotation terms:", kegg_unique_genes))
+```
+
+47,196 putative axolotl proteins were annotated. That's around 1/4 of our predicted proteins mapped to KEGG Pathways, and less than half of our genes mapped to GO! Ouch. As much as we expect this with uncurated novel species genomes, it's still unpleasant to face :-)
+
+
+What of the genes in our gene list specifically? We have an uncurated proteome, yet the genes in our input matrix were expressed at a meaningful level within axolotl, so these may actually have a higher annotation percentage than all genes in the proteome.
+
+
+```{r report gene list GO annotation percentages}
+# Filter the term2gene table to only include genes in the background gene list
+go_filtered_term2gene <- go_term2gene %>% filter(gene %in% background)
+
+# Count the number of unique background genes with at least one GO term
+unique_genes_with_go <- go_filtered_term2gene %>%
+  distinct(gene) %>%
+  nrow()
+
+# Calculate the percentage of background genes that have GO annotations
+percent_go_unique <- (unique_genes_with_go / length(background)) * 100
+
+# Print results
+cat("Number of input genes with GO annotations:", unique_genes_with_go, "(", percent_go_unique, "%)\n")
+```
+
+
+```{r report gene list KEGG annotation percentages}
+# Filter the term2gene table to only include genes in the background gene list
+kegg_filtered_term2gene <- kegg_term2gene %>% filter(gene %in% background)
+
+# Count the number of unique background genes with at least one GO term
+unique_genes_with_kegg <- kegg_filtered_term2gene %>%
+  distinct(gene) %>%
+  nrow()
+
+# Calculate the percentage of background genes that have GO annotations
+percent_kegg_unique <- (unique_genes_with_kegg / length(background)) * 100
+
+# Print results
+cat("Number of input genes with KEGG Pathways annotations:", unique_genes_with_kegg, "(", percent_kegg_unique, "%)\n")
+```
+
+As expected, the annotation % is higher for expressed genes than all predicted genes, and very much higher than the GTF of 99,088 predicted gene models (!!!) with an annotation rate of 21.6%.
+
+This highlights a major caveat when performing FEA on non-model species: the results are only as good as the annotations behind them. Therefore, all results must be interpreted with caution. For many novel (and under-funded) species, there are little opportunities (at present) to improve the annotation. Some in-silico predicted genes appear to be highly expressed and significantly regulated yet have no significant similarity to anything in the non-redundant nucleotide or protein databases. When working with datasets like this, it is critical to explore those individual genes through other methods, in addition to trying to garner some higher level overview such as we aim to obtain from FEA. Hopefully, recent advances in AI protein modelling can help provide insights into the functions of these novel genes.
+
+For the axolotl with only 22% of predicted genes annotated, its clear that the in-silico gene predictions within the GTF file require much curation!
+
+## 4. Run `clusterProfiler` universal FEA functions `enricher` and `GSEA`
+
+In the interest of time, and to try and cover as many options as possible, let's do ORA with GO and GSEA with KEGG for both tools.
+
+### 4.1 clusterProfiler ORA of GO terms
+
+The `enricher` function is the 'universal' ORA option that accepts the `TERM2GENE` and `TERM2NAME` files we have just created.
+
+Let's review the help page:
+
+```{r help enricher}
+# ?clusterProfiler::enricher
+```
+
+There are parameters for both adjusted P value and q value. Terms must pass all thresholds (unadjusted P, adjusted P, and q value) so the important filter will be the most stringent test applied. Let's go with BH and 0.05 which we have used regularly within this workshop and are fairly common choices in the field.
+
+we need to provide term2gene and term2name, and don't specify an organism.
+
+
+```{r CP GO ORA }
+cp_go_ora <- enricher(
+  gene = degs,
+  pvalueCutoff = 0.05,
+  pAdjustMethod = "BH",
+  universe = background,
+  minGSSize = 10,
+  maxGSSize = 500,
+  TERM2GENE = go_term2gene,
+  TERM2NAME = go_term2name
+)
+```
+
+
+```{r view CP GP ORA result summary}
+cp_go_ora
+```
+
+91 significantly enriched terms at P.adj < 0.05.
+
+Look at the geneRatio column: our gene list object `degs` has 247 genes, but the tool has applied the input size as 145 - this is because it is automatically discarding any that do not have annotations.
+
+Results would be the same if we instead used `annotated_degs` object.
+
+Likewise, the background size is being reported as 15072 (the number annotated) not 24,419 (the total in background list).
+
+
+Save the results to a text file:
+
+
+```{r save CP GO ORA table}
+file <- "Axolotl_clusterProfiler_GO_ORA_results.tsv"
+write.table(cp_go_ora, file, sep = "\t", quote = FALSE, row.names = FALSE)
+```
+
+
+Let's visualise with one of my favourite `enrichplot` plots, the treeplot! Another advantage of this plot is that it can be used for both ORA and GSEA results, so we can compare more easily. We will add a custom subtitle that informs the number of DEGs that were actually annotated and included in the FEA, so anyone reviewing the plot will understand that caution must be exercised when interpreting the results.
+
+```{r treeplot CP GO ORA, , fig.width=12}
+# calculate pairwise similarities between the enriched terms
+cp_go_ora <- enrichplot::pairwise_termsim(cp_go_ora)
+p <- enrichplot::treeplot(cp_go_ora,
+  showCategory = 15,
+  color = "p.adjust",
+  nCluster = 5
+)
+
+# Add annotations (number of input genes and number of input genes with GO terms)
+num_genes <- length(degs)
+genes_with_GO_terms <- sum(degs %in% go_term2gene$gene)
+
+# Print the plot with custom sub-title
+p <- p + ggtitle("clusterProfiler ORA of GO terms") + labs(subtitle = paste("Input genes:", num_genes, "| Input genes with GO terms:", genes_with_GO_terms))
+print(p)
+```
+
+
+There's a lot of skin and muscle stuff, which we expect to be expressed in the blastema. As for why they are dysregulated? This is a dummy experiment from public RNAseq, with poor replication, and may not even be the right experiment type for this question, so let's not hope for too many clear answers :-)
+
+### 4.2 clusterProfiler GSEA of KEGG terms
+
+The `GSEA` function is the 'universal' GSEA option that accepts the `TERM2GENE` and `TERM2NAME` files we have just created.
+
+Let's review the help page:
+
+```{r help GSEA}
+# ?clusterProfiler::GSEA
+```
+
+Recall from our `clusterProfiler` session with human data that we needed to add `nPermSimple = 10000` to avoid a warning about "unbalanced (positive and negative) gene-level statistic value" and reduce `eps` to zero to avoid a warning about obtaining better P value estimates . Let's do this from the start.
+
+```{r CP KEGG GSEA}
+cp_kegg_gsea <- GSEA(
+  geneList = ranked_vector,
+  exponent = 1,
+  minGSSize = 10,
+  maxGSSize = 500,
+  eps = 0,
+  pvalueCutoff = 0.05,
+  pAdjustMethod = "BH",
+  TERM2GENE = kegg_term2gene,
+  TERM2NAME = kegg_term2name,
+  seed = 123,
+  by = "fgsea",
+  nPermSimple = 10000
+)
+```
+
+
+```{r view CP KEGG GSEA result summary}
+cp_kegg_gsea
+```
+
+29 enriched terms.
+
+Let's treeplot!
+
+```{r treeplot CP KEGG GSEA, fig.width=12}
+# calculate pairwise similarities between the enriched terms
+cp_kegg_gsea <- enrichplot::pairwise_termsim(cp_kegg_gsea)
+p <- enrichplot::treeplot(cp_kegg_gsea,
+  showCategory = 15,
+  color = "p.adjust",
+  nCluster = 5
+)
+
+# Add annotations (number of input genes and number of input genes with GO terms)
+# Use background since all genes for ranked are in background
+num_genes <- length(background)
+genes_with_kegg_terms <- sum(background %in% kegg_term2gene$gene)
+
+# Print the plot with custom sub-title
+p <- p + ggtitle("clusterProfiler GSEA of KEGG Pathways") + labs(subtitle = paste("Input genes:", num_genes, "| Input genes with KEGG pathway terms:", genes_with_kegg_terms))
+print(p)
+```
+
+Some muscle stuff, some cull junction stuff, and some infection-related terms. This can be common in FEA, many genes involved in infection responses are also part of broader stress response pathways. These genes may be activated under different conditions, such as environmental stress, tissue injury, or other disruptions to homeostasis, which are common in various types of experiments. Pathways related to immune responses can also be interconnected with pathways controlling inflammation, wound healing, and metabolic processes. As a result, infection-related pathways can appear in enrichment analysis even when the experimental conditions don't directly involve infection. This does not mean the result is spurious - it just requires that you exercise pragmatism, employ a basic understanding of the statistical approach, and commit to interpreting the results in the context of your experiment. Remember that the FEA results are to bring a large list of genes down to a high level overview to help guide further investigation rather than give a clear answer to your experiment.
+
+
+I favour a volcano plot for GSEA, so we can see positive vs negative NES. This is part of `ggplot`, not `enrichplot`, where the `volplot` is only for ORA.
+
+
+```{r volcano plot CP gsea kegg, ,  fig.height=6, fig.width=9}
+p <- ggplot(cp_kegg_gsea@result, aes(x = enrichmentScore, y = -log10(p.adjust), color = p.adjust)) +
+  geom_point(alpha = 0.7, size = 2) + # Adjust point size
+  scale_color_gradient(low = "blue", high = "red") + # Color by p.adjust values
+  theme_minimal() +
+  labs(
+    title = "clusterProfiler GSEA of KEGG Pathways",
+    x = "Enrichment Score (NES)",
+    y = "-log10(Adjusted P-value)",
+    color = "Adjusted P-value"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + # Rotate x-axis labels for readability
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") + # Add vertical line at x=0
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "black") + # Add horizontal line at p=0.05 cutoff
+  geom_text(aes(label = Description),
+    hjust = 0.5,
+    vjust = -0.5, # Move labels higher off the points
+    size = 3,
+    check_overlap = TRUE,
+    alpha = 0.7
+  ) # Add labels for each pathway term
+
+print(p)
+```
+
+Interesting that all terms except one have leading edge genes that are upregulated in distal compared to proximal (the reference level)!
+
+
+## 5. Reformat annotation files for `WebGestaltR` GO and KEGG analysis
+
+GMT files must have `.gmt` suffix and description files must have `.des` suffix.
+
+### 5.1 Create GMT objects
+
+The GMT files need links for all of the terms, so that we can have that handy link-out to enriched terms from the HTML report we experienced in the last activity. This is actually pretty simple to do thanks to consistent URLs.
+
+For GO, we just need to paste the term ID to the end of this link https://www.ebi.ac.uk/QuickGO/term/<GOID>
+
+And for KEGG, we need to paste the map ID to the end of this link: https://www.genome.jp/dbget-bin/www_bget?<mapID>
+
+
+#### 5.1.1 GO GMT
+
+Note that in the below code, the first command is identical the one that created the `go_term2gene` object earlier in the notebook. we could just use the `go_term2gene` object and skip step of the below code, using `go_term2gene` as input for step 2 rather than `go_data`. This code duplication is intentional, so that this code chunk is standalone for re-use and re-purpose.
+
+```{r GO GMT}
+# Step 1: Extract relevant columns (GO terms and gene IDs) from eggnog_anno
+go_data <- eggnog_anno %>% # use the emapper annotations for axolotl
+  dplyr::select(GOs, `#query`) %>% # Select the GO terms and the gene IDs
+  dplyr::filter(GOs != "-") %>% # Filter out rows where the GO ID is missing ("-")
+  separate_rows(GOs, sep = ",") %>% # Split comma-delimited list of GO terms into separate rows
+  dplyr::select(GOs, `#query`) %>% # Keep GO terms and gene IDs columns
+  distinct() %>% # Remove duplicates
+  drop_na() # Drop any rows with missing values
+
+# Rename columns to match the format (term, gene)
+colnames(go_data) <- c("term", "gene")
+
+# Step 2: Create external links for each GO term (link to QuickGO)
+go_data <- go_data %>%
+  dplyr::mutate(external_link = paste0("https://www.ebi.ac.uk/QuickGO/term/", term))
+
+# Step 3: Group genes by GO term and concatenate gene list by tab so all genes per term are on the same row
+go_term_grouped <- go_data %>%
+  dplyr::group_by(term) %>%
+  dplyr::summarize(genes = paste(gene, collapse = "\t"), .groups = "drop")
+
+# Step 4: Add the external link for each GO term
+go_term_grouped <- go_term_grouped %>%
+  dplyr::left_join(go_data %>% dplyr::select(term, external_link) %>% distinct(), by = "term")
+
+# Step 5: Create the final GMT format entry (term ID, external link, and gene list)
+go_gmt <- go_term_grouped %>%
+  dplyr::mutate(gmt_entry = paste(term, external_link, genes, sep = "\t")) %>%
+  dplyr::select(gmt_entry)
+
+# Save to file
+write.table(go_gmt, file = "Axolotl_GO.gmt", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
+# check only the first line (the lines can be long re all genes per term!:
+cat(go_gmt$gmt_entry[1:1], sep = "\n")
+```
+
+
+
+
+#### 5.1.2 KEGG GMT
+
+As above, for clarity we have avoided using the `TERM2GENE` object to ensure this code chunk can be standalone.
+
+
+```{r KEGG GMT}
+# Step 1: Extract relevant columns (KEGG Pathway and gene IDs) from eggnog_anno
+kegg_data <- eggnog_anno %>%
+  dplyr::select(KEGG_Pathway, `#query`) %>% # Select the KEGG Pathway and gene ID columns
+  dplyr::filter(grepl("map", KEGG_Pathway)) %>% # Keep only rows where KEGG_Pathway contains 'map'
+  separate_rows(KEGG_Pathway, sep = ",") %>% # Split multiple pathways into separate rows
+  dplyr::mutate(term = gsub("map:", "", KEGG_Pathway)) %>% # Remove the "map:" prefix
+  dplyr::filter(grepl("^map", term)) %>% # Filter again to keep only 'map' pathways (after removing "map:")
+  dplyr::select(term, `#query`) %>% # Select the KEGG Pathway and gene ID columns
+  distinct() %>% # Remove duplicate rows
+  drop_na() # Remove rows with missing values
+
+# Ensure the column is properly named
+colnames(kegg_data)[colnames(kegg_data) == "#query"] <- "gene"
+
+# Step 2: Create external links for each KEGG pathway
+kegg_data <- kegg_data %>%
+  dplyr::mutate(external_link = paste0("https://www.genome.jp/dbget-bin/www_bget?", term))
+
+# Step 3: Group by KEGG pathway term and concatenate the gene list
+kegg_term_grouped <- kegg_data %>%
+  dplyr::group_by(term) %>%
+  dplyr::summarize(genes = paste(gene, collapse = "\t"), .groups = "drop")
+
+# Step 4: Add the external link for each KEGG pathway
+kegg_term_grouped <- kegg_term_grouped %>%
+  dplyr::left_join(kegg_data %>% dplyr::select(term, external_link) %>% distinct(), by = "term")
+
+# Step 5: Create the final GMT format entry (Pathway, External Link, Genes)
+kegg_gmt <- kegg_term_grouped %>%
+  dplyr::mutate(gmt_entry = paste(term, external_link, genes, sep = "\t")) %>%
+  dplyr::select(gmt_entry)
+
+# Save to file
+write.table(kegg_gmt, file = "Axolotl_KEGG-pathways.gmt", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
+# check only the first line (the lines can be long re all genes per term!:
+cat(kegg_gmt$gmt_entry[1:1], sep = "\n")
+```
+
+### 5.2 Create description objects
+
+#### 5.2.1 GO description
+
+The description file is identical to `clusterProfiler` `TERM2NAME` . Again, we don't want to use any code from the creation of `clusterProfiler` objects to ensure this part can be used alone.
+
+
+```{r GO description }
+# Step 1: Get terms from ontology object created from go.obo with ontologyIndex function:
+ontology_term_names <- ontology$name
+
+# Step 2: Filter and separate GO terms from the annotation file
+# We filter out rows where no GO terms are assigned and separate comma-delimited GO terms
+go_terms <- eggnog_anno %>%
+  dplyr::select(GOs, `#query`) %>%
+  dplyr::filter(GOs != "-") %>% # Keep only rows with GO terms
+  separate_rows(GOs, sep = ",") %>%
+  dplyr::mutate(term = GOs) %>%
+  dplyr::select(term, `#query`) %>%
+  distinct() %>%
+  drop_na() # Drop rows with missing values
+
+# Step 3: Create the description by matching GO terms to their names in the ontology
+go_des <- go_terms %>%
+  dplyr::mutate(name = ontology_term_names[term]) %>% # Map term to its name from the ontology
+  dplyr::select(term, name) %>% # Keep only the term and name
+  distinct() %>% # Remove duplicates
+  drop_na() %>% # Remove rows with missing values
+  filter(!grepl("obsolete", name)) # Remove obsolete terms if present
+
+# Save to file
+write.table(go_des, file = "Axolotl_GO.des", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
+# Check
+head(go_des)
+```
+
+
+
+#### 5.2.2 KEGG description file
+
+More extra work for the sake of portability :-)
+
+```{r KEGG description}
+# Get columns from kegg gmt object
+kegg_gmt_columns <- kegg_gmt %>%
+  separate(gmt_entry, into = c("term", "external_link", "genes"), sep = "\t")
+
+# Create the kegg_des table by joining the pathways file with the species-specific terms from kegg_gmt
+kegg_des <- kegg_pathways %>%
+  dplyr::filter(term %in% kegg_gmt_columns$term) %>%
+  dplyr::select(term, name) %>%
+  distinct() %>%
+  drop_na()
+
+# Save to file
+write.table(kegg_des, file = "Axolotl_KEGG-pathways.des", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
+# Check the first few rows
+head(kegg_des)
+```
+
+
+
+
+## 6. Run `WebGestaltR` ORA and GSEA with custom database files
+
+We will use the same approach as with `clusterProfiler` and run ORA with GO and GSEA with KEGG for both tools.
+
+### 6.1 WebGestaltR ORA of GO terms
+
+Parameters to note for novel species:
+
+- `organism = others`
+- `enrichDatabaseFile = "Axolotl_GO.gmt"`
+- `enrichDatabaseDescriptionFile = "Axolotl_GO.des"`
+
+`WebGestaltR` outputs results to a folder containing multiple files. Make a parent directory for the results of this tool:
+
+```{r create output dir}
+dir.create("WebGestaltR_results")
+```
+
+```{r WGR ORA GO }
+outputDirectory <- "WebGestaltR_results"
+project <- "Axolotl_ORA_GO"
+
+WebGestaltR(
+  organism = "others", # must specify 'others' when using custom db files
+  enrichMethod = "ORA", # Perform ORA, GSEA or NTA
+  interestGene = degs, # gene list of interest
+  referenceGene = background, # background genes
+  enrichDatabaseFile = "Axolotl_GO.gmt", # the custom gmt file
+  enrichDatabaseDescriptionFile = "Axolotl_GO.des", # the custom description file
+  isOutput = TRUE, # Set to FALSE if you don't want files saved to disk
+  fdrMethod = "BH", # Benjamini-Hochberg multiple testing correction
+  sigMethod = "fdr", # Significance method ('fdr' or 'top')
+  fdrThr = 0.05, # FDR significance threshold
+  minNum = 10, # Minimum number of genes per category
+  maxNum = 500, # Maximum number of genes per category
+  outputDirectory = outputDirectory,
+  projectName = project
+)
+```
+
+
+Open the HTML report `WebGestaltR_results/Project_Axolotl_ORA_GO/Report_Axolotl_ORA_GO.html` from the files pane in a browser.
+
+Note some term similarity to what we have seen with the past 2 analyses (that's reassuring!)
+
+We no longer have GO Slim, as this needs to call the actual GO database, which we haven't used.
+
+Change the 'Enrichment Results' view from table to 'Bar  chart', then try the 'Affinity propagation' and 'Weighted set cover' term clustering algorithms. 'All' has more terms with higher specificty, and the term redundancy has performed clustering to give fewwer terms and provide a more concise overview. It's up to you as the researcher to decided which approach is best suited to your dataset!
+
+Confirm that our GMT file correctly included the term link by selecting a term and clicking the hyperlink at `Analyte set`. Pretty neat huh :-)
+
+### 6.2 WebGestaltR GSEA of KEGG Pathways
+
+This will take slightly longer than ORA. We will set threads to 2 to speed it up as much as we can.
+
+There is no `seed` parameter for `WebGestaltR` GSEA as there is for `clusterProfiler`. We can set it in R instead with `set.seed()`.
+
+```{r set seed}
+set.seed(123)
+```
+
+Again we are specifying `organism = "others"` and providing our GMT and description file:
+
+```{r WGR GSEA KEGG }
+outputDirectory <- "WebGestaltR_results"
+project <- "Axolotl_GSEA_KEGG"
+
+suppressWarnings({
+  WebGestaltR(
+    organism = "others", # must specify 'others' when using custom db files
+    enrichMethod = "GSEA", # Perform ORA, GSEA or NTA
+    interestGene = ranked_df, # ranked dataframe
+    enrichDatabaseFile = "Axolotl_KEGG-pathways.gmt", # the custom gmt file
+    enrichDatabaseDescriptionFile = "Axolotl_KEGG-pathways.des", # the custom description file
+    isOutput = TRUE, # Set to FALSE if you don't want files saved to disk
+    fdrMethod = "BH", # Benjamini-Hochberg multiple testing correction
+    sigMethod = "fdr", # Significance method ('fdr' or 'top')
+    fdrThr = 0.05, # FDR significance threshold
+    minNum = 10, # Minimum number of genes per category
+    maxNum = 500, # Maximum number of genes per category
+    outputDirectory = outputDirectory,
+    projectName = project,
+    nThreads = 2
+  )
+})
+```
+
+Open the HTML report `WebGestaltR_results/Project_Axolotl_GSEA_KEGG/Report_Axolotl_GSEA_KEGG.html` from the files pane in a browser.
+
+Expand 'Job summary' to read that "22 positive related categories and no negative related categories" are significant in this analysis. This is in contrast to the one negative category we observed when running KEGG GSEA with `clusterProfiler`. We expect some differences between these tools.
+
+Compare the tabular results in this report to the treeplot we produced under code chunk `treeplot CP KEGG GSEA`. There are a lot of shared terms, and this is reassuring.
+
+## 7. Save versions and session details
+
+### GO database version
+
+Print the database version of GO Core Ontology used:
+
+```{r print GO core ontology file version}
+# Read go.obo lines
+lines <- readLines("go.obo")
+
+# Use grep to pull "data-version"
+version <- grep("data-version", lines, value = TRUE)
+
+# Print version
+cat("GO version from go.obo file:", version, "\n")
+```
+
+### KEGG Pathways database version
+
+The KEGG pathways file does not contain any version details within the file contents, but does have the date saved in the name of the file that was imported into this workbook. Adding the date of download was done manually, and is always recommended practice for files and databases that do not contain any date or version details.
+
+
+### R version and R package versions
+
+```{r info novel species}
+sessionInfo()
+```
+
+
+### RStudio version
+
+And RStudio version. Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the notebook.
+
+
+```{r rstudio version - not run during knit novel species, eval = FALSE}
+# Get RStudio version information
+rstudio_info <- RStudio.Version()
+
+# Convert the version information to a string
+rstudio_version_str <- paste(
+  "RStudio Version Information:\n",
+  "Version: ", rstudio_info$version, "\n",
+  "Release Name: ", rstudio_info$release_name, "\n",
+  "Long Version: ", rstudio_info$long_version, "\n",
+  "Mode: ", rstudio_info$mode, "\n",
+  "Citation: ", rstudio_info$citation,
+  sep = ""
+)
+
+# Write the output to a text file
+writeLines(rstudio_version_str, "rstudio_version.txt")
+```
+
+```{r rstudio version saved from text novel species, eval = FALSE}
+# Read the saved version information from the file
+rstudio_version_text <- readLines("rstudio_version.txt")
+
+# Print the version information to the document
+rstudio_version_text
+```
+
+```{r restore working directory novel species, include=FALSE}
+# Restore the book's working directory so later chapters (and their
+# before_chapter_script, which re-reads _bookdown.yml) resolve their own
+# relative paths correctly.
+knitr::opts_knit$set(root.dir = novel_species_book_root_dir)
+```
+
+## Build the Bookdown output
+
+Save all changes before rendering. Build the complete book from the RStudio **Build** pane using **Build Book**, or run the project-specific Bookdown render command used by this workshop.
+
+The chapter will render successfully only when all required packages and input files are available and the executable code chunks complete without errors. Output tables and figures written by the analysis will be saved relative to the Bookdown project directory unless a different path is specified.
+
+❗ If the build fails, use the first error message in the render log to identify the missing file, package, object, or failed code chunk.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-💫 You have  now explored two tools performing FEA in R for your novel species, and we have observed that both methods require the same starting files (annotation of novel species genes to databases, database term IDs to term descriptions) and give very similar results. Which you use depends on your personal preferences. 
+💫 You have  now explored two tools performing FEA in R for your novel species, and we have observed that both methods require the same starting files (annotation of novel species genes to databases, database term IDs to term descriptions) and give very similar results. Which you use depends on your personal preferences.
 
 - Do you enjoy the flexibility of plot options offered with `clusterProfiler` and `enrichplot`?
-- Do you love the ease of use and interactive HTML provided by `WebGestaltR`? 
+- Do you love the ease of use and interactive HTML provided by `WebGestaltR`?
 
-We will now take a quick look at novel species FEA online with `STRING`. 
+We will now take a quick look at novel species FEA online with `STRING`.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 ## STRING (web) novel species FEA
 
-The axolotl putative proteome was previously uploaded to STRING and custom annotation performed. This completed using the STRING servers, with compute time less than one day. 
+The axolotl putative proteome was previously uploaded to STRING and custom annotation performed. This completed using the STRING servers, with compute time less than one day.
 
 
 <img src="images/string-upload-proteome.png" style="border: none; box-shadow: none; background: none;">
@@ -213,15 +1096,15 @@ Using the STRING web tool, we will now peform ORA of this custom axolotl annotat
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-&#x27A4; Open the following link in your browser: 
+&#x27A4; Open the following link in your browser:
 
 https://version-12-0.string-db.org/organism/STRG0A90SNX
 
-`STRG0A90SNX` is the annotation ID assigned by STRING. 
+`STRG0A90SNX` is the annotation ID assigned by STRING.
 
 This link will take you to the axolotl annotation page, where you can click `SELECT SPECIES ON INPUT PAGE` to add the custom species to the `Organisms` field, then toggle to your desired search type.
 
-There is also a downloads page, where any of the STRING annotation files can be downloaded. If you wanted to use the STRING annotation files in `clusterProfiler` or `WebGestaltR`, you would download the ['protein enrichment terms'](https://stringdb-downloads.org/download_proteomes/protein.enrichment.terms.v12.0/STRG0A90SNX.protein.enrichment.terms.v12.0.txt.gz) file and then extract the terms and axolotl gene IDs into the required formats, as we did for the `emapper` annotations. 
+There is also a downloads page, where any of the STRING annotation files can be downloaded. If you wanted to use the STRING annotation files in `clusterProfiler` or `WebGestaltR`, you would download the ['protein enrichment terms'](https://stringdb-downloads.org/download_proteomes/protein.enrichment.terms.v12.0/STRG0A90SNX.protein.enrichment.terms.v12.0.txt.gz) file and then extract the terms and axolotl gene IDs into the required formats, as we did for the `emapper` annotations.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -233,7 +1116,7 @@ There is also a downloads page, where any of the STRING annotation files can be 
 
 &#x27A4; On STRING, click `SELECT SPECIES ON INPUT PAGE`, then from the left search options, select `Multiple proteins`.
 
-Note that the `Organism` field is pre-filled with `STRG0A90SNX (axolotl)`. 
+Note that the `Organism` field is pre-filled with `STRG0A90SNX (axolotl)`.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -243,9 +1126,9 @@ Note that the `Organism` field is pre-filled with `STRG0A90SNX (axolotl)`.
 
 Before we explore the results, note that we have performed ORA without a background gene list! 😮
 
-There is no option at the query page (even under `Advanced Settings`) to provide a custom background gene list initially. This must be done *after* the initial search has been run. Hopefully this will change in future versions 🫠 
+There is no option at the query page (even under `Advanced Settings`) to provide a custom background gene list initially. This must be done *after* the initial search has been run. Hopefully this will change in future versions 🫠
 
-❗In order to add or apply a previously saved custom background gene list, you need to be logged in to `STRING`. The upload can take a bit of time, so you do not need to do this now, however the dropdowns below provide instructions for applying a saved background or adding a new one. 
+❗In order to add or apply a previously saved custom background gene list, you need to be logged in to `STRING`. The upload can take a bit of time, so you do not need to do this now, however the dropdowns below provide instructions for applying a saved background or adding a new one.
 
 <details>
 <summary>Add a saved custom background to STRING analysis</summary>
@@ -254,9 +1137,9 @@ There is no option at the query page (even under `Advanced Settings`) to provide
 
 1. After running ORA or GSEA, on the results page, click on the `ANALYSIS` tab
 2. Scroll ALL the way to the bottom of the page to the subheading `Statistical background`
-    - If you do not have a relevant saved background gene list in your `STRING` saved datasets, you would select `Add background`. See next dropdown for details 
+    - If you do not have a relevant saved background gene list in your `STRING` saved datasets, you would select `Add background`. See next dropdown for details
     - If you do have a relevant background saved, change `Whole Genome` to the relevant gene background list from the drop-down menu
-3. Once you have selected the background, click `UPDATE` and the FEA will be re-computed using the custom statistical background 
+3. Once you have selected the background, click `UPDATE` and the FEA will be re-computed using the custom statistical background
 
 <img src="images/string-update-bg.png" style="border: none; box-shadow: none; background: none; width: 100%;">
 
@@ -273,10 +1156,10 @@ There is no option at the query page (even under `Advanced Settings`) to provide
 1. Under `ANALYSIS` tab of results page, at `Statistical background`, select `ADD BACKGROUND`
 2. You will be prompted to login if you are not already
 3. Under `1) name your new set` provide a descriptive name for your background gene list
-4. Select your organism at `2) identify your organism` 
+4. Select your organism at `2) identify your organism`
 5. At `3) provide identifiers` copy your list of background IDs into the `list of gene/protein names` field
 6. Ensure that `enable usage as a statistical background` is checked at `4) set additional options...`
-7. Click `CONTINUE` to map your IDs. This may take several minutes. 
+7. Click `CONTINUE` to map your IDs. This may take several minutes.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -293,12 +1176,7 @@ There is no option at the query page (even under `Advanced Settings`) to provide
 
 
 
-
-
-
-
 <p>&nbsp;</p>  <!-- insert blank line -->
-
 
 
 
@@ -310,23 +1188,23 @@ There is no option at the query page (even under `Advanced Settings`) to provide
 
 Some suggestions:
 
-- Select a node on the network, and then `Show this node's terms in the analysis table` to highlight the terms the gene was present in 
+- Select a node on the network, and then `Show this node's terms in the analysis table` to highlight the terms the gene was present in
 - Select the coloured lines connecting nodes to show evidence suggesting a functional link (all putative of course!)
 - Clicking on the `Analysis` tab will show the enrichment tables with results for GO, STRING, KEGG, Reactome, TISSUES and UniProt
 - Below the tables, under `Functional enrichment visualization` you can change `Category` to alter which database results are plotted
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-### How do the STRING results compare to those we generated in R? 
+### How do the STRING results compare to those we generated in R?
 
-**We expect a large difference in the results because of the differing proteome annotation methods - both the annotation tool and the databases that were annotated against.**  
+**We expect a large difference in the results because of the differing proteome annotation methods - both the annotation tool and the databases that were annotated against.**
 
 The `eggNOG emapper` annotations we used in `R` rely on orthology-based predictions, employing extensive similarity searches to map genes to their closest evolutionary counterparts across diverse species. This results in a more comprehensive catalog of functional terms, even if they are inferred rather than directly evidenced.
 
-In contrast, `STRING’s` custom species annotations are based on high-confidence protein-protein interaction networks and empirical data, which can narrow down the set of enriched pathways. We expect species bias to have a considerable effect when attempting to use this platform for novel species. 
+In contrast, `STRING’s` custom species annotations are based on high-confidence protein-protein interaction networks and empirical data, which can narrow down the set of enriched pathways. We expect species bias to have a considerable effect when attempting to use this platform for novel species.
 
 
-First of all we see a difference in the number of genes annotated to terms: 
+First of all we see a difference in the number of genes annotated to terms:
 
 
 |   Method    | GO      | KEGG Pathways | All     |
@@ -340,8 +1218,8 @@ And a clear lack of overlap in number of enriched GO terms and term IDs between 
 
 <img src="images/string-novel-ora-compare.png" style="border: none; box-shadow: none; background: none; ">
 
-These GO terms from `STRING` may be parent terms of more specific child terms prevalent in the `R` output. For a real world analysis, it would be optimal to compare, and deduce whether both methods could provide valuable and complimentary insights, or whether the results from one annotation approach or the other were more suited to your novel species. 
+These GO terms from `STRING` may be parent terms of more specific child terms prevalent in the `R` output. For a real world analysis, it would be optimal to compare, and deduce whether both methods could provide valuable and complimentary insights, or whether the results from one annotation approach or the other were more suited to your novel species.
 
-Whichever you choose, strength to you! This is not an easy space to work in 💪 
+Whichever you choose, strength to you! This is not an easy space to work in 💪
 
 Remember the importance of validating your results through other means! 🧪

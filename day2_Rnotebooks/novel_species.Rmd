@@ -7,7 +7,6 @@ output:
 
 
 ```{r  Load libraries, include=FALSE }
-
 library(readr)
 library(dplyr)
 library(ontologyIndex)
@@ -15,7 +14,6 @@ library(tidyverse)
 library(clusterProfiler)
 library(WebGestaltR)
 library(enrichplot)
-
 ```
 
 
@@ -24,6 +22,7 @@ library(enrichplot)
 Ensure the 'workshop' directory is your current working directory:
 
 ```{r check notebook workdir}
+knitr::opts_knit$set(root.dir = "~/Documents/LEARNINGs/WORKSHOPS/Functional_Enrichment_Workshops/Functional_Enrichment_Web_and_Command_Line/day2_inputData")
 getwd()
 ```
 
@@ -50,7 +49,7 @@ A predicted proteome was created by extracting the predicted peptide sequences f
 The `emapper` annotation output contains results against a number of databases including GO and KEGG, which we will focus on today. 
 
 ```{r Load eggnog annotation}
-eggnog_anno <- read_tsv("AmexG_v6.0-DD.emapper.annotations.txt", show_col_types = FALSE) 
+eggnog_anno <- read_tsv("AmexG_v6.0-DD.emapper.annotations.txt", show_col_types = FALSE)
 head(eggnog_anno)
 ```
 
@@ -64,10 +63,12 @@ We will use the `ontologyIndex` package to retrieve ontology info and save to an
 
 
 ```{r Extract GO ontology}
-ontology <- ontologyIndex::get_ontology(file = "go.obo",
-  propagate_relationships = "is_a", #propagates relationships from parent terms to children
+ontology <- ontologyIndex::get_ontology(
+  file = "go.obo",
+  propagate_relationships = "is_a", # propagates relationships from parent terms to children
   extract_tags = "everything", # retrieve all available details for each term
-  merge_equivalent_terms = TRUE) # avoid unecessary redundancy 
+  merge_equivalent_terms = TRUE
+) # avoid unecessary redundancy
 ```
 
 
@@ -119,14 +120,12 @@ Recall from the last 2 activities that `clusterProfiler` requires a vector objec
 
 
 ```{r create ranked gene vector }
-
 # Create ranked vector for clusterProfiler GSEA
-ranked_vector <- setNames(de_matrix$log2FoldChange, de_matrix$geneID) %>% sort(decreasing = TRUE)  # Named vector
+ranked_vector <- setNames(de_matrix$log2FoldChange, de_matrix$geneID) %>% sort(decreasing = TRUE) # Named vector
 
 # check
 head(ranked_vector)
 tail(ranked_vector)
-
 ```
 
 
@@ -148,24 +147,22 @@ For ORA, both tools require vector class gene lists. We will filter for adjusted
 The matrix has already filtered out genes with very low counts so we take all genes present as the background. 
 
 ```{r create ORA vector gene lists}
-
-# Filter for DEGs and save gene IDs as vector  
+# Filter for DEGs and save gene IDs as vector
 degs <- de_matrix %>%
   filter(padj <= 0.01 & abs(log2FoldChange) >= 1.5) %>%
-  pull(geneID)  # Extract 
+  pull(geneID) # Extract
 
-# Extract the background gene list vector 
+# Extract the background gene list vector
 background <- de_matrix %>%
-  pull(geneID)  
+  pull(geneID)
 
-# Check number of genes: 
-cat("Number of DEGs:", length(degs), "\n")         # Number of DEGs
-cat("Number of background genes:", length(background), "\n")   # Number of background genes
+# Check number of genes:
+cat("Number of DEGs:", length(degs), "\n") # Number of DEGs
+cat("Number of background genes:", length(background), "\n") # Number of background genes
 
-# Check format: 
+# Check format:
 head(degs)
 head(background)
-
 ```
 
 Note the large drop in gene numbers: 100K in GTF, 48K in predicted proteome, 24K expressed in the blastema! By reducing the number of background genes to what are expressed in the studied tissue, we can reduce falsely inflated P values and false positives within our list of enriched terms. 
@@ -182,7 +179,6 @@ write.table(degs, file = "Axolotl_DEGs.txt", quote = FALSE, col.names = FALSE, r
 write.table(background, file = "Axolotl_background.txt", quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t")
 # Save ranked
 write.table(ranked_df, file = "Axolotl_rankedFC.txt", sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
-
 ```
 
 
@@ -210,12 +206,12 @@ There are several steps to this - comments have been included to outline what ea
 
 ```{r GO TERM2GENE}
 go_term2gene <- eggnog_anno %>%
-    dplyr::select(GOs, `#query`) %>% # select the GO column and the query column (axolotl gene ID) 
-    dplyr::filter(GOs != "-") %>% # filter out rows where the GO ID is "-" ie no GO annotation for this gene
-    separate_rows(GOs, sep = ",") %>% # split comma-delimited list of many GO terms for a gene into separate rows
-    dplyr::select(GOs, `#query`) %>% # keep the GO and query columns
-    distinct() %>% # remove any duplicate rows 
-    drop_na() # remove rows with missing values
+  dplyr::select(GOs, `#query`) %>% # select the GO column and the query column (axolotl gene ID)
+  dplyr::filter(GOs != "-") %>% # filter out rows where the GO ID is "-" ie no GO annotation for this gene
+  separate_rows(GOs, sep = ",") %>% # split comma-delimited list of many GO terms for a gene into separate rows
+  dplyr::select(GOs, `#query`) %>% # keep the GO and query columns
+  distinct() %>% # remove any duplicate rows
+  drop_na() # remove rows with missing values
 
 # Rename columns to match desired output format
 colnames(go_term2gene) <- c("term", "gene")
@@ -223,15 +219,13 @@ colnames(go_term2gene) <- c("term", "gene")
 # Save to file
 write.table(go_term2gene, file = "Axolotl_GO_term2gene.txt", sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
 
-# Number of rows: 
+# Number of rows:
 cat("Number of GO term2gene rows:", nrow(go_term2gene), "\n")
-
 ```
 
 ```{r view go term2gene}
 # Check first few rows
 head(go_term2gene)
-
 ```
 
 
@@ -241,14 +235,14 @@ Here we use the same process as we did above for GO (colum name `GOs`), selectin
 
 ```{r KEGG TERM2GENE}
 kegg_term2gene <- eggnog_anno %>%
-    dplyr::select(KEGG_Pathway, `#query`) %>%  # Select the relevant columns
-    dplyr::filter(grepl("map", KEGG_Pathway)) %>%  # Keep only rows where KEGG_Pathway contains 'map'
-    separate_rows(KEGG_Pathway, sep = ",") %>%  # Split multiple pathways into separate rows
-    dplyr::mutate(term = gsub("map:", "", KEGG_Pathway)) %>%  # Remove the "map:" prefix
-    dplyr::filter(grepl("^map", term)) %>%  # Filter again to make sure we only have map pathways (after removing "map:")
-    dplyr::select(term, `#query`) %>%  # Select the pathway (term) and gene columns
-    distinct() %>%  # Remove duplicate rows
-    drop_na()  # Remove rows with missing values
+  dplyr::select(KEGG_Pathway, `#query`) %>% # Select the relevant columns
+  dplyr::filter(grepl("map", KEGG_Pathway)) %>% # Keep only rows where KEGG_Pathway contains 'map'
+  separate_rows(KEGG_Pathway, sep = ",") %>% # Split multiple pathways into separate rows
+  dplyr::mutate(term = gsub("map:", "", KEGG_Pathway)) %>% # Remove the "map:" prefix
+  dplyr::filter(grepl("^map", term)) %>% # Filter again to make sure we only have map pathways (after removing "map:")
+  dplyr::select(term, `#query`) %>% # Select the pathway (term) and gene columns
+  distinct() %>% # Remove duplicate rows
+  drop_na() # Remove rows with missing values
 
 
 # Rename columns to match desired output format
@@ -264,7 +258,6 @@ cat("Number of KEGG term2gene rows:", nrow(kegg_term2gene), "\n")
 ```{r view kegg term2gene}
 # View result to check
 head(kegg_term2gene)
-
 ```
 
 ## 3.2 TERM2NAME 
@@ -276,21 +269,19 @@ Now we will assign term descriptions to term IDs and create our `TERM2NAME` file
 This may take a few moments to run. It will use the `ontology` object we created earlier from the `go.obo` file. 
 
 ```{r GO TERM2NAME}
-
-# Create term to name table, removing duplicates, missing values and obsolete terms 
+# Create term to name table, removing duplicates, missing values and obsolete terms
 go_term2name <- go_term2gene %>% # only keep terms that are in our term2gene object (ie, mapped to axolotl)
-    mutate(name = ontology$name[term]) %>% 
-    dplyr::select(term, name) %>%
-    distinct() %>%
-    drop_na() %>%
-    filter(!grepl("obsolete", name))
+  mutate(name = ontology$name[term]) %>%
+  dplyr::select(term, name) %>%
+  distinct() %>%
+  drop_na() %>%
+  filter(!grepl("obsolete", name))
 
 # Save to file
 write.table(go_term2name, file = "Axolotl_GO_term2name.txt", sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
 
 # Show the first few lines
 head(go_term2name)
-
 ```
 
 
@@ -308,9 +299,9 @@ Let's restrict it to include the terms relevant to our analysis, and then print 
 
 ```{r KEGG TERM2NAME}
 kegg_term2name <- kegg_pathways %>%
-  dplyr::filter(term %in% kegg_term2gene$term) %>%  # Only keep terms that are in kegg_term2gene
-  distinct() %>%  # Remove duplicate entries
-  drop_na()  # Remove rows with missing values
+  dplyr::filter(term %in% kegg_term2gene$term) %>% # Only keep terms that are in kegg_term2gene
+  distinct() %>% # Remove duplicate entries
+  drop_na() # Remove rows with missing values
 
 # Save the result to a file
 write.table(kegg_term2name, file = "Axolotl_KEGG_term2name.txt", sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
@@ -331,25 +322,21 @@ Genes that do not have any annotation are excluded from enrichment analysis, so 
 Count the number of GO terms found within the genome, and the number of genes with GO annotations: 
 
 ```{r report GO annotation counts}
-
-go_total_terms<-nrow(go_term2gene)
+go_total_terms <- nrow(go_term2gene)
 print(paste("Total annotations to GO:", go_total_terms))
 
 go_unique_genes <- length(unique(go_term2gene$gene))
 print(paste("Number of unique genes with 1 or more annotation terms:", go_unique_genes))
-
 ```
 
 And for KEGG:
 
 ```{r report KEGG annotation counts}
-
-kegg_total_terms<-nrow(kegg_term2gene)
+kegg_total_terms <- nrow(kegg_term2gene)
 print(paste("Total annotations to KEGG Pathways:", kegg_total_terms))
 
 kegg_unique_genes <- length(unique(kegg_term2gene$gene))
 print(paste("Number of unique genes with 1 or more annotation terms:", kegg_unique_genes))
-
 ```
 
 47,196 putative axolotl proteins were annotated. That's around 1/4 of our predicted proteins mapped to KEGG Pathways, and less than half of our genes mapped to GO! Ouch. As much as we expect this with uncurated novel species genomes, it's still unpleasant to face :-)
@@ -363,15 +350,15 @@ What of the genes in our gene list specifically? We have an uncurated proteome, 
 go_filtered_term2gene <- go_term2gene %>% filter(gene %in% background)
 
 # Count the number of unique background genes with at least one GO term
-unique_genes_with_go <- go_filtered_term2gene %>% distinct(gene) %>% nrow()
+unique_genes_with_go <- go_filtered_term2gene %>%
+  distinct(gene) %>%
+  nrow()
 
 # Calculate the percentage of background genes that have GO annotations
 percent_go_unique <- (unique_genes_with_go / length(background)) * 100
 
 # Print results
-cat("Number of input genes with GO annotations:", unique_genes_with_go, "(",percent_go_unique,"%)\n")
-
-
+cat("Number of input genes with GO annotations:", unique_genes_with_go, "(", percent_go_unique, "%)\n")
 ```
 
 
@@ -380,15 +367,15 @@ cat("Number of input genes with GO annotations:", unique_genes_with_go, "(",perc
 kegg_filtered_term2gene <- kegg_term2gene %>% filter(gene %in% background)
 
 # Count the number of unique background genes with at least one GO term
-unique_genes_with_kegg <- kegg_filtered_term2gene %>% distinct(gene) %>% nrow()
+unique_genes_with_kegg <- kegg_filtered_term2gene %>%
+  distinct(gene) %>%
+  nrow()
 
 # Calculate the percentage of background genes that have GO annotations
 percent_kegg_unique <- (unique_genes_with_kegg / length(background)) * 100
 
 # Print results
-cat("Number of input genes with KEGG Pathways annotations:", unique_genes_with_kegg, "(",percent_kegg_unique,"%)\n")
-
-
+cat("Number of input genes with KEGG Pathways annotations:", unique_genes_with_kegg, "(", percent_kegg_unique, "%)\n")
 ```
 
 As expected, the annotation % is higher for expressed genes than all predicted genes, and very much higher than the GTF of 99,088 predicted gene models (!!!) with an annotation rate of 21.6%.   
@@ -408,7 +395,7 @@ The `enricher` function is the 'universal' ORA option that accepts the `TERM2GEN
 Let's review the help page:
 
 ```{r help enricher}
-?clusterProfiler::enricher
+# ?clusterProfiler::enricher
 ```
 
 There are parameters for both adjusted P value and q value. Terms must pass all thresholds (unadjusted P, adjusted P, and q value) so the important filter will be the most stringent test applied. Let's go with BH and 0.05 which we have used regularly within this workshop and are fairly common choices in the field. 
@@ -417,7 +404,6 @@ we need to provide term2gene and term2name, and don't specify an organism.
 
 
 ```{r CP GO ORA }
-
 cp_go_ora <- enricher(
   gene = degs,
   pvalueCutoff = 0.05,
@@ -433,7 +419,6 @@ cp_go_ora <- enricher(
 
 ```{r view CP GP ORA result summary}
 cp_go_ora
-
 ```
 
 91 significantly enriched terms at P.adj < 0.05. 
@@ -450,8 +435,7 @@ Save the results to a text file:
 
 ```{r save CP GO ORA table}
 file <- "Axolotl_clusterProfiler_GO_ORA_results.tsv"
-write.table(cp_go_ora, file, sep = "\t", quote = FALSE, row.names = FALSE)	
-
+write.table(cp_go_ora, file, sep = "\t", quote = FALSE, row.names = FALSE)
 ```
 
 
@@ -460,10 +444,10 @@ Let's visualise with one of my favourite `enrichplot` plots, the treeplot! Anoth
 ```{r treeplot CP GO ORA, , fig.width=12}
 # calculate pairwise similarities between the enriched terms
 cp_go_ora <- enrichplot::pairwise_termsim(cp_go_ora)
-p<- enrichplot::treeplot(cp_go_ora, 
-  showCategory = 15, 
-  color = "p.adjust", 
-  cluster.params = list(label_words_n = 5)
+p <- enrichplot::treeplot(cp_go_ora,
+  showCategory = 15,
+  color = "p.adjust",
+  nCluster = 5
 )
 
 # Add annotations (number of input genes and number of input genes with GO terms)
@@ -485,27 +469,26 @@ The `GSEA` function is the 'universal' GSEA option that accepts the `TERM2GENE` 
 Let's review the help page:
 
 ```{r help GSEA}
-?clusterProfiler::GSEA
+# ?clusterProfiler::GSEA
 ```
 
 Recall from our `clusterProfiler` session with human data that we needed to add `nPermSimple = 10000` to avoid a warning about "unbalanced (positive and negative) gene-level statistic value" and reduce `eps` to zero to avoid a warning about obtaining better P value estimates . Let's do this from the start.
 
 ```{r CP KEGG GSEA}
 cp_kegg_gsea <- GSEA(
-  geneList = ranked_vector, 
-  exponent = 1, 
-  minGSSize = 10, 
-  maxGSSize = 500, 
+  geneList = ranked_vector,
+  exponent = 1,
+  minGSSize = 10,
+  maxGSSize = 500,
   eps = 0,
   pvalueCutoff = 0.05,
   pAdjustMethod = "BH",
-  TERM2GENE = kegg_term2gene, 
-  TERM2NAME = kegg_term2name, 
-  seed = 123, 
+  TERM2GENE = kegg_term2gene,
+  TERM2NAME = kegg_term2name,
+  seed = 123,
   by = "fgsea",
   nPermSimple = 10000
 )
-
 ```
 
 
@@ -520,10 +503,10 @@ Let's treeplot!
 ```{r treeplot CP KEGG GSEA, fig.width=12}
 # calculate pairwise similarities between the enriched terms
 cp_kegg_gsea <- enrichplot::pairwise_termsim(cp_kegg_gsea)
-p<- enrichplot::treeplot(cp_kegg_gsea, 
-  showCategory = 15, 
-  color = "p.adjust", 
-  cluster.params = list(label_words_n = 5)
+p <- enrichplot::treeplot(cp_kegg_gsea,
+  showCategory = 15,
+  color = "p.adjust",
+  nCluster = 5
 )
 
 # Add annotations (number of input genes and number of input genes with GO terms)
@@ -543,24 +526,26 @@ I favour a volcano plot for GSEA, so we can see positive vs negative NES. This i
 
 
 ```{r volcano plot CP gsea kegg, ,  fig.height=6, fig.width=9}
-
-p<- ggplot(cp_kegg_gsea@result, aes(x = enrichmentScore, y = -log10(p.adjust), color = p.adjust)) + 
-  geom_point(alpha = 0.7, size = 2) +  # Adjust point size
-  scale_color_gradient(low = "blue", high = "red") +  # Color by p.adjust values
-  theme_minimal() + 
-  labs(title = "clusterProfiler GSEA of KEGG Pathways", 
-       x = "Enrichment Score (NES)", 
-       y = "-log10(Adjusted P-value)",
-       color = "Adjusted P-value") + 
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels for readability
-  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +  # Add vertical line at x=0
-  geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "black") +  # Add horizontal line at p=0.05 cutoff
-  geom_text(aes(label = Description), 
-            hjust = 0.5, 
-            vjust = -0.5,  # Move labels higher off the points
-            size = 3, 
-            check_overlap = TRUE, 
-            alpha = 0.7)  # Add labels for each pathway term
+p <- ggplot(cp_kegg_gsea@result, aes(x = enrichmentScore, y = -log10(p.adjust), color = p.adjust)) +
+  geom_point(alpha = 0.7, size = 2) + # Adjust point size
+  scale_color_gradient(low = "blue", high = "red") + # Color by p.adjust values
+  theme_minimal() +
+  labs(
+    title = "clusterProfiler GSEA of KEGG Pathways",
+    x = "Enrichment Score (NES)",
+    y = "-log10(Adjusted P-value)",
+    color = "Adjusted P-value"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + # Rotate x-axis labels for readability
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") + # Add vertical line at x=0
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "black") + # Add horizontal line at p=0.05 cutoff
+  geom_text(aes(label = Description),
+    hjust = 0.5,
+    vjust = -0.5, # Move labels higher off the points
+    size = 3,
+    check_overlap = TRUE,
+    alpha = 0.7
+  ) # Add labels for each pathway term
 
 print(p)
 ```
@@ -586,15 +571,14 @@ And for KEGG, we need to paste the map ID to the end of this link: https://www.g
 Note that in the below code, the first command is identical the one that created the `go_term2gene` object earlier in the notebook. we could just use the `go_term2gene` object and skip step of the below code, using `go_term2gene` as input for step 2 rather than `go_data`. This code duplication is intentional, so that this code chunk is standalone for re-use and re-purpose. 
 
 ```{r GO GMT}
-
 # Step 1: Extract relevant columns (GO terms and gene IDs) from eggnog_anno
-go_data <- eggnog_anno %>% # use the emapper annotations for axolotl 
-  dplyr::select(GOs, `#query`) %>%  # Select the GO terms and the gene IDs
-  dplyr::filter(GOs != "-") %>%  # Filter out rows where the GO ID is missing ("-")
-  separate_rows(GOs, sep = ",") %>%  # Split comma-delimited list of GO terms into separate rows
-  dplyr::select(GOs, `#query`) %>%  # Keep GO terms and gene IDs columns
-  distinct() %>%  # Remove duplicates
-  drop_na()  # Drop any rows with missing values
+go_data <- eggnog_anno %>% # use the emapper annotations for axolotl
+  dplyr::select(GOs, `#query`) %>% # Select the GO terms and the gene IDs
+  dplyr::filter(GOs != "-") %>% # Filter out rows where the GO ID is missing ("-")
+  separate_rows(GOs, sep = ",") %>% # Split comma-delimited list of GO terms into separate rows
+  dplyr::select(GOs, `#query`) %>% # Keep GO terms and gene IDs columns
+  distinct() %>% # Remove duplicates
+  drop_na() # Drop any rows with missing values
 
 # Rename columns to match the format (term, gene)
 colnames(go_data) <- c("term", "gene")
@@ -622,7 +606,6 @@ write.table(go_gmt, file = "Axolotl_GO.gmt", sep = "\t", quote = FALSE, row.name
 
 # check only the first line (the lines can be long re all genes per term!:
 cat(go_gmt$gmt_entry[1:1], sep = "\n")
-
 ```
 
 
@@ -636,14 +619,14 @@ As above, for clarity we have avoided using the `TERM2GENE` object to ensure thi
 ```{r KEGG GMT}
 # Step 1: Extract relevant columns (KEGG Pathway and gene IDs) from eggnog_anno
 kegg_data <- eggnog_anno %>%
-  dplyr::select(KEGG_Pathway, `#query`) %>%  # Select the KEGG Pathway and gene ID columns
-  dplyr::filter(grepl("map", KEGG_Pathway)) %>%  # Keep only rows where KEGG_Pathway contains 'map'
-  separate_rows(KEGG_Pathway, sep = ",") %>%  # Split multiple pathways into separate rows
-  dplyr::mutate(term = gsub("map:", "", KEGG_Pathway)) %>%  # Remove the "map:" prefix
-  dplyr::filter(grepl("^map", term)) %>%  # Filter again to keep only 'map' pathways (after removing "map:")
-  dplyr::select(term, `#query`) %>%  # Select the KEGG Pathway and gene ID columns
-  distinct() %>%  # Remove duplicate rows
-  drop_na()  # Remove rows with missing values
+  dplyr::select(KEGG_Pathway, `#query`) %>% # Select the KEGG Pathway and gene ID columns
+  dplyr::filter(grepl("map", KEGG_Pathway)) %>% # Keep only rows where KEGG_Pathway contains 'map'
+  separate_rows(KEGG_Pathway, sep = ",") %>% # Split multiple pathways into separate rows
+  dplyr::mutate(term = gsub("map:", "", KEGG_Pathway)) %>% # Remove the "map:" prefix
+  dplyr::filter(grepl("^map", term)) %>% # Filter again to keep only 'map' pathways (after removing "map:")
+  dplyr::select(term, `#query`) %>% # Select the KEGG Pathway and gene ID columns
+  distinct() %>% # Remove duplicate rows
+  drop_na() # Remove rows with missing values
 
 # Ensure the column is properly named
 colnames(kegg_data)[colnames(kegg_data) == "#query"] <- "gene"
@@ -671,7 +654,6 @@ write.table(kegg_gmt, file = "Axolotl_KEGG-pathways.gmt", sep = "\t", quote = FA
 
 # check only the first line (the lines can be long re all genes per term!:
 cat(kegg_gmt$gmt_entry[1:1], sep = "\n")
-
 ```
 
 ## 5.2 Create description objects
@@ -682,28 +664,27 @@ The description file is identical to `clusterProfiler` `TERM2NAME` . Again, we d
 
 
 ```{r GO description }
-
-# Step 1: Get terms from ontology object created from go.obo with ontologyIndex function: 
-ontology_term_names <- ontology$name 
+# Step 1: Get terms from ontology object created from go.obo with ontologyIndex function:
+ontology_term_names <- ontology$name
 
 # Step 2: Filter and separate GO terms from the annotation file
 # We filter out rows where no GO terms are assigned and separate comma-delimited GO terms
 go_terms <- eggnog_anno %>%
   dplyr::select(GOs, `#query`) %>%
-  dplyr::filter(GOs != "-") %>%  # Keep only rows with GO terms
+  dplyr::filter(GOs != "-") %>% # Keep only rows with GO terms
   separate_rows(GOs, sep = ",") %>%
   dplyr::mutate(term = GOs) %>%
   dplyr::select(term, `#query`) %>%
   distinct() %>%
-  drop_na()  # Drop rows with missing values
+  drop_na() # Drop rows with missing values
 
 # Step 3: Create the description by matching GO terms to their names in the ontology
 go_des <- go_terms %>%
-  dplyr::mutate(name = ontology_term_names[term]) %>%  # Map term to its name from the ontology
-  dplyr::select(term, name) %>%  # Keep only the term and name
-  distinct() %>%  # Remove duplicates
-  drop_na() %>%  # Remove rows with missing values
-  filter(!grepl("obsolete", name))  # Remove obsolete terms if present
+  dplyr::mutate(name = ontology_term_names[term]) %>% # Map term to its name from the ontology
+  dplyr::select(term, name) %>% # Keep only the term and name
+  distinct() %>% # Remove duplicates
+  drop_na() %>% # Remove rows with missing values
+  filter(!grepl("obsolete", name)) # Remove obsolete terms if present
 
 # Save to file
 write.table(go_des, file = "Axolotl_GO.des", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
@@ -719,7 +700,7 @@ head(go_des)
 More extra work for the sake of portability :-)
 
 ```{r KEGG description}
-# Get columns from kegg gmt object 
+# Get columns from kegg gmt object
 kegg_gmt_columns <- kegg_gmt %>%
   separate(gmt_entry, into = c("term", "external_link", "genes"), sep = "\t")
 
@@ -752,28 +733,32 @@ Parameters to note for novel species:
 - `enrichDatabaseFile = "Axolotl_GO.gmt"`
 - `enrichDatabaseDescriptionFile = "Axolotl_GO.des"`
 
-```{r WGR ORA GO }
+`WebGestaltR` outputs results to a folder containing multiple files. Make a parent directory for the results of this tool:
 
-outputDirectory <- "WebGestaltR_results" 
+```{r create output dir}
+dir.create("WebGestaltR_results")
+```
+
+```{r WGR ORA GO }
+outputDirectory <- "WebGestaltR_results"
 project <- "Axolotl_ORA_GO"
 
 WebGestaltR(
-    organism = "others",                          # must specify 'others' when using custom db files
-    enrichMethod = "ORA",                         # Perform ORA, GSEA or NTA
-    interestGene = degs,                          # gene list of interest
-    referenceGene = background,                   # background genes
-    enrichDatabaseFile = "Axolotl_GO.gmt",        # the custom gmt file
-    enrichDatabaseDescriptionFile = "Axolotl_GO.des",   # the custom description file  
-    isOutput = TRUE,                              # Set to FALSE if you don't want files saved to disk
-    fdrMethod = "BH",                             # Benjamini-Hochberg multiple testing correction
-    sigMethod = "fdr",                            # Significance method ('fdr' or 'top')
-    fdrThr = 0.05,                                # FDR significance threshold
-    minNum = 10,                                   # Minimum number of genes per category
-    maxNum = 500,                                 # Maximum number of genes per category
-    outputDirectory = outputDirectory,
-    projectName = project
+  organism = "others", # must specify 'others' when using custom db files
+  enrichMethod = "ORA", # Perform ORA, GSEA or NTA
+  interestGene = degs, # gene list of interest
+  referenceGene = background, # background genes
+  enrichDatabaseFile = "Axolotl_GO.gmt", # the custom gmt file
+  enrichDatabaseDescriptionFile = "Axolotl_GO.des", # the custom description file
+  isOutput = TRUE, # Set to FALSE if you don't want files saved to disk
+  fdrMethod = "BH", # Benjamini-Hochberg multiple testing correction
+  sigMethod = "fdr", # Significance method ('fdr' or 'top')
+  fdrThr = 0.05, # FDR significance threshold
+  minNum = 10, # Minimum number of genes per category
+  maxNum = 500, # Maximum number of genes per category
+  outputDirectory = outputDirectory,
+  projectName = project
 )
-
 ```
 
 
@@ -800,27 +785,27 @@ set.seed(123)
 Again we are specifying `organism = "others"` and providing our GMT and description file: 
 
 ```{r WGR GSEA KEGG }
-
-outputDirectory <- "WebGestaltR_results" 
+outputDirectory <- "WebGestaltR_results"
 project <- "Axolotl_GSEA_KEGG"
 
-suppressWarnings({ WebGestaltR(
-    organism = "others",                          # must specify 'others' when using custom db files
-    enrichMethod = "GSEA",                        # Perform ORA, GSEA or NTA
-    interestGene = ranked_df,                     # ranked dataframe
-    enrichDatabaseFile = "Axolotl_KEGG-pathways.gmt",        # the custom gmt file
-    enrichDatabaseDescriptionFile = "Axolotl_KEGG-pathways.des",   # the custom description file  
-    isOutput = TRUE,                              # Set to FALSE if you don't want files saved to disk
-    fdrMethod = "BH",                             # Benjamini-Hochberg multiple testing correction
-    sigMethod = "fdr",                            # Significance method ('fdr' or 'top')
-    fdrThr = 0.05,                                # FDR significance threshold
-    minNum = 10,                                   # Minimum number of genes per category
-    maxNum = 500,                                 # Maximum number of genes per category
+suppressWarnings({
+  WebGestaltR(
+    organism = "others", # must specify 'others' when using custom db files
+    enrichMethod = "GSEA", # Perform ORA, GSEA or NTA
+    interestGene = ranked_df, # ranked dataframe
+    enrichDatabaseFile = "Axolotl_KEGG-pathways.gmt", # the custom gmt file
+    enrichDatabaseDescriptionFile = "Axolotl_KEGG-pathways.des", # the custom description file
+    isOutput = TRUE, # Set to FALSE if you don't want files saved to disk
+    fdrMethod = "BH", # Benjamini-Hochberg multiple testing correction
+    sigMethod = "fdr", # Significance method ('fdr' or 'top')
+    fdrThr = 0.05, # FDR significance threshold
+    minNum = 10, # Minimum number of genes per category
+    maxNum = 500, # Maximum number of genes per category
     outputDirectory = outputDirectory,
     projectName = project,
-    nThreads = 7
-) })
-
+    nThreads = 2
+  )
+})
 ```
 
 Open the HTML report `WebGestaltR_results/Project_Axolotl_GSEA_KEGG/Report_Axolotl_GSEA_KEGG.html` from the files pane in a browser.
@@ -844,7 +829,6 @@ version <- grep("data-version", lines, value = TRUE)
 
 # Print version
 cat("GO version from go.obo file:", version, "\n")
-
 ```
 
 ## KEGG Pathways database version 
@@ -864,7 +848,7 @@ sessionInfo()
 And RStudio version. Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the notebook. 
 
 
-```{r rstudio version - not run during knit, eval=FALSE}
+```{r rstudio version - not run during knit, eval = FALSE}
 # Get RStudio version information
 rstudio_info <- RStudio.Version()
 
@@ -881,17 +865,14 @@ rstudio_version_str <- paste(
 
 # Write the output to a text file
 writeLines(rstudio_version_str, "rstudio_version.txt")
-
 ```
 
-```{r rstudio version saved from text}
-
+```{r rstudio version saved from text, eval = FALSE}
 # Read the saved version information from the file
 rstudio_version_text <- readLines("rstudio_version.txt")
 
 # Print the version information to the document
 rstudio_version_text
-
 ```
 
 
