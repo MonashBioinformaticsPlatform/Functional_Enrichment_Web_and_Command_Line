@@ -50,7 +50,7 @@ Since we are doing ORA, we will need a filtered gene list, and a background gene
 The complete executable analysis is included below. Run the code chunks interactively while working through the chapter, or render the full Bookdown project to execute the analysis and retain the code, parameters, results, figures, and software-version information in the book output.
 
 
-```{r Load R packages, include=FALSE, eval=TRUE}
+```{r Load R packages, include=TRUE, eval=TRUE}
 library(readr)
 library(dplyr)
 library(gprofiler2)
