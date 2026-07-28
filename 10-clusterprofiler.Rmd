@@ -66,7 +66,7 @@ library(ggupset)
 library(ggplot2)
 ```
 
-## 0. Working directory
+## Working directory
 
 Bookdown evaluates relative file paths from the book project directory. Confirm that the input files used below are available from that directory, or update the file paths to match your project structure:
 
@@ -83,7 +83,7 @@ knitr::opts_knit$set(root.dir = "day2_inputData")
 getwd()
 ```
 
-## 1. Load input data and extract ranked gene list
+## Load input data and extract ranked gene list
 
 We will once again load the Pezzini RNAseq dataset.
 
@@ -116,7 +116,7 @@ tail(ranked)
 ```
 
 
-## 2. Check `gseKEGG` function arguments and requirements
+## Check `gseKEGG` function arguments and requirements
 
 Review the parameters:
 
@@ -150,7 +150,7 @@ Going back to where we loaded the input data and ran `head` to view the first fe
 Since our input data does not match any of the valid namespaces, we need to convert gene IDs! `clusterProfiler` has the `bitr` function to do this. `BiomaRt` is also a popular R package for this task.
 
 
-## 3. Convert gene IDs
+## Convert gene IDs
 
 Check the usage for the `bitr` function:
 
@@ -212,7 +212,7 @@ tail(ranked_entrez)
 
 Looks good! Now we are ready to enrich!
 
-## 4. Run GSEA over KEGG database
+## Run GSEA over KEGG database
 
 Now run GSEA over the KEGG database with `gseKEGG` function, setting a `seed` value and `kegg` as our gene ID type. this may take a minute or two to run.
 
@@ -263,7 +263,7 @@ gsea_kegg <- gseKEGG(
 Great, those last 2 warnings have resolved and we only have the expected one about tied rankings.
 
 
-## 5. Visualise GSEA KEGG results
+## Visualise GSEA KEGG results
 
 
 ### Tabular results
@@ -634,7 +634,7 @@ ggplot2::ggplot(gsea_kegg@result, aes(x = enrichmentScore, y = -log10(p.adjust),
 ```
 
 
-## 6. Save versions and session details
+## Save versions and session details
 
 ### Database query dates
 
