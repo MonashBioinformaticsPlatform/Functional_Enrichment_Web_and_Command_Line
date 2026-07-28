@@ -727,6 +727,5 @@ The chapter will render successfully only when all required packages and input f
 
 This may be the one you found most informative, easiest to interpret, most eye-catching...
 
-<p>&nbsp;</p>  <!-- insert blank line -->
 
-<img src="images/poll-favourite-plot-type.png" style="border: none; box-shadow: none; background: none; width: 100%;">
+<img src="images/poll-favourite-plot-type.png" class="screenshot screenshot-full">
