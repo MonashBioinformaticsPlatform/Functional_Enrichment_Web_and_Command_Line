@@ -106,3 +106,17 @@ div.sidebar {
   background-color: transparent;
   color: initial;
 }
+
+/* Screenshot images --------------------------------------------*/
+
+.screenshot {
+  border: none;
+  box-shadow: none;
+  background: none;
+  display: block;
+  margin: 1.5em 0;
+}
+
+.screenshot-full {
+  width: 100%;
+}
