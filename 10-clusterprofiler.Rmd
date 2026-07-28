@@ -1,5 +1,16 @@
 # clusterProfiler and enrichplot
 
+```{r clusterprofiler-echo-setup, include=FALSE}
+knitr::opts_chunk$set(
+  eval = FALSE,
+  echo = TRUE,
+  include = TRUE,
+  results = "markup",
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center"
+)
+```
 
 [clusterProfiler](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html) is a comprehensive suite of enrichment tools. It has functions to run ORA or GSEA over commonly used databases (GO, KEGG, KEGG Modules, DAVID, Pathway Commons, WikiPathways) as well as universal enrichment functions to perform ORA or GSEA with novel species or custom gene sets. We will use these universal tools in the final activity of this workshop, focusing on the supported organisms and datbases for the present activity.
 
@@ -55,7 +66,7 @@ Since we have covered ORA with `gprofiler`, we will perform a GSEA with `cluster
 The complete executable analysis is included below. Run the code chunks interactively while working through the chapter, or render the full Bookdown project to execute the analysis and retain the code, parameters, results, figures, and software-version information in the book output.
 
 
-```{r Load R packages clusterprofiler, include=FALSE}
+```{r Load R packages clusterprofiler, include=FALSE, eval=TRUE}
 library(clusterProfiler)
 library(enrichplot)
 library(readr)
@@ -70,7 +81,7 @@ library(ggplot2)
 
 Bookdown evaluates relative file paths from the book project directory. Confirm that the input files used below are available from that directory, or update the file paths to match your project structure:
 
-```{r check notebook workdir}
+```{r check notebook workdir, eval=TRUE}
 # Bookdown evaluates relative file paths from the book project directory.
 # Confirm the directory from which the book is being rendered.
 getwd()
@@ -685,7 +696,7 @@ rstudio_version_text <- readLines("rstudio_version.txt")
 rstudio_version_text
 ```
 
-```{r restore working directory clusterprofiler, include=FALSE}
+```{r restore working directory clusterprofiler, include=FALSE, eval=TRUE}
 # Restore the book's working directory so later chapters (and their
 # before_chapter_script, which re-reads _bookdown.yml) resolve their own
 # relative paths correctly.

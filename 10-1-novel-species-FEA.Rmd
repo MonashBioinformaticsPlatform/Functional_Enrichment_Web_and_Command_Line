@@ -1,5 +1,17 @@
 # Novel species FEA
 
+```{r novel-species-echo-setup, include=FALSE}
+knitr::opts_chunk$set(
+  eval = FALSE,
+  echo = TRUE,
+  include = TRUE,
+  results = "markup",
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center"
+)
+```
+
 FEA can be easily performed for many non-model species with user friendly web tools or R packages. [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) web currently supports 984 species, and [STRING](https://string-db.org/) currently supports over 12 thousand species.
 
 Since many non-model species are supported by some FEA tools, today I am using the term **novel species** to describe a species that is not currently supported by any FEA tool.
@@ -178,7 +190,7 @@ The KEGG Pathways file is identical in format to what is required for both the `
 
 The complete executable analysis is included below. Run the code chunks interactively while working through the chapter, or render the full Bookdown project to execute the analysis and retain the code, parameters, results, figures, and software-version information in the book output.
 
-```{r  Load libraries, include=FALSE }
+```{r  Load libraries, include=FALSE, eval=TRUE }
 library(readr)
 library(dplyr)
 library(ontologyIndex)
@@ -192,7 +204,7 @@ library(enrichplot)
 
 Ensure the 'workshop' directory is your current working directory:
 
-```{r check notebook workdir novel species}
+```{r check notebook workdir novel species, eval=TRUE}
 # Bookdown evaluates relative file paths from the book project directory.
 # Confirm the directory from which the book is being rendered.
 getwd()
@@ -1051,7 +1063,7 @@ rstudio_version_text <- readLines("rstudio_version.txt")
 rstudio_version_text
 ```
 
-```{r restore working directory novel species, include=FALSE}
+```{r restore working directory novel species, include=FALSE, eval=TRUE}
 # Restore the book's working directory so later chapters (and their
 # before_chapter_script, which re-reads _bookdown.yml) resolve their own
 # relative paths correctly.

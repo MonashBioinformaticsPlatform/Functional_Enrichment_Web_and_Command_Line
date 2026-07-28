@@ -2,6 +2,18 @@
 
 # gprofiler2
 
+```{r gprofiler2-echo-setup, include=FALSE}
+knitr::opts_chunk$set(
+  eval = FALSE,
+  echo = TRUE,
+  include = TRUE,
+  results = "markup",
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center"
+)
+```
+
 [gprofiler2](https://cran.r-project.org/web/packages/gprofiler2/index.html) is the R interface to the `g:Profiler` web-based toolset that you used in day 1 of the workshop.
 
 Like the web interface, `gprofiler2` performs ORA with `g:GOSt` against multiple databases simultaneously. 
@@ -38,7 +50,7 @@ Since we are doing ORA, we will need a filtered gene list, and a background gene
 The complete executable analysis is included below. Run the code chunks interactively while working through the chapter, or render the full Bookdown project to execute the analysis and retain the code, parameters, results, figures, and software-version information in the book output.
 
 
-```{r Load R packages, include=FALSE}
+```{r Load R packages, include=FALSE, eval=TRUE}
 library(readr)
 library(dplyr)
 library(gprofiler2)
@@ -51,7 +63,7 @@ library(tidyr)
 Bookdown evaluates relative file paths from the book project directory. Confirm that the input files used below are available from that directory, or update the file paths to match your project structure:
 
 
-```{r working directory}
+```{r working directory, eval=TRUE}
 # Bookdown evaluates relative file paths from the book project directory.
 # Confirm the directory from which the book is being rendered.
 getwd()
@@ -733,7 +745,7 @@ rstudio_version_text <- readLines("rstudio_version.txt")
 rstudio_version_text
 ```
 
-```{r restore working directory, include=FALSE}
+```{r restore working directory, include=FALSE, eval=TRUE}
 # Restore the book's working directory so later chapters (and their
 # before_chapter_script, which re-reads _bookdown.yml) resolve their own
 # relative paths correctly.
