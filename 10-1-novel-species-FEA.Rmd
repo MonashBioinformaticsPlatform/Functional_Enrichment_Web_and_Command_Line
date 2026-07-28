@@ -42,7 +42,7 @@ Despite the lack of quality resources, there is much 'omics work conducted in ax
 
 Today we will use [public RNAseq data](https://pmc.ncbi.nlm.nih.gov/articles/PMC5419050/#SD7) from axolotl, comparing gene expression in the blastema after proximal (at the shoulder) and distal (at the hand) limb amputation. The blastema is a collection of undifferentiated progenitor cells that give rise to the regenerated limb. Maybe our functional enrichment analysis of differentially expressed genes can help us understand processes that cause the blastema to grow into a full limb or just a hand!
 
-## Caveat!
+### Caveat!
 
 This is not a real experiment! It was tricky to find a novel species that had:
 
@@ -74,7 +74,7 @@ The [reference genome](https://www.axolotl-omics.org/dl/AmexG_v6.0-DD.fa.gz) and
 
 The annotation output file has been provided to you, and we will import this into R and use the `dplyr` package v 1.1.4 to extract GO and KEGG IDs into the required format for R-based FEA with `clusterProfiler` and `WebGestaltR`.
 
-The predicted proteome was also annotated with [STRING](https://string-db.org/) v 12.0. As of version 12, STRING includes a feature `Add any organism to STRING / Annotate proteome` ([Szklarczyk etl al 2023](https://pmc.ncbi.nlm.nih.gov/articles/PMC9825434/)). The axolotl proteome was uploaded to STRING and annotation performed on STRING servers in less than 1 day. The [resulting annotation](https://version-12-0.string-db.org/organism/STRG0A90SNX) is persistent and shareable and can be used for all of STRING's search functions including ORA (`Multiple proteins`) and GSEA (`Proteins with Values/Ranks`).
+The predicted proteome was also annotated with [STRING](https://string-db.org/) v 12.0. As of version 12, STRING includes a feature `Add any organism to STRING / Annotate proteome` ([Szklarczyk et al 2023](https://pmc.ncbi.nlm.nih.gov/articles/PMC9825434/)). The axolotl proteome was uploaded to STRING and annotation performed on STRING servers in less than 1 day. The [resulting annotation](https://version-12-0.string-db.org/organism/STRG0A90SNX) is persistent and shareable and can be used for all of STRING's search functions including ORA (`Multiple proteins`) and GSEA (`Proteins with Values/Ranks`).
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -203,7 +203,7 @@ library(enrichplot)
 
 ## Working directory
 
-Ensure the 'workshop' directory is your current working directory:
+Ensure the 'workshop' directory is your current working directory. ("workshop" refers to your own RStudio project folder if you're running this during the live session — the code below handles the book's own relative paths automatically.)
 
 ```{r check notebook workdir novel species, eval=TRUE}
 # Bookdown evaluates relative file paths from the book project directory.
@@ -220,19 +220,7 @@ getwd()
 
 ## Import `emapper` axolotl annotation file, GO ontology file and KEGG Pathways file
 
-### Public data sources used for this notebook
-
-- [Reference genome](https://www.axolotl-omics.org/dl/AmexG_v6.0-DD.fa.gz)
-- [GTF file](https://www.axolotl-omics.org/dl/AmexT_v47-AmexG_v6.0-DD.gtf.gz)
-- [Raw fastq](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA300706)
-- [GO 'core' ontology file](https://purl.obolibrary.org/obo/go.obo)
-
-
-### Data processing
-
-The raw reads were processed to counts matrix and DE results broadly following https://github.com/Sydney-Informatics-Hub/RNASeq-DE using the reference genome from www.axolotl-omics.org. Differential gene expression analysis was performed in R with `DESeq2` v 1.46.0, filtering for genes with at least a count of 10 in at least 2 samples. The data comprises 2 groups (proximal blastema and distal blastema) and 2 replicates per group.
-
-A predicted proteome was created by extracting the predicted peptide sequences from the GTF file from www.axolotl-omics.org then filtering for longest isoform per gene with `AGAT` v 1.4.0. The predicated proteome was annotated against GO and KEGG with `eggNOG emapper` v 2.1.12.
+See [Raw data sources](#raw-data-sources) and [Data preparation](#data-preparation) above for the full data provenance and processing pipeline behind the files imported below.
 
 ### Import annotation files
 
@@ -275,7 +263,7 @@ For KEGG, we have both `map` and `ko` IDs in our `emapper` annotation.
 
 Today we will be working with the `map` terms due to database download restrictions.
 
-Free access to the KEGG FTP downloads requires an academic subscription, to which you must confirm to be the  "only user of the KEGG FTP Data". The pathways list was available freely. As a single user, you can request academic access here https://www.pathway.jp/en/academic.html.
+Free access to the KEGG FTP downloads requires an academic subscription, to which you must confirm to be the "only user of the KEGG FTP Data". The pathways list was available freely. As a single user, you can request academic access here https://www.pathway.jp/en/academic.html.
 
 There is an alternate method for using `ko` IDs, which uses the KEGG ontology information available through the `clusterProfiler` functions `enrichKEGG` and `gseKEGG`. An example of the R code can be found here https://github.com/dadrasarmin/enrichment_analysis_for_non_model_organism.  However, this poses a problem: as the novel species gene IDs are assigned to KEGG terms, gene:name duplicate records are identified, and duplicates must be removed in order to avoid errors running the enrichment. This loss of data will have a real impact on the results, with the importance of some terms being underestimated.
 
@@ -567,7 +555,9 @@ percent_kegg_unique <- (unique_genes_with_kegg / length(background)) * 100
 cat("Number of input genes with KEGG Pathways annotations:", unique_genes_with_kegg, "(", percent_kegg_unique, "%)\n")
 ```
 
-As expected, the annotation % is higher for expressed genes than all predicted genes, and very much higher than the GTF of 99,088 predicted gene models (!!!) with an annotation rate of 21.6%.
+As expected, the annotation % is higher for expressed genes than all predicted genes.
+
+Note this is a different denominator than the percentages above: those covered the ~47,196-protein *predicted proteome* (already filtered to the longest isoform per gene), whereas the figure below covers the GTF of 99,088 predicted gene models (!!!) *before* that filtering, with an annotation rate of 21.6%.
 
 This highlights a major caveat when performing FEA on non-model species: the results are only as good as the annotations behind them. Therefore, all results must be interpreted with caution. For many novel (and under-funded) species, there are little opportunities (at present) to improve the annotation. Some in-silico predicted genes appear to be highly expressed and significantly regulated yet have no significant similarity to anything in the non-redundant nucleotide or protein databases. When working with datasets like this, it is critical to explore those individual genes through other methods, in addition to trying to garner some higher level overview such as we aim to obtain from FEA. Hopefully, recent advances in AI protein modelling can help provide insights into the functions of these novel genes.
 
@@ -1023,6 +1013,8 @@ cat("GO version from go.obo file:", version, "\n")
 ### KEGG Pathways database version
 
 The KEGG pathways file does not contain any version details within the file contents, but does have the date saved in the name of the file that was imported into this workbook. Adding the date of download was done manually, and is always recommended practice for files and databases that do not contain any date or version details.
+
+**No code chunk is needed here** — the download date (`kegg_pathways_2024-11-13.txt`) is already recorded above where the file was imported.
 
 
 ### R version and R package versions
