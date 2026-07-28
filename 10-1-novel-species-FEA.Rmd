@@ -188,7 +188,7 @@ library(WebGestaltR)
 library(enrichplot)
 ```
 
-## 0. Working directory
+## Working directory
 
 Ensure the 'workshop' directory is your current working directory:
 
@@ -205,9 +205,9 @@ knitr::opts_knit$set(root.dir = "day2_inputData")
 getwd()
 ```
 
-## 1. Import `emapper` axolotl annotation file, GO ontology file and KEGG Pathways file
+## Import `emapper` axolotl annotation file, GO ontology file and KEGG Pathways file
 
-### 1.1 Public data sources used for this notebook
+### Public data sources used for this notebook
 
 - [Reference genome](https://www.axolotl-omics.org/dl/AmexG_v6.0-DD.fa.gz)
 - [GTF file](https://www.axolotl-omics.org/dl/AmexT_v47-AmexG_v6.0-DD.gtf.gz)
@@ -215,15 +215,15 @@ getwd()
 - [GO 'core' ontology file](https://purl.obolibrary.org/obo/go.obo)
 
 
-### 1.2 Data processing
+### Data processing
 
 The raw reads were processed to counts matrix and DE results broadly following https://github.com/Sydney-Informatics-Hub/RNASeq-DE using the reference genome from www.axolotl-omics.org. Differential gene expression analysis was performed in R with `DESeq2` v 1.46.0, filtering for genes with at least a count of 10 in at least 2 samples. The data comprises 2 groups (proximal blastema and distal blastema) and 2 replicates per group.
 
 A predicted proteome was created by extracting the predicted peptide sequences from the GTF file from www.axolotl-omics.org then filtering for longest isoform per gene with `AGAT` v 1.4.0. The predicated proteome was annotated against GO and KEGG with `eggNOG emapper` v 2.1.12.
 
-### 1.3 Import annotation files
+### Import annotation files
 
-#### 1.3.1 emapper proteome annotation
+#### emapper proteome annotation
 
 The `emapper` annotation output contains results against a number of databases including GO and KEGG, which we will focus on today.
 
@@ -234,7 +234,7 @@ head(eggnog_anno)
 
 The raw annotation file provides us with 'term ID to gene ID' mappings for our species. We also need 'term ID to term description' mappings. These files are not organisms specific: we will extract only the terms that are found within our custom species annotation, to make our organism specific version.
 
-#### 1.3.2 GO Core Ontology
+#### GO Core Ontology
 
 For GO, we will use the GO 'core' ontology file, downloaded from https://purl.obolibrary.org/obo/go.obo and included in the data files you downloaded to `workshop` directory earlier.
 
@@ -252,7 +252,7 @@ ontology <- ontologyIndex::get_ontology(
 
 
 
-#### 1.3.3 KEGG Pathways
+#### KEGG Pathways
 
 For KEGG, we have both `map` and `ko` IDs in our `emapper` annotation.
 
@@ -278,9 +278,9 @@ head(kegg_pathways)
 
 
 
-## 2. Import axolotl DE results file and extract gene lists for ORA and GSEA
+## Import axolotl DE results file and extract gene lists for ORA and GSEA
 
-### 2.1 Import axolotl DE data
+### Import axolotl DE data
 
 Load the DE results file for axolotl:
 
@@ -290,7 +290,7 @@ head(de_matrix)
 ```
 
 
-### 2.2 Create the ranked gene list for GSEA
+### Create the ranked gene list for GSEA
 
 Recall from the last 2 activities that `clusterProfiler` requires a vector object for GSEA, while `WebGestaltR` requires a 2-column dataframe. Since we intend to use both tools, let's create both now:
 
@@ -316,7 +316,7 @@ head(ranked_df)
 tail(ranked_df)
 ```
 
-### 2.3 Create gene lists for ORA
+### Create gene lists for ORA
 
 For ORA, both tools require vector class gene lists. We will filter for adjusted P value < 0.01 and absolute log2 fold change greater than 1.5.
 
@@ -344,7 +344,7 @@ head(background)
 Note the large drop in gene numbers: 100K in GTF, 48K in predicted proteome, 24K expressed in the blastema! By reducing the number of background genes to what are expressed in the studied tissue, we can reduce falsely inflated P values and false positives within our list of enriched terms.
 
 
-### 2.4 Save gene lists
+### Save gene lists
 
 Saving any outputs generated from R code is vital to reproducibility! You should include all analysed gene lists within the supplementary materials of your manuscript.
 
@@ -358,11 +358,11 @@ write.table(ranked_df, file = "Axolotl_rankedFC.txt", sep = "\t", quote = FALSE,
 ```
 
 
-## 3. Reformat annotation files for `clusterProfiler` GO and KEGG analysis
+## Reformat annotation files for `clusterProfiler` GO and KEGG analysis
 
 Now we have annotation files and gene lists, we will bring those together to create the custom database files required for R FEA!
 
-### 3.1 Create TERM2GENE files
+### Create TERM2GENE files
 
 These are 2 column text files with the term ID (one per line) alongside the ID of the gene that maps to the term. A gene can map to many terms and thus be present on multiple lines. A term can be mapped to more than one gene and thus be present on many lines.
 
@@ -374,7 +374,7 @@ colnames(eggnog_anno)
 
 We need `GOs` and `KEGG_Pathway` columns.
 
-#### 3.1.1 GO TERM2GENE
+#### GO TERM2GENE
 
 Next, we will extract the GO IDs from the `emapper` annotation file, and wrangle into the correct format for `clusterProfiler` `TERM2GENE`.
 
@@ -405,7 +405,7 @@ head(go_term2gene)
 ```
 
 
-#### 3.1.2 KEGG TERM2GENE
+#### KEGG TERM2GENE
 
 Here we use the same process as we did above for GO (colum name `GOs`), selecting a different column name for KEGG (`KEGG_Pathway`).
 
@@ -436,9 +436,9 @@ cat("Number of KEGG term2gene rows:", nrow(kegg_term2gene), "\n")
 head(kegg_term2gene)
 ```
 
-### 3.2 TERM2NAME
+### TERM2NAME
 
-#### 3.2.1 GO
+#### GO
 
 Now we will assign term descriptions to term IDs and create our `TERM2NAME` files.
 
@@ -462,7 +462,7 @@ head(go_term2name)
 
 
 
-#### 3.2.2 KEGG
+#### KEGG
 
 The KEGG Pathways file was available for download in the correct format for `TERM2NAME`.
 
@@ -488,7 +488,7 @@ head(kegg_term2name)
 
 
 
-### 3.3 Count annotations
+### Count annotations
 
 How much of our proteome was annotated? What about our DEGs and background?
 
@@ -560,11 +560,11 @@ This highlights a major caveat when performing FEA on non-model species: the res
 
 For the axolotl with only 22% of predicted genes annotated, its clear that the in-silico gene predictions within the GTF file require much curation!
 
-## 4. Run `clusterProfiler` universal FEA functions `enricher` and `GSEA`
+## Run `clusterProfiler` universal FEA functions `enricher` and `GSEA`
 
 In the interest of time, and to try and cover as many options as possible, let's do ORA with GO and GSEA with KEGG for both tools.
 
-### 4.1 clusterProfiler ORA of GO terms
+### clusterProfiler ORA of GO terms
 
 The `enricher` function is the 'universal' ORA option that accepts the `TERM2GENE` and `TERM2NAME` files we have just created.
 
@@ -638,7 +638,7 @@ print(p)
 
 There's a lot of skin and muscle stuff, which we expect to be expressed in the blastema. As for why they are dysregulated? This is a dummy experiment from public RNAseq, with poor replication, and may not even be the right experiment type for this question, so let's not hope for too many clear answers :-)
 
-### 4.2 clusterProfiler GSEA of KEGG terms
+### clusterProfiler GSEA of KEGG terms
 
 The `GSEA` function is the 'universal' GSEA option that accepts the `TERM2GENE` and `TERM2NAME` files we have just created.
 
@@ -729,11 +729,11 @@ print(p)
 Interesting that all terms except one have leading edge genes that are upregulated in distal compared to proximal (the reference level)!
 
 
-## 5. Reformat annotation files for `WebGestaltR` GO and KEGG analysis
+## Reformat annotation files for `WebGestaltR` GO and KEGG analysis
 
 GMT files must have `.gmt` suffix and description files must have `.des` suffix.
 
-### 5.1 Create GMT objects
+### Create GMT objects
 
 The GMT files need links for all of the terms, so that we can have that handy link-out to enriched terms from the HTML report we experienced in the last activity. This is actually pretty simple to do thanks to consistent URLs.
 
@@ -742,7 +742,7 @@ For GO, we just need to paste the term ID to the end of this link https://www.eb
 And for KEGG, we need to paste the map ID to the end of this link: https://www.genome.jp/dbget-bin/www_bget?<mapID>
 
 
-#### 5.1.1 GO GMT
+#### GO GMT
 
 Note that in the below code, the first command is identical the one that created the `go_term2gene` object earlier in the notebook. we could just use the `go_term2gene` object and skip step of the below code, using `go_term2gene` as input for step 2 rather than `go_data`. This code duplication is intentional, so that this code chunk is standalone for re-use and re-purpose.
 
@@ -787,7 +787,7 @@ cat(go_gmt$gmt_entry[1:1], sep = "\n")
 
 
 
-#### 5.1.2 KEGG GMT
+#### KEGG GMT
 
 As above, for clarity we have avoided using the `TERM2GENE` object to ensure this code chunk can be standalone.
 
@@ -832,9 +832,9 @@ write.table(kegg_gmt, file = "Axolotl_KEGG-pathways.gmt", sep = "\t", quote = FA
 cat(kegg_gmt$gmt_entry[1:1], sep = "\n")
 ```
 
-### 5.2 Create description objects
+### Create description objects
 
-#### 5.2.1 GO description
+#### GO description
 
 The description file is identical to `clusterProfiler` `TERM2NAME` . Again, we don't want to use any code from the creation of `clusterProfiler` objects to ensure this part can be used alone.
 
@@ -871,7 +871,7 @@ head(go_des)
 
 
 
-#### 5.2.2 KEGG description file
+#### KEGG description file
 
 More extra work for the sake of portability :-)
 
@@ -897,11 +897,11 @@ head(kegg_des)
 
 
 
-## 6. Run `WebGestaltR` ORA and GSEA with custom database files
+## Run `WebGestaltR` ORA and GSEA with custom database files
 
 We will use the same approach as with `clusterProfiler` and run ORA with GO and GSEA with KEGG for both tools.
 
-### 6.1 WebGestaltR ORA of GO terms
+### WebGestaltR ORA of GO terms
 
 Parameters to note for novel species:
 
@@ -948,7 +948,7 @@ Change the 'Enrichment Results' view from table to 'Bar  chart', then try the 'A
 
 Confirm that our GMT file correctly included the term link by selecting a term and clicking the hyperlink at `Analyte set`. Pretty neat huh :-)
 
-### 6.2 WebGestaltR GSEA of KEGG Pathways
+### WebGestaltR GSEA of KEGG Pathways
 
 This will take slightly longer than ORA. We will set threads to 2 to speed it up as much as we can.
 
@@ -990,7 +990,7 @@ Expand 'Job summary' to read that "22 positive related categories and no negativ
 
 Compare the tabular results in this report to the treeplot we produced under code chunk `treeplot CP KEGG GSEA`. There are a lot of shared terms, and this is reassuring.
 
-## 7. Save versions and session details
+## Save versions and session details
 
 ### GO database version
 
