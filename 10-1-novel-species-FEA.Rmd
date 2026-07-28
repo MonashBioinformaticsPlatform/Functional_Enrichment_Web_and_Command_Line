@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-FEA can be easily performed for many non-model species with user friendly web tools or R packages. [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) web currently supports 984 species, and [STRING](https://string-db.org/) currently supports over 12 thousand species.
+FEA can be easily performed for many non-model species with user friendly web tools or R packages. [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) web currently lists 1,113 supported organism records, and [STRING](https://string-db.org/) currently (v12) supports 12,535 organisms.
 
 Since many non-model species are supported by some FEA tools, today I am using the term **novel species** to describe a species that is not currently supported by any FEA tool.
 
@@ -40,7 +40,7 @@ The axolotl (*Ambystoma mexicanum*) is a salamander with some very cool abilitie
 
 Despite the lack of quality resources, there is much 'omics work conducted in axolotl due to its regenerative capabilities.
 
-Today we will use [public RNAseq data](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5419050/#SD7) from axolotl, comparing gene expression in the blastema after proximal (at the shoulder) and distal (at the hand) limb amputation. The blastema is a collection of undifferentiated progenitor cells that give rise to the regenerated limb. Maybe our functional enrichment analysis of differentially expressed genes can help us understand processes that cause the blastema to grow into a full limb or just a hand!
+Today we will use [public RNAseq data](https://pmc.ncbi.nlm.nih.gov/articles/PMC5419050/#SD7) from axolotl, comparing gene expression in the blastema after proximal (at the shoulder) and distal (at the hand) limb amputation. The blastema is a collection of undifferentiated progenitor cells that give rise to the regenerated limb. Maybe our functional enrichment analysis of differentially expressed genes can help us understand processes that cause the blastema to grow into a full limb or just a hand!
 
 ## Caveat!
 
@@ -108,6 +108,7 @@ Before heading over to RStudio, we will briefly review the annotation requiremen
 
 This tool can perform ORA or GSEA for any organism with the provision of custom `TERM2GENE` and `TERM2NAME` files.  `TERM2GENE` maps the species gene ID to database (eg GO, KEGG) terms, and `TERM2NAME` maps the terms to their descriptive names. The gene IDs for our axolotl annotation are prefixed with `AMEX60DD`.
 
+<p>&nbsp;</p>  <!-- insert blank line -->
 
 **Example TERM2GENE format:**
 
@@ -127,7 +128,7 @@ In RStudio, we will extract these file formats from the `emapper` annotations fi
 
 We are using GO and KEGG today, however you can use any database, provided you first annotate your proteome to the database in order to obtain the term to name mappings.
 
-Acknowledgement to [Armin Dadras](https://github.com/dadrasarmin) for sharing his [code](https://github.com/dadrasarmin/enrichment_analysis_for_non_model_organism]) to extract `TERM2GENE` and `TERM2NAME` from `emapper` output.
+Acknowledgement to [Armin Dadras](https://github.com/dadrasarmin) for sharing his [code](https://github.com/dadrasarmin/enrichment_analysis_for_non_model_organism) to extract `TERM2GENE` and `TERM2NAME` from `emapper` output.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -190,7 +191,7 @@ The KEGG Pathways file is identical in format to what is required for both the `
 
 The complete executable analysis is included below. Run the code chunks interactively while working through the chapter, or render the full Bookdown project to execute the analysis and retain the code, parameters, results, figures, and software-version information in the book output.
 
-```{r  Load libraries, include=FALSE, eval=TRUE }
+```{r  Load libraries, include=TRUE, eval=TRUE }
 library(readr)
 library(dplyr)
 library(ontologyIndex)

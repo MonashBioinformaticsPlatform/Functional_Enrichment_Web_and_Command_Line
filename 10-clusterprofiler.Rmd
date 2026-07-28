@@ -66,7 +66,7 @@ Since we have covered ORA with `gprofiler`, we will perform a GSEA with `cluster
 The complete executable analysis is included below. Run the code chunks interactively while working through the chapter, or render the full Bookdown project to execute the analysis and retain the code, parameters, results, figures, and software-version information in the book output.
 
 
-```{r Load R packages clusterprofiler, include=FALSE, eval=TRUE}
+```{r Load R packages clusterprofiler, include=TRUE, eval=TRUE}
 library(clusterProfiler)
 library(enrichplot)
 library(readr)
