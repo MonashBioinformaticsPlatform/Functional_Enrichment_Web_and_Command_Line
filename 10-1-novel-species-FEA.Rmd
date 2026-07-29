@@ -878,7 +878,7 @@ More extra work for the sake of portability :-)
 ```{r KEGG description}
 # Get columns from kegg gmt object
 kegg_gmt_columns <- kegg_gmt %>%
-  separate(gmt_entry, into = c("term", "external_link", "genes"), sep = "\t")
+  separate(gmt_entry, into = c("term", "external_link", "genes"), sep = "\t") # We only need the "term" column
 
 # Create the kegg_des table by joining the pathways file with the species-specific terms from kegg_gmt
 kegg_des <- kegg_pathways %>%
@@ -938,7 +938,7 @@ WebGestaltR(
 ```
 
 
-&#x27A4; Open the HTML report `WebGestaltR_results/Project_Axolotl_ORA_GO/Report_Axolotl_ORA_GO.html` from the files pane in a browser.
+**View the results:** Open the HTML report `WebGestaltR_results/Project_Axolotl_ORA_GO/Report_Axolotl_ORA_GO.html` from the files pane in a browser.
 
 Note some term similarity to what we have seen with the past 2 analyses (that's reassuring!)
 
@@ -981,10 +981,10 @@ suppressWarnings({
     projectName = project,
     nThreads = 2
   )
-})
+}) # This will take ~ 4 min !
 ```
 
-&#x27A4; Open the HTML report `WebGestaltR_results/Project_Axolotl_GSEA_KEGG/Report_Axolotl_GSEA_KEGG.html` from the files pane in a browser.
+**View the results:** Open the HTML report `WebGestaltR_results/Project_Axolotl_GSEA_KEGG/Report_Axolotl_GSEA_KEGG.html` from the files pane in a browser.
 
 Expand 'Job summary' to read that "22 positive related categories and no negative related categories" are significant in this analysis. This is in contrast to the one negative category we observed when running KEGG GSEA with `clusterProfiler`. We expect some differences between these tools.
 
@@ -1096,7 +1096,7 @@ Using the STRING web tool, we will now peform ORA of this custom axolotl annotat
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-&#x27A4; Open the following link in your browser:
+**Step 1:** Open the following link in your browser:
 
 https://version-12-0.string-db.org/organism/STRG0A90SNX
 
@@ -1113,15 +1113,15 @@ There is also a downloads page, where any of the STRING annotation files can be 
 <img src="images/string-enrichment-file-format.png" class="screenshot screenshot-full">
 
 
-&#x27A4; On STRING, click `SELECT SPECIES ON INPUT PAGE`, then from the left search options, select `Multiple proteins`.
+**Step 2:** On STRING, click `SELECT SPECIES ON INPUT PAGE`, then from the left search options, select `Multiple proteins`.
 
 Note that the `Organism` field is pre-filled with `STRG0A90SNX (axolotl)`.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-&#x27A4; In the RStudio `Files` pane, locate your saved ORA gene list from earlier - `workshop/Axolotl_DEGs.txt`. Click the file to view it in RStudio, then copy paste the list into the STRING `List of Names` search field, then select `SEARCH`
+**Step 3:** In the RStudio `Files` pane, locate your saved ORA gene list from earlier - `workshop/Axolotl_DEGs.txt`. Click the file to view it in RStudio, then copy paste the list into the STRING `List of Names` search field, then select `SEARCH`
 
-&#x27A4; Click `CONTINUE` at the gene ID review page
+**Step 4:** Click `CONTINUE` at the gene ID review page
 
 Before we explore the results, note that we have performed ORA without a background gene list! 😮
 
@@ -1204,10 +1204,10 @@ In contrast, `STRING’s` custom species annotations are based on high-confidenc
 First of all we see a difference in the number of genes annotated to terms:
 
 
-|   Method    | GO      | KEGG Pathways | All     |
-|-------|---------|---------------|---------|
-| emapper | 21,376 | 12,229        | 39,539  |
-| STRING  | 36,895 | 21,502        | 38,398  |
+| Method  | GO     | KEGG Pathways | All    |
+|:--------|-------:|--------------:|-------:|
+| emapper | 21,373 |        12,226 | 39,536 |
+| STRING  | 36,895 |        21,502 | 38,398 |
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
