@@ -91,7 +91,29 @@ div.sidebar {
   border-radius: 5px;
   background: rgb(201, 249, 245);
 }
-.rationale > :first-child, .rational > :nth-child(2) {
+.rationale > :first-child, .rationale > :nth-child(2) {
+  margin-top: 0;
+}
+
+.overview {
+  margin: 2em;
+  padding: 1em;
+  border: 1px solid black;
+  border-radius: 5px;
+  background: #d6e8fb;
+}
+.overview > :first-child, .overview > :nth-child(2) {
+  margin-top: 0;
+}
+
+.summary {
+  margin: 2em;
+  padding: 1em;
+  border: 1px solid black;
+  border-radius: 5px;
+  background: #dff5df;
+}
+.summary > :first-child, .summary > :nth-child(2) {
   margin-top: 0;
 }
 

@@ -88,6 +88,7 @@ The DE results file has been provided to you, and we will import this into R to 
 
 ## Activity overview
 
+<div class="overview">
 1. Import `emapper` axolotl annotation file, GO ontology file and KEGG Pathways file
 2. Import axolotl DE results file and extract gene lists for ORA and GSEA
 3. Reformat annotation files for `clusterProfiler` GO and KEGG analysis
@@ -96,6 +97,7 @@ The DE results file has been provided to you, and we will import this into R to 
 6. Run `WebGestaltR` ORA and GSEA and visualise results in the interactive HTML report
 7. Run ORA with `STRING` online using custom axolotl annotation
 8. Compare `STRING` ORA web results to those generated using the `emapper` annotations in R
+</div>
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -1060,15 +1062,6 @@ rstudio_version_text
 knitr::opts_knit$set(root.dir = novel_species_book_root_dir)
 ```
 
-## Build the Bookdown output
-
-Save all changes before rendering. Build the complete book from the RStudio **Build** pane using **Build Book**, or run the project-specific Bookdown render command used by this workshop.
-
-The chapter will render successfully only when all required packages and input files are available and the executable code chunks complete without errors. Output tables and figures written by the analysis will be saved relative to the Bookdown project directory unless a different path is specified.
-
-❗ If the build fails, use the first error message in the render log to identify the missing file, package, object, or failed code chunk.
-
-<p>&nbsp;</p>  <!-- insert blank line -->
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 💫 You have  now explored two tools performing FEA in R for your novel species, and we have observed that both methods require the same starting files (annotation of novel species genes to databases, database term IDs to term descriptions) and give very similar results. Which you use depends on your personal preferences.
