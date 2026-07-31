@@ -50,6 +50,18 @@ pre code {
   white-space: inherit;
 }
 
+/* Sidebar navigation labels --------------------------------------------*/
+
+/* "Day 1" / "Day 2" part dividers in the sidebar TOC */
+.sidebar li.book-part {
+  font-weight: bold;
+}
+
+/* "Table of contents" heading above the sidebar TOC */
+nav[aria-label="Table of contents"] h2 {
+  font-weight: bold;
+}
+
 /* Sidebar formating --------------------------------------------*/
 
 div.sidebar {

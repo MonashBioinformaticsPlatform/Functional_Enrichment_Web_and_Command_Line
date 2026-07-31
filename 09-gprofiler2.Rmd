@@ -1,5 +1,3 @@
-# (PART) Day 2 {-}
-
 # gprofiler2
 
 ```{r gprofiler2-echo-setup, include=FALSE}
