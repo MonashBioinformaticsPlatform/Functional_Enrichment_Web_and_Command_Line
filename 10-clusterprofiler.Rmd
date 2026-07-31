@@ -49,7 +49,7 @@ This highlights the need to carefully review the tool you are using and explore 
 
 ## Activity overview
 
-
+<div class="overview">
 Since we have covered ORA with `gprofiler`, we will perform a GSEA with `clusterProfiler` using `gseKEGG`.
 
 1. Explore the functions of `clusterProfiler` including which FEA functions support which organisms and which namespaces
@@ -58,6 +58,7 @@ Since we have covered ORA with `gprofiler`, we will perform a GSEA with `cluster
 4. Use `bitr` to convert gene IDs from ENSEMBL to ENTREZ for compatability with `gseKEGG`
 5. Perform GSEA with `gseKEGG`
 6. Visualise results with many different plot types from `enrichplot`
+</div>
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -662,7 +663,9 @@ knitr::opts_knit$set(root.dir = clusterprofiler_book_root_dir)
 
 ## End of activity summary
 
+<div class="summary">
 - We have explored the supported organisms, namespaces and databases of the `clusterProfiler` enrichment functions
 - We have extracted a ranked gene list for GSEA and converted the gene IDs for compatability with `gseKEGG`
 - We have performed GSEA on the KEGG database with `gseKEGG` and visualised the results with multiple plot types
 - We have captured all version details relevant to the session within the R notebook and knit the file to HTML for record keeping
+</div>
