@@ -18,6 +18,7 @@ rmd_files:
   - 07-reporting.Rmd
   - 08-resources.Rmd
   - part-day2.Rmd
+  - package-setup.Rmd
   - 09-gprofiler2.Rmd
   - 10-clusterprofiler.Rmd
   - 10-1-novel-species-FEA.Rmd

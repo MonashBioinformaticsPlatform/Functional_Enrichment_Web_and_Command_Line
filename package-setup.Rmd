@@ -1,0 +1,90 @@
+# Setting Up R Packages
+
+```{r setup-echo-setup, include=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+The command-line chapters of this workshop (`gprofiler2`, `clusterProfiler` and `enrichplot`, Novel species FEA, `FGSEA`, and `STRINGdb`) use a number of R packages. On the day, these are already installed on the workshop-provided computers/VMs, so no action is needed. This page is for anyone who wants to run the code on their **own computer**, either during the workshop or afterwards.
+
+This workshop was built and tested with **R 4.6.1** and **Bioconductor 3.23**. Any recent R release (4.4 or later) with a matching Bioconductor release should work; see the [Bioconductor release/R version table](https://bioconductor.org/about/release-announcements/) if you are installing on an older R version.
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## CRAN packages
+
+Most of these come from the [tidyverse](https://www.tidyverse.org/) plus a handful of enrichment-specific packages:
+
+```{r install-cran, eval = FALSE}
+install.packages(c(
+  "tidyverse",  # includes dplyr, ggplot2, readr, tidyr, and friends
+  "data.table",
+  "gprofiler2",
+  "ggupset",
+  "ggtangle",
+  "msigdbr",
+  "ontologyIndex",
+  "WebGestaltR"
+))
+```
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## Bioconductor packages
+
+Bioconductor packages are installed via `BiocManager` rather than `install.packages()`:
+
+```{r install-bioc, eval = FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
+
+BiocManager::install(c(
+  "clusterProfiler",
+  "enrichplot",
+  "biomaRt",
+  "org.Hs.eg.db",
+  "fgsea",
+  "BiocParallel",
+  "STRINGdb"
+))
+```
+
+`org.Hs.eg.db` is the human genome-wide annotation package; it matches the human [Pezzini et al. 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) dataset used throughout the workshop.
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## Optional: GitHub-only package
+
+The `clusterProfiler`/`enrichplot` chapter mentions `multienrichjam`, a package that converts ORA results from other tools into `enrichplot`-compatible objects. It is **not required** for this workshop, has a large dependency footprint, and is not installed on the workshop VMs. If you'd like to try it on your own computer:
+
+```{r install-multienrichjam, eval = FALSE}
+install.packages("remotes")
+remotes::install_github("jmw86069/multienrichjam", dependencies = TRUE)
+```
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## Where each package is used
+
+::: {.overview}
+| Package             | Source        | Used in                                              |
+|---------------------|---------------|-------------------------------------------------------|
+| `tidyverse`/`dplyr`/`ggplot2`/`readr`/`tidyr` | CRAN | throughout all Day 2 chapters |
+| `data.table`         | CRAN          | FGSEA                                                 |
+| `gprofiler2`         | CRAN          | gprofiler2                                            |
+| `ggupset`            | CRAN          | clusterProfiler and enrichplot                        |
+| `ggtangle`           | CRAN          | clusterProfiler and enrichplot (`cnetplot` labelling)  |
+| `msigdbr`            | CRAN          | FGSEA                                                 |
+| `ontologyIndex`      | CRAN          | Novel species FEA                                     |
+| `WebGestaltR`        | CRAN          | Novel species FEA                                     |
+| `clusterProfiler`    | Bioconductor  | clusterProfiler and enrichplot, Novel species FEA      |
+| `enrichplot`         | Bioconductor  | clusterProfiler and enrichplot, Novel species FEA      |
+| `biomaRt`            | Bioconductor  | clusterProfiler and enrichplot                        |
+| `org.Hs.eg.db`       | Bioconductor  | clusterProfiler and enrichplot                        |
+| `fgsea`              | Bioconductor  | FGSEA                                                 |
+| `BiocParallel`       | Bioconductor  | FGSEA                                                 |
+| `STRINGdb`           | Bioconductor  | STRINGdb                                              |
+| `multienrichjam`     | GitHub (optional) | clusterProfiler and enrichplot (not run)          |
+:::
+
+<p>&nbsp;</p>  <!-- insert blank line -->
