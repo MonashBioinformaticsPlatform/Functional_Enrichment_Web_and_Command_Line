@@ -1213,3 +1213,13 @@ These GO terms from `STRING` may be parent terms of more specific child terms pr
 Whichever you choose, strength to you! This is not an easy space to work in 💪
 
 Remember the importance of validating your results through other means! 🧪
+
+## End of activity summary
+
+::: {.summary}
+- We have imported a custom `emapper` annotation, GO ontology, and KEGG Pathways file for a novel species (axolotl) not supported by any FEA tool
+- We have run `clusterProfiler` ORA of GO terms and GSEA of KEGG pathways using custom `TERM2GENE`/`TERM2NAME` files, and visualised results with `enrichplot`
+- We have run `WebGestaltR` ORA of GO terms and GSEA of KEGG pathways using custom `.gmt`/`.des` files, and explored the results in the interactive HTML report
+- We have run ORA on `STRING` web using a custom, persistent, citable proteome annotation
+- We have compared `STRING` and R-based results, and discussed why differing annotation methods and databases lead to divergent enrichment outcomes for novel species
+:::
