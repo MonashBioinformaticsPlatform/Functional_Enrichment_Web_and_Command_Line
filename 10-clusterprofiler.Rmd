@@ -28,13 +28,13 @@ One of the challenges when working with `clusterProfiler` for FEA is that each e
 
 Let's start by reviewing the dedicated database enrichment functions and what inbuilt support they have.
 
-| Database             | GO                                              | KEGG                                                                            | KEGG Modules                                                                    | Pathway Commons                   | WikiPathways | DAVID                    |
-|----------------------|-------------------------------------------------|---------------------------------------------------------------------------------|---------------------------------------------------------------------------------|------------------------------------|--------------|--------------------------|
-| GSEA function        | gseGO                                           | gseKEGG                                                                         | gseMKEGG                                                                        | gsePC                             | gseWP        | NA                       |
-| ORA function         | enrichGO                                        | enrichKEGG                                                                      | enrichMKEGG                                                                     | enrichPC                          | enrichWP     | enrichDAVID              |
-| Supported species    | Those with Bioconductor annotation package (20) | KEGG Organisms (thousands)                                                      | KEGG Organisms (thousands)                                                      | Human (or convert to UniProt IDs) | entrez       | Those supported by DAVID |
-| Supported namespaces | differs depending on species                    | 'kegg' (compatible with entrez), 'ncbi-geneid', 'ncib-proteinid' or   'uniprot' | 'kegg' (compatible with entrez), 'ncbi-geneid', 'ncib-proteinid' or   'uniprot' | 'hgnc' or 'uniprot                | entrez       | Those supported by DAVID |
 
+| Database             | GO                                              | KEGG                                                                           | KEGG Modules                                                                   | Pathway Commons                  | WikiPathways | DAVID                    |
+| -------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | -------------------------------- | ------------ | ------------------------ |
+| GSEA function        | `gseGO`                                         | `gseKEGG`                                                                      | `gseMKEGG`                                                                     | `gsePC`                          | `gseWP`      | NA                       |
+| ORA function         | `enrichGO`                                      | `enrichKEGG`                                                                   | `enrichMKEGG`                                                                  | `enrichPC`                       | `enrichWP`   | `enrichDAVID`            |
+| Supported species    | Those with Bioconductor annotation package (20) | KEGG organisms (thousands)                                                     | KEGG organisms (thousands)                                                     | Human, or convert to UniProt IDs | Entrez       | Those supported by DAVID |
+| Supported namespaces | Differs depending on species                    | `kegg` (compatible with Entrez), `ncbi-geneid`, `ncbi-proteinid`, or `uniprot` | `kegg` (compatible with Entrez), `ncbi-geneid`, `ncbi-proteinid`, or `uniprot` | `hgnc` or `uniprot`              | Entrez       | Those supported by DAVID |
 
 
 To obtain this information, 3 sources were required:
@@ -77,11 +77,11 @@ library(ggupset)
 library(ggplot2)
 ```
 
-## Working directory
+<!-- ## Working directory -->
 
-Bookdown evaluates relative file paths from the book project directory. Confirm that the input files used below are available from that directory, or update the file paths to match your project structure:
+<!-- Bookdown evaluates relative file paths from the book project directory. Confirm that the input files used below are available from that directory, or update the file paths to match your project structure: -->
 
-```{r check notebook workdir, eval=TRUE}
+```{r check notebook workdir, include = FALSE, eval=TRUE}
 # Bookdown evaluates relative file paths from the book project directory.
 # Confirm the directory from which the book is being rendered.
 getwd()
@@ -108,8 +108,8 @@ This time, instead of filtering for DEGs, we will extract all genes, and sort th
 
 What class of R object does our ranked gene list need to be in?
 
-```{r help gseKEGG}
-# ?gseKEGG
+```{r help gseKEGG, eval = FALSE}
+?gseKEGG
 ```
 
 We can see `geneList = order ranked geneList`. Not informative!
@@ -131,8 +131,8 @@ tail(ranked)
 
 Review the parameters:
 
-```{r help gsekegg}
-# ?gseKEGG
+```{r help gsekegg, eval = FALSE}
+?gseKEGG
 ```
 
 
@@ -165,8 +165,8 @@ Since our input data does not match any of the valid namespaces, we need to conv
 
 Check the usage for the `bitr` function:
 
-```{r help bitr}
-# ?bitr
+```{r help bitr, eval = FALSE}
+?bitr
 ```
 
 We need to understand what the valid `fromType` and `toType` values are, and it turns out we need an Org.db to use `bitr`! This is a Bioconductor annotation package, of which there are currently only 20. So while the `gseKEGG` function supports all organisms in KEGG, performing gene ID conversion within `clusterProfiler` may not be possible for non-model species and you would need to seek a different method.
@@ -308,15 +308,15 @@ To determine which plot functions are compatible with which FEA results type, yo
 
 Review the help menu for the `dotplot` function, which can plot both ORA and GSEA:
 
-```{r dotplot help}
-# ?enrichplot::dotplot
+```{r dotplot help, eval = FALSE}
+?enrichplot::dotplot
 ```
 
 
 And review the help menu for `ridgeplot` which can only plot GSEA results:
 
-```{r ridgeplot help}
-# ?enrichplot::ridgeplot
+```{r ridgeplot help, eval = FALSE}
+?enrichplot::ridgeplot
 ```
 
 Unfortunately, `enrichplot` is only compatible with the enrichment results from the packages produced by this development team, although the desire to use `enrichplot` with the output of other tools is widespread. The R package `multienrichjam` has a function `enrichDF2enrichResult` that converts ORA dataframe results from other FEA tools to the format required for `enrichplot`.
@@ -324,17 +324,17 @@ Unfortunately, `enrichplot` is only compatible with the enrichment results from 
 `multienrichjam` has a lot of dependencies and has not been installed on these VMs so we will not be performing this today. However, this functionality and flexibility is pretty cool, so if you wanted to install this on your own computer outside the workshop, below is the code for installing :-)
 
 
-```{r install multienrichjam}
+```{r install multienrichjam, eval = FALSE}
 # github remotes package required:
-# install.packages("remotes")
-# library(remotes)
+install.packages("remotes")
+library(remotes)
 
 # install multienrichjam:
-# remotes::install_github("jmw86069/multienrichjam", dependencies=TRUE)
-# library(multienrichjam)
+remotes::install_github("jmw86069/multienrichjam", dependencies = TRUE)
+library(multienrichjam)
 
 # check function help:
-# ?enrichDF2enrichResult
+?enrichDF2enrichResult
 ```
 
 
@@ -620,7 +620,6 @@ The `volplot` function within `enrichplot` does not support GSEA result objects,
 
 The volcano plot has the advantage of showing whether the genes in the enriched terms were predominantly from the top (upregulated) or bottom (downregulated) end of the list.
 
-
 ```{r gsea volcano plot}
 ggplot2::ggplot(gsea_kegg@result, aes(x = enrichmentScore, y = -log10(p.adjust), color = p.adjust)) +
   geom_point(alpha = 0.7, size = 2) + # Adjust point size
@@ -645,55 +644,12 @@ ggplot2::ggplot(gsea_kegg@result, aes(x = enrichmentScore, y = -log10(p.adjust),
 ```
 
 
-## Save versions and session details
+### R version and R package versions 
 
-### Database query dates
-
-Unlike `gprofiler`, `clusterProfiler` does not have a function to list the version of the queried databases.
-
-For this reason, we will save the analysis date to our rendered notebook, so the external database version could be back-calculated from the date if required:
-
-```{r date}
-cat("Date of analysis:\n")
-print(Sys.Date())
-```
-
-### R version and R package versions
+We can also capture the version of R and other session details including all loaded packages and versions with the `sessionInfo()` function: 
 
 ```{r info clusterprofiler}
 sessionInfo()
-```
-
-### RStudio version
-
-Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the chapter.
-
-
-```{r rstudio version - not run during knit clusterprofiler, eval=FALSE}
-# Get RStudio version information
-rstudio_info <- RStudio.Version()
-
-# Convert the version information to a string
-rstudio_version_str <- paste(
-  "RStudio Version Information:\n",
-  "Version: ", rstudio_info$version, "\n",
-  "Release Name: ", rstudio_info$release_name, "\n",
-  "Long Version: ", rstudio_info$long_version, "\n",
-  "Mode: ", rstudio_info$mode, "\n",
-  "Citation: ", rstudio_info$citation,
-  sep = ""
-)
-
-# Write the output to a text file
-writeLines(rstudio_version_str, "rstudio_version.txt")
-```
-
-```{r rstudio version saved from text clusterprofiler, eval=FALSE}
-# Read the saved version information from the file
-rstudio_version_text <- readLines("rstudio_version.txt")
-
-# Print the version information to the document
-rstudio_version_text
 ```
 
 ```{r restore working directory clusterprofiler, include=FALSE, eval=TRUE}
@@ -703,14 +659,6 @@ rstudio_version_text
 knitr::opts_knit$set(root.dir = clusterprofiler_book_root_dir)
 ```
 
-## Build the Bookdown output
-
-Save all changes before rendering. Build the complete book from the RStudio **Build** pane using **Build Book**, or run the project-specific Bookdown render command used by this workshop.
-
-The chapter will render successfully only when all required packages and input files are available and the executable code chunks complete without errors. Output tables and figures written by the analysis will be saved relative to the Bookdown project directory unless a different path is specified.
-
-❗ If the build fails, use the first error message in the render log to identify the missing file, package, object, or failed code chunk.
-
 
 ## End of activity summary
 
@@ -718,14 +666,3 @@ The chapter will render successfully only when all required packages and input f
 - We have extracted a ranked gene list for GSEA and converted the gene IDs for compatability with `gseKEGG`
 - We have performed GSEA on the KEGG database with `gseKEGG` and visualised the results with multiple plot types
 - We have captured all version details relevant to the session within the R notebook and knit the file to HTML for record keeping
-
-<p>&nbsp;</p>  <!-- insert blank line -->
-
-## Poll
-
-❓What was your favourite R plot from this activity? 🤔
-
-This may be the one you found most informative, easiest to interpret, most eye-catching...
-
-
-<img src="images/poll-favourite-plot-type.png" class="screenshot screenshot-full">

@@ -142,8 +142,8 @@ cat("Table saved to", title, "\n")
 Before running the below code chunk, review the parameters for the `gost` ORA function. We can do this easily by bringing up the help page for the function in the `Help` pane of RStudio. This is the same information that is displayed in the [gprofiler2](https://cran.r-project.org/web/packages/gprofiler2/gprofiler2.pdf) user guide. 
 
 
-```{r gost help}
-# ?gprofiler2::gost
+```{r gost help, eval = FALSE}
+?gprofiler2::gost
 ```
 
 
@@ -713,37 +713,6 @@ We can also capture the version of R and other session details including all loa
 sessionInfo()
 ```
 
-### RStudio version
-
-Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the chapter. 
-
-
-```{r rstudio version - not run during knit, eval=FALSE}
-# Get RStudio version information
-rstudio_info <- RStudio.Version()
-
-# Convert the version information to a string
-rstudio_version_str <- paste(
-  "RStudio Version Information:\n",
-  "Version: ", rstudio_info$version, "\n",
-  "Release Name: ", rstudio_info$release_name, "\n",
-  "Long Version: ", rstudio_info$long_version, "\n",
-  "Mode: ", rstudio_info$mode, "\n",
-  "Citation: ", rstudio_info$citation,
-  sep = ""
-)
-
-# Write the output to a text file
-writeLines(rstudio_version_str, "rstudio_version.txt")
-```
-
-```{r rstudio version saved from text, eval=FALSE}
-# Read the saved version information from the file
-rstudio_version_text <- readLines("rstudio_version.txt")
-
-# Print the version information to the document
-rstudio_version_text
-```
 
 ```{r restore working directory, include=FALSE, eval=TRUE}
 # Restore the book's working directory so later chapters (and their
@@ -751,14 +720,6 @@ rstudio_version_text
 # relative paths correctly.
 knitr::opts_knit$set(root.dir = gprofiler2_book_root_dir)
 ```
-
-## Build the Bookdown output
-
-Save all changes before rendering. Build the complete book from the RStudio **Build** pane using **Build Book**, or run the project-specific Bookdown render command used by this workshop.
-
-The chapter will render successfully only when all required packages and input files are available and the executable code chunks complete without errors. Output tables and figures written by the analysis will be saved relative to the Bookdown project directory unless a different path is specified.
-
-❗ If the build fails, use the first error message in the render log to identify the missing file, package, object, or failed code chunk.
 
 
 ## End of activity summary
