@@ -43,7 +43,7 @@ Today we will use [public RNAseq data](https://pmc.ncbi.nlm.nih.gov/articles/PMC
 
 ### Caveat!
 
-<div class="rationale">
+::: {.rationale}
 This is not a real experiment! It was tricky to find a novel species that had:
 
 A) a reference genome
@@ -53,7 +53,7 @@ D) had publicly available RNAseq data
 E) FEA described in a peer-reviewed study
 
 This axolotl data ticked A through D yet not E (RNA from various tissues were sequenced to aid a genome assembly project rather than for a valid biological experiment). Please keep this in mind when reviewing the results of the FEA we perform 😉 The goal of the session is not *really* to uncover how a blastema differentiates into a hand or an arm, but to demonstrate to you how you can apply this method to your own novel species.
-</div>
+:::
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -88,7 +88,7 @@ The DE results file has been provided to you, and we will import this into R to 
 
 ## Activity overview
 
-<div class="overview">
+::: {.overview}
 1. Import `emapper` axolotl annotation file, GO ontology file and KEGG Pathways file
 2. Import axolotl DE results file and extract gene lists for ORA and GSEA
 3. Reformat annotation files for `clusterProfiler` GO and KEGG analysis
@@ -97,7 +97,7 @@ The DE results file has been provided to you, and we will import this into R to 
 6. Run `WebGestaltR` ORA and GSEA and visualise results in the interactive HTML report
 7. Run ORA with `STRING` online using custom axolotl annotation
 8. Compare `STRING` ORA web results to those generated using the `emapper` annotations in R
-</div>
+:::
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -554,9 +554,9 @@ cat("Number of input genes with KEGG Pathways annotations:", unique_genes_with_k
 
 As expected, the annotation % is higher for expressed genes than all predicted genes.
 
-<div class="rationale">
+::: {.rationale}
 Note this is a different denominator than the percentages above: those covered the ~47,196-protein *predicted proteome* (already filtered to the longest isoform per gene), whereas the figure below covers the GTF of 99,088 predicted gene models (!!!) *before* that filtering, with an annotation rate of 21.6%.
-</div>
+:::
 
 This highlights a major caveat when performing FEA on non-model species: the results are only as good as the annotations behind them. Therefore, all results must be interpreted with caution. For many novel (and under-funded) species, there are little opportunities (at present) to improve the annotation. Some in-silico predicted genes appear to be highly expressed and significantly regulated yet have no significant similarity to anything in the non-redundant nucleotide or protein databases. When working with datasets like this, it is critical to explore those individual genes through other methods, in addition to trying to garner some higher level overview such as we aim to obtain from FEA. Hopefully, recent advances in AI protein modelling can help provide insights into the functions of these novel genes.
 
