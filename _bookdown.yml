@@ -9,6 +9,7 @@ language:
 rmd_files:
   - index.Rmd
   - 01-overview.Rmd
+  - 01-02-setup.Rmd
   - part-day1.Rmd
   - 02-recap.Rmd
   - 03-stats.Rmd
@@ -18,7 +19,6 @@ rmd_files:
   - 07-reporting.Rmd
   - 08-resources.Rmd
   - part-day2.Rmd
-  - package-setup.Rmd
   - 09-gprofiler2.Rmd
   - 10-clusterprofiler.Rmd
   - 10-1-novel-species-FEA.Rmd
