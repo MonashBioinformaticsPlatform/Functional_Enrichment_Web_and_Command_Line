@@ -110,10 +110,10 @@ degs <- data %>%
 cat("Number of genes passing FDR and fold change filter:", length(degs), "\n")
 
 # Save the DEG gene list to disk:
-title <- "Pezzini_DEGs.txt"
-write.table(degs, "Pezzini_DEGs.txt", row.names = FALSE, col.names = FALSE, quote = FALSE)
+filename <- "Pezzini_DEGs.txt"
+write.table(degs, filename, row.names = FALSE, col.names = FALSE, quote = FALSE)
 
-cat("Table saved to", title, "\n")
+cat("Table saved to", filename, "\n")
 ```
 
 We have 792 genes passing our filters. 
@@ -131,10 +131,10 @@ background <- data$Gene.ID
 cat("Number of background genes:", length(background), "\n")
 
 # Save the background gene list to disk:
-title <- "Pezzini_background_genes.txt"
-write.table(background, title, row.names = FALSE, col.names = FALSE, quote = FALSE)
+filename <- "Pezzini_background_genes.txt"
+write.table(background, filename, row.names = FALSE, col.names = FALSE, quote = FALSE)
 
-cat("Table saved to", title, "\n")
+cat("Table saved to", filename, "\n")
 ```
 
 ## Run ORA with `gost` function
@@ -153,7 +153,7 @@ Observe the similarities to the parameters available on the g:Profiler web inter
 Run the below code which explicitly includes all available `gost` parameters. Including all parameters, even if the defaults suit your needs, makes your
 parameter choices explicit. Sometimes, default settings can change between versions!
 
-An error-free `gost` run should produce no console output.  As the code is running, there wll be a green bar to the elft of the code chunk. 
+An error-free `gost` run should produce no console output.  As the code is running, there will be a green bar to the left of the code chunk.
 
 Our results are saved in the R object `ora`.
 
@@ -246,10 +246,10 @@ head(ora_reordered)
 
 ```{r write ora to csv}
 # print to CSV
-title <- "gprofiler_ORA_results.csv"
-write.csv(ora_reordered, title, row.names = FALSE)
+filename <- "gprofiler_ORA_results.csv"
+write.csv(ora_reordered, filename, row.names = FALSE)
 
-cat("Table saved to", title, "\n")
+cat("Table saved to", filename, "\n")
 ```
 
 `gprofiler` has a function to print tables that mimic the web tool called `publish_gosttable`. These are image files, so not for importing to Excel like the CSV we just created. 
@@ -286,24 +286,29 @@ The `gostplot` function creates a Manhattan plot similar to the one shown on the
 
 The parameter `capped = TRUE` is an indicator whether the -log10(p-values) would be capped at 16 if bigger than 16. This fixes the scale of y-axis to keep Manhattan plots from different queries comparable and is also intuitive since p-values smaller than that can all be summarised as 'highly significant'.
 
+We'll reuse the same source-database colour palette across all of the `gostplot` calls below, so let's define it once:
+
+```{r gostplot palette}
+gprofiler_pal <- c(
+  `GO:MF` = "#dc3912",
+  `GO:BP` = "#ff9900",
+  `GO:CC` = "#109618",
+  KEGG = "#dd4477",
+  REAC = "#3366cc",
+  WP = "#0099c6",
+  TF = "#5574a6",
+  MIRNA = "#22aa99",
+  HPA = "#6633cc",
+  CORUM = "#66aa00",
+  HP = "#990099"
+)
+```
 
 ```{r gostplot}
 gostplot(ora,
   capped = TRUE,
   interactive = TRUE,
-  pal = c(
-    `GO:MF` = "#dc3912",
-    `GO:BP` = "#ff9900",
-    `GO:CC` = "#109618",
-    KEGG = "#dd4477",
-    REAC = "#3366cc",
-    WP = "#0099c6",
-    TF = "#5574a6",
-    MIRNA = "#22aa99",
-    HPA = "#6633cc",
-    CORUM = "#66aa00",
-    HP = "#990099"
-  )
+  pal = gprofiler_pal
 )
 ```
 
@@ -325,19 +330,7 @@ ora_filter_termsize$result <- ora$result %>%
 gostplot(ora_filter_termsize,
   capped = TRUE,
   interactive = TRUE,
-  pal = c(
-    `GO:MF` = "#dc3912",
-    `GO:BP` = "#ff9900",
-    `GO:CC` = "#109618",
-    KEGG = "#dd4477",
-    REAC = "#3366cc",
-    WP = "#0099c6",
-    TF = "#5574a6",
-    MIRNA = "#22aa99",
-    HPA = "#6633cc",
-    CORUM = "#66aa00",
-    HP = "#990099"
-  )
+  pal = gprofiler_pal
 )
 ```
 
@@ -351,19 +344,7 @@ This has cleaned up 'Biological Process' a little bit, enabling signals of more 
 plot <- gostplot(ora_filter_termsize,
   capped = TRUE,
   interactive = FALSE,
-  pal = c(
-    `GO:MF` = "#dc3912",
-    `GO:BP` = "#ff9900",
-    `GO:CC` = "#109618",
-    KEGG = "#dd4477",
-    REAC = "#3366cc",
-    WP = "#0099c6",
-    TF = "#5574a6",
-    MIRNA = "#22aa99",
-    HPA = "#6633cc",
-    CORUM = "#66aa00",
-    HP = "#990099"
-  )
+  pal = gprofiler_pal
 )
 ```
 
@@ -372,7 +353,7 @@ The `publish_gostplot` parameter `highlight_terms` enables you to highlight spec
 Let's highlight some selected terms manually. You need to provide the term ID not term name. 
 
 ```{r save terms to highlight }
-# specify term IDs for tmers of interest: 'Collagen degradation' and 'Collagen formation'
+# specify term IDs for terms of interest: 'Collagen degradation' and 'Collagen formation'
 highlight <- c("REAC:R-HSA-1442490", "REAC:R-HSA-1474290")
 ```
 
@@ -470,8 +451,8 @@ p_go_bp <- ggplot(go_bp_results, aes(x = reorder(term_name, -p_value), y = -log1
 
 
 # Open a PDF device to save the plot as a full size A4:
-title <- "gprofiler_GO_BP_dotplot.pdf"
-pdf(title, width = 8.27, height = 11.69) # A4 portrait size in inches
+filename <- "gprofiler_GO_BP_dotplot.pdf"
+pdf(filename, width = 8.27, height = 11.69) # A4 portrait size in inches
 
 # Print the plot to the device
 print(p_go_bp)
@@ -479,7 +460,7 @@ print(p_go_bp)
 # Close the device (this saves the plot)
 dev.off()
 
-cat("Table saved to", title, "\n")
+cat("Table saved to", filename, "\n")
 ```
 
 Open this plot by clicking it from the 'Files' pane of RStudio. Notice how the term names are now readable :-) 
@@ -501,9 +482,9 @@ up_degs <- data %>%
 cat("Number of upregulated DEGs:", length(up_degs), "\n")
 
 # Save the DEG gene list to disk:
-title <- "up_DEGs.txt"
-write.table(up_degs, title, row.names = FALSE, col.names = FALSE, quote = FALSE)
-cat("Up-regulated DEGs saved to", title, "\n")
+filename <- "up_DEGs.txt"
+write.table(up_degs, filename, row.names = FALSE, col.names = FALSE, quote = FALSE)
+cat("Up-regulated DEGs saved to", filename, "\n")
 
 # make an object for downregualted genes
 down_degs <- data %>%
@@ -512,10 +493,10 @@ down_degs <- data %>%
 cat("Number of downregulated DEGs:", length(down_degs), "\n")
 
 # Save the DEG gene list to disk:
-title <- "down_DEGs.txt"
-write.table(down_degs, title, row.names = FALSE, col.names = FALSE, quote = FALSE)
+filename <- "down_DEGs.txt"
+write.table(down_degs, filename, row.names = FALSE, col.names = FALSE, quote = FALSE)
 
-cat("Down-regulated DEGs saved to", title, "\n")
+cat("Down-regulated DEGs saved to", filename, "\n")
 ```
 
 Now run `gost` as multi-query. This may take a few moments. 
@@ -598,10 +579,10 @@ head(ora_multi$result)
 
 ```{r write multiquery table}
 # Print TSV file
-title <- "gprofiler_ORA_ora_multiquery.tsv"
-write.table(ora_multi$result, title, row.names = F, quote = F, sep = "\t")
+filename <- "gprofiler_ORA_ora_multiquery.tsv"
+write.table(ora_multi$result, filename, row.names = F, quote = F, sep = "\t")
 
-cat("ORA multi-query results written to", title, "\n")
+cat("ORA multi-query results written to", filename, "\n")
 ```
 
 
@@ -621,9 +602,9 @@ head(web)
 
 
 
-Check the numbers: are there any terms significant from one tool but not the other? 
+Check the numbers: are there any terms significant from one tool but not the other?
 
-```{r}
+```{r compare web vs r term counts}
 # Extract significant term names
 web_terms <- web$term_name
 ora_terms <- ora$result$term_name

@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-[clusterProfiler](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html) is a comprehensive suite of enrichment tools. It has functions to run ORA or GSEA over commonly used databases (GO, KEGG, KEGG Modules, DAVID, Pathway Commons, WikiPathways) as well as universal enrichment functions to perform ORA or GSEA with novel species or custom gene sets. We will use these universal tools in the final activity of this workshop, focusing on the supported organisms and datbases for the present activity.
+[clusterProfiler](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html) is a comprehensive suite of enrichment tools. It has functions to run ORA or GSEA over commonly used databases (GO, KEGG, KEGG Modules, DAVID, Pathway Commons, WikiPathways) as well as universal enrichment functions to perform ORA or GSEA with novel species or custom gene sets. We will use these universal tools in the final activity of this workshop, focusing on the supported organisms and databases for the present activity.
 
 One of the key advantages of using R over web tools is flexibility with visualisations.
 
@@ -24,7 +24,7 @@ The same authors have released a plotting package [enrichplot](https://www.bioco
 
 ## Supported databases, species and namespaces
 
-One of the challenges when working with `clusterProfiler` for FEA is that each enrichment function has different supported organisms and different namespace requirements, so you can not necessarily use all of the functions over the same gene list. In this activity, we will review the FEA functions and investigate their requirements, before performing a gene ID conversion with the `bitr` function to enable compatability with our [Pezzini et al 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) dataset.
+One of the challenges when working with `clusterProfiler` for FEA is that each enrichment function has different supported organisms and different namespace requirements, so you can not necessarily use all of the functions over the same gene list. In this activity, we will review the FEA functions and investigate their requirements, before performing a gene ID conversion with the `bitr` function to enable compatibility with our [Pezzini et al 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) dataset.
 
 Let's start by reviewing the dedicated database enrichment functions and what inbuilt support they have.
 
@@ -55,7 +55,7 @@ Since we have covered ORA with `gprofiler`, we will perform a GSEA with `cluster
 1. Explore the functions of `clusterProfiler` including which FEA functions support which organisms and which namespaces
 2. Load input dataset (a gene matrix with adjusted P values and log2 fold change values)
 3. Extract the gene IDs and sort by log2 fold change to create the GSEA ranked gene list R object
-4. Use `bitr` to convert gene IDs from ENSEMBL to ENTREZ for compatability with `gseKEGG`
+4. Use `bitr` to convert gene IDs from ENSEMBL to ENTREZ for compatibility with `gseKEGG`
 5. Perform GSEA with `gseKEGG`
 6. Visualise results with many different plot types from `enrichplot`
 :::
@@ -174,7 +174,7 @@ We need to understand what the valid `fromType` and `toType` values are, and it 
 
 We have already loaded the `org.Hs.eg.db` annotation library. We can use this to search `keytypes`:
 
-```{r check org db keytypes for huamn}
+```{r check org db keytypes for human}
 keytypes(org.Hs.eg.db)
 ```
 
@@ -227,6 +227,8 @@ Looks good! Now we are ready to enrich!
 ## Run GSEA over KEGG database
 
 Now run GSEA over the KEGG database with `gseKEGG` function, setting a `seed` value and `kegg` as our gene ID type. this may take a minute or two to run.
+
+As in the previous `gprofiler2` chapter, we'll spell out every parameter explicitly below, even where the default would do - this keeps your parameter choices visible and documented, and protects you if a package's defaults ever change between versions.
 
 
 ```{r gseKEGG}
@@ -363,7 +365,7 @@ enrichplot::dotplot(
 
 The upset plot shows the pattern of shared genes among the enriched terms (since a gene can belong to multiple terms or pathways).
 
-For GSEA, the plot includess fold change distributions on the Y axis.
+For GSEA, the plot includes fold change distributions on the Y axis.
 
 `n` controls the number of terms plotted - here we have restricted to 10 for ease of viewing. Plot view is quite small within a notebook, but if you wanted to plot more terms, you could print to an A4 size output file for enhanced clarity.
 
@@ -420,7 +422,7 @@ enrichplot::treeplot(gsea_kegg, showCategory = 15, color = "p.adjust", nCluster 
 
 #### cnetplot
 
-The cnetplot depicts the linkages of genes and terms as a network. This is helpful to understanding which genes are involved in the enriched terms, ading a level of detail not offered by the plots we have generated so far.
+The cnetplot depicts the linkages of genes and terms as a network. This is helpful to understanding which genes are involved in the enriched terms, adding a level of detail not offered by the plots we have generated so far.
 
 For GSEA, where all genes (not just DEGs) are used, only the 'core' enriched genes are used to create the network plot. These are the 'leading edge genes', those genes up to the point where the Enrichment Score (ES) gets maximised from the base zero. In other words, the subset of genes that are most strongly associated with a specific term.
 
@@ -582,7 +584,7 @@ enrichplot::gseaplot(gsea_kegg,
 )
 ```
 
-The term 'hsa04062' (Chemokine signaling pathway) has a negative NE, a highly significant adjusted P value of 1.11E-06 and a set size of 129.
+The term 'hsa04062' (Chemokine signaling pathway) has a negative NES, a highly significant adjusted P value of 1.11E-06 and a set size of 129.
 
 ```{r gseaplot GSEA KEGG downreg, fig.width=10 }
 gene_set_id <- "hsa04062"
@@ -665,7 +667,7 @@ knitr::opts_knit$set(root.dir = clusterprofiler_book_root_dir)
 
 ::: {.summary}
 - We have explored the supported organisms, namespaces and databases of the `clusterProfiler` enrichment functions
-- We have extracted a ranked gene list for GSEA and converted the gene IDs for compatability with `gseKEGG`
+- We have extracted a ranked gene list for GSEA and converted the gene IDs for compatibility with `gseKEGG`
 - We have performed GSEA on the KEGG database with `gseKEGG` and visualised the results with multiple plot types
 - We have captured all version details relevant to the session within the R notebook and knit the file to HTML for record keeping
 :::
