@@ -1,4 +1,4 @@
-# Setting Up R Packages
+# Set up
 
 ```{r setup-echo-setup, include=FALSE}
 knitr::opts_chunk$set(eval = FALSE)
@@ -66,3 +66,26 @@ remotes::install_github("jmw86069/multienrichjam", dependencies = TRUE)
 ```
 
 <p>&nbsp;</p>  <!-- insert blank line -->
+
+
+
+## Raw Data
+
+```{r }
+# where are you? what folder are you working in
+
+getwd()
+
+## Download and untar the data
+options(timeout = 3600)
+download.file(
+  "https://bioinformatics.erc.monash.edu/home/hval0004/FEA_Workshop/data.tar", "data.tar"
+)
+
+untar("data.tar")
+
+# ## Download workshop.R script. This file contains all the example code for this workshop.
+# download.file(
+#     "https://monashbioinformaticsplatform.github.io/scRNAseq_Workshop_ABACBS_2024/workshop.R", "workshop.R"
+# )
+```
