@@ -580,6 +580,8 @@ There are parameters for both adjusted P value and q value. Terms must pass all 
 
 we need to provide term2gene and term2name, and don't specify an organism.
 
+As in earlier chapters, we spell out every parameter explicitly below (even ones left at their default), so your choices stay visible and documented rather than hidden behind whatever the package's current defaults happen to be.
+
 
 ```{r CP GO ORA }
 cp_go_ora <- enricher(
@@ -1018,41 +1020,10 @@ The KEGG pathways file does not contain any version details within the file cont
 
 ### R version and R package versions
 
+We can also capture the version of R and other session details including all loaded packages and versions with the `sessionInfo()` function:
+
 ```{r info novel species}
 sessionInfo()
-```
-
-
-### RStudio version
-
-And RStudio version. Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the notebook.
-
-
-```{r rstudio version - not run during knit novel species, eval = FALSE}
-# Get RStudio version information
-rstudio_info <- RStudio.Version()
-
-# Convert the version information to a string
-rstudio_version_str <- paste(
-  "RStudio Version Information:\n",
-  "Version: ", rstudio_info$version, "\n",
-  "Release Name: ", rstudio_info$release_name, "\n",
-  "Long Version: ", rstudio_info$long_version, "\n",
-  "Mode: ", rstudio_info$mode, "\n",
-  "Citation: ", rstudio_info$citation,
-  sep = ""
-)
-
-# Write the output to a text file
-writeLines(rstudio_version_str, "rstudio_version.txt")
-```
-
-```{r rstudio version saved from text novel species, eval = FALSE}
-# Read the saved version information from the file
-rstudio_version_text <- readLines("rstudio_version.txt")
-
-# Print the version information to the document
-rstudio_version_text
 ```
 
 ```{r restore working directory novel species, include=FALSE, eval=TRUE}
