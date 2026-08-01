@@ -1,0 +1,151 @@
+# GSEA (web)
+
+<!-- ## FEA in [GenePattern](https://www.genepattern.org/#gsc.tab=0) -->
+## <a href="https://www.gsea-msigdb.org/gsea/downloads.jsp" target="_blank"><img src="images/GSEA-logo.gif" alt="MSigDB GSEA Logo" style="height:35px; vertical-align:middle;"></a> or <a href="https://www.genepattern.org/#gsc.tab=0" target="_blank"><img src="images/GenePattern-logo.png" alt="GenePattern Logo" style="height:35px; vertical-align:middle;"></a>
+[GenePattern](https://www.genepattern.org/), an online platform developed by the Broad Institute, offers a suite of tools for analyzing and visualizing genomic data, making bioinformatics accessible to researchers through a user-friendly, no-programming interface. Among its supported tools is Gene Set Enrichment Analysis (GSEA), which implements [MSigDB GSEA](https://www.gsea-msigdb.org/gsea/index.jsp) analysis for identifying enriched gene sets in genomic data.
+
+[MSigDB](https://www.gsea-msigdb.org/gsea/index.jsp) (Molecular Signatures Database) is a collection of gene sets for Gene Set Enrichment Analysis, representing pathways and gene signatures linked to biological states or diseases. It helps identify enriched gene sets, aiding the analysis of gene expression changes and key pathways in experimental data.
+
+### Steps to Locate GSEA Module in GenePattern:
+
+- Click on the Run button and then the Public Server
+
+<!-- ![](images/GenePattern-Run.png) -->
+```{r, echo=FALSE, fig.align = "center", fig.cap="Navigate to Public Server"}
+knitr::include_graphics("images/GenePattern-Run.png")
+```
+
+
+- Sign in to GenePattern or Enter as Guest
+
+- Under `Modules` tab hit `Browse Modules`
+
+- Find gsea in the Browse Modules by Category page and hit GSEA
+
+<!-- ![](images/Browse_Modules_gsea.png){ width=100% } -->
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Browse GSEA module in GenePattern"}
+knitr::include_graphics("images/Browse_Modules_gsea.png")
+```
+
+
+### Steps to Perform GSEA:
+<!-- https://cloud.genepattern.org/gp/pages/index.jsf?jobid=613752&openVisualizers=true&openNewWindow=false -->
+
+1. Basic Parameters
+
+\- Create both `.gct` and `.cls` files following [this scrit in R](degust.html)
+
+\- Load the `.gct` input file in the `expression dataset` tab and `.cls` file in the `phenotype labels` tab
+
+\- Select a `.gmt` file (Gene Matrix Transposed) from the `gene sets database` tab
+
+\- Set permutation under `number of permutations` tab
+
+\- Type of the permutation to be set under `permutation type` tab
+
+\- Select an appropriate DNA Chip annotation file from `chip platform file` tab
+
+\- Name the output file in `output file name` tab
+
+2. Advanced Parameters
+
+\- Scoring Scheme:
+
+  - K-S: The score increment is the same for all genes in *S* regardless of their ranking or correlation strength.
+
+  - Weighted: the score increment for each gene in *S* is weighted by its correlation with the phenotype, typically the absolute value of the correlation or ranking metric.
+
+\- Metric for ranking genes: Ranking metric of interest can be chosen from drop down menu. A detailed description of the metrics is given on [GSEA-MSigDB Documentation](https://docs.gsea-msigdb.org/#GSEA/GSEA_User_Guide/#metrics-for-ranking-genes).
+
+  - Categorical Phenotypes: Signal-to-Noise Ratio, t-Test, Ratio of Classes, Log2 Ratio of Classes
+
+  - Continuous Phenotypes: Pearson Correlation, Spearman Correlation
+
+\- Minimum and Maximum size of gene sets can be set using `max gene set size` and `min gene set size` tabs
+<!-- <GeneSetName> <Description> <Gene1> <Gene2> <Gene3> ... -->
+
+#### Browse the GSEA results
+
+Once the job has been queued and successfully run, the output will be listed on the left panel under `Jobs` tab:
+
+```{r, echo=FALSE, fig.align = "center", fig.cap="Job status in GenePattern"}
+knitr::include_graphics("images/GenePattern-Jobs.png")
+```
+
+Of the most important files is the `.zip` file that was earlier specified under `output file name` tab in Basic parameters section which includes all the results. The results can also be navigated using the single files listed under the job id.
+
+For Pezzini experiment, two `html` files generated for each of up- and down-regulated gene sets, something like:
+
+  - gsea_report_for_Diff_1731388275794.html
+
+  - gsea_report_for_Nodiff_1731388275794.html
+
+The tabulated versions of the results are given in `.tsv` format:
+
+  - gsea_report_for_Diff_1731388275794.tsv
+
+  - gsea_report_for_Nodiff_1731388275794.tsv
+
+
+<!-- ```{css, echo=FALSE} -->
+<!-- table { -->
+<!--   width: 75%;                   -->
+<!--   margin: auto;                 -->
+<!--   border-collapse: collapse;    -->
+<!-- } -->
+
+<!-- th, td { -->
+<!--   padding: 5px;                 -->
+<!--   text-align: left; -->
+<!--   border: 1px solid #ddd;       -->
+<!-- } -->
+<!-- ``` -->
+
+The GSEA result tables have the following header and below is given details of one gene set:
+
+```{r, echo=FALSE, message=FALSE}
+data <- data.frame(
+  Parameter = c("GS (follow link to MSigDB)", "GS DETAILS", "SIZE", "ES", "NES", "NOM p-val", "FDR q-val", "FWER p-val", "RANK AT MAX", "LEADING EDGE"),
+  Value = c(
+    "[REACTOME_FRS_MEDIATED_FGFR2_SIGNALING](https://www.gsea-msigdb.org/gsea/msigdb/human/geneset/REACTOME_FRS_MEDIATED_FGFR2_SIGNALING)",
+    "Details ...",  # Link formatted in Markdown
+    "16",
+    "0.83905387",
+    "1.7128055",
+    "0",
+    "0.03902518",
+    "0.648",
+    "995",
+    "tags=38%, list=7%, signal=40%"
+  )
+)
+
+# Display the data as a table
+kable(data, caption = "Summary of GSEA Results for REACTOME_FRS_MEDIATED_FGFR2_SIGNALING Gene Set")
+```
+
+<!-- HALLMARK_CHOLESTEROL_HOMEOSTASIS -->
+<!-- 68	0.59	1.49	0.012	0.059	0.201	4015	tags=60%, list=28%, signal=83% -->
+
+The leading edge column has three values:
+
+  - tags: 38% of the genes in the gene set are key to the enrichment result.
+  - list: These genes make up 7% of the total gene list being analyzed.
+  - signal: They contribute 40% of the enrichment signal, highlighting their importance in driving the association between this gene set and the biological phenotype being studied.
+
+
+#### **Challenge:** How do different ranking metrics impact the output? {- .challenge}
+
+Run GSEA analysis using Hallmark gene sets with two metrics (tTest and Ratio_of_Classes). What are the upregulated terms (FDR < 0.1) in the `Diff` class, based on the t-test and Ratio of Classes metrics?
+
+#### **Question ** {- .rationale}
+
+Why might the HALLMARK_CHOLESTEROL_HOMEOSTASIS gene set be upregulated specifically in the differentiation condition of SH-SY5Y cells in [Pezzini, et al 2016](https://pubmed.ncbi.nlm.nih.gov/27422411/) experiment?
+
+<details>
+<summary>Show</summary>
+  - Relevance: Cholesterol is essential for neuronal function and membrane fluidity, particularly in processes like axonal growth and synapse formation. Neurons have a high demand for cholesterol, especially during differentiation when they extend axons and dendrites.
+  - Possible Insight: Upregulation of genes in this set could signify that differentiating cells are actively producing or transporting cholesterol to support membrane synthesis and cellular remodeling required for mature neuronal structures.
+</details>
+
+####  {-}

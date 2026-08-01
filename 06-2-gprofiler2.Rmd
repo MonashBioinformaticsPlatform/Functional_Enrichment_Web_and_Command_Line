@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-[gprofiler2](https://cran.r-project.org/web/packages/gprofiler2/index.html) is the R interface to the `g:Profiler` web-based toolset that you used in day 1 of the workshop.
+[gprofiler2](https://cran.r-project.org/web/packages/gprofiler2/index.html) is the R interface to the `g:Profiler` web-based toolset that you used earlier in the book.
 
 Like the web interface, `gprofiler2` performs ORA with `g:GOSt` against multiple databases simultaneously. 
 
@@ -26,7 +26,7 @@ The `gprofiler2` user guide can be found [here](https://cran.r-project.org/web/p
 
 ## Input data 
 
-Since we are doing ORA, we will need a filtered gene list, and a background gene list. We will continue with the RNAseq dataset from [Pezzini et al 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) introduced yesterday. 
+Since we are doing ORA, we will need a filtered gene list, and a background gene list. We will continue with the RNAseq dataset from [Pezzini et al 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) introduced earlier in the book.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -120,7 +120,7 @@ We have 792 genes passing our filters.
 
 ## Get background gene list
 
-Recall from the webinar and day 1 of the workshop that an experimental background gene list is crucial to avoiding false positives and minimising tissue bias with ORA. 
+Recall from the webinar and earlier in the book that an experimental background gene list is crucial to avoiding false positives and minimising tissue bias with ORA.
 
 The analysis in Degust has already removed lowly expressed genes, so we can simply extract all genes from this data matrix as our background gene list and save it as our 'background' object, as well as save to disk so that we can include it within the supplementary materials of any resultant publications for reproducibility. 
 
@@ -590,7 +590,7 @@ cat("ORA multi-query results written to", filename, "\n")
 
 ## Compare gprofiler2 R results to g:Profiler web results
 
-In day 1 of the workshop, you ran ORA with g:Profiler web tool and saved the results to a CSV. Let's compare the results to those we have generated in R. Do we expect the results to be identical or differ slightly? 
+Earlier in the book, you ran ORA with g:Profiler web tool and saved the results to a CSV. Let's compare the results to those we have generated in R. Do we expect the results to be identical or differ slightly?
 
 The input file here is one that we have created, but should match yours as long as you used the same P filters and gprofiler parameters. 
 
@@ -675,7 +675,7 @@ Great! We know we applied the same parameters, and used the same input gene list
 
 ### gProfiler database version
 
-Let's check: yesterday when you ran ORA on the web, hopefully you saved your 'query parameters' as well as your results. 
+Let's check: earlier in the book when you ran ORA on the web, hopefully you saved your 'query parameters' as well as your results.
 
 From my run, I can see version as 'e111_eg58_p18_f463989d'. 
 
