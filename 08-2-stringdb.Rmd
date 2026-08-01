@@ -6,7 +6,7 @@ knitr::opts_chunk$set(eval = FALSE)
 
 [STRING](https://string-db.org) is a database of known and predicted protein-protein interactions, including both direct (physical) and indirect (functional) associations, drawn from experimental repositories, computational prediction methods, and text-mined publications. Each interaction is given a combined confidence score integrating all of the underlying evidence. STRING v12.0 covers over 59 million proteins from more than 12,500 organisms.
 
-Earlier in this workshop you used the [STRING website](https://string-db.org) directly to explore both a protein-protein interaction network and functional enrichment for a gene list. The [`STRINGdb`](https://bioconductor.org/packages/release/bioc/html/STRINGdb.html) R/Bioconductor package gives scripted, reproducible access to the same underlying database and, being an R package, integrates directly with your existing gene lists, expression values, and enrichment workflows. STRINGdb uses R's [Reference Classes](https://stat.ethz.ch/R-manual/R-devel/library/methods/html/refClasses.html) system, so most functionality is accessed as *methods* on a `STRINGdb` object (`string_db$method_name(...)`) rather than as standalone functions, and represents the network internally using [igraph](https://igraph.org/r/).
+Earlier in the book you used the [STRING website](https://string-db.org) directly to explore both a protein-protein interaction network and functional enrichment for a gene list. The [`STRINGdb`](https://bioconductor.org/packages/release/bioc/html/STRINGdb.html) R/Bioconductor package gives scripted, reproducible access to the same underlying database and, being an R package, integrates directly with your existing gene lists, expression values, and enrichment workflows. STRINGdb uses R's [Reference Classes](https://stat.ethz.ch/R-manual/R-devel/library/methods/html/refClasses.html) system, so most functionality is accessed as *methods* on a `STRINGdb` object (`string_db$method_name(...)`) rather than as standalone functions, and represents the network internally using [igraph](https://igraph.org/r/).
 
 This chapter is based on the [STRINGdb package vignette](https://bioconductor.org/packages/release/bioc/vignettes/STRINGdb/inst/doc/STRINGdb.pdf), reworked to use our own [Pezzini et al. 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) SH-SY5Y neuronal differentiation dataset in place of the vignette's example data, so that you can compare the R output directly against what you saw on the STRING website earlier.
 
@@ -161,7 +161,7 @@ grid::grid.raster(enrichment_img, interpolate = FALSE)
 
 ## 8. Setting a custom statistical background
 
-As discussed earlier in the workshop, using an appropriate background/universe is important for avoiding false positives in enrichment tests. By default, `get_enrichment` tests against the whole proteome. If your experiment only measured a defined subset of genes (as ours does), you should set that as the background instead:
+As discussed earlier in the book, using an appropriate background/universe is important for avoiding false positives in enrichment tests. By default, `get_enrichment` tests against the whole proteome. If your experiment only measured a defined subset of genes (as ours does), you should set that as the background instead:
 
 ```{r stringdb-set-background}
 background_v <- string_db$map(
