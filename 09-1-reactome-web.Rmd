@@ -1,0 +1,101 @@
+# Reactome (web)
+
+<!-- ## FEA in [Reactome](https://reactome.org/) -->
+## <a href="https://reactome.org/" target="_blank"><img src="images/reactome-logo.png" alt="Reactome Logo" style="height:35px; vertical-align:middle;"></a>
+
+[Reactome](https://reactome.org/) is an open-source database of curated biological pathways across species, offering pathway maps and enrichment tools to analyse gene lists in a pathway-focused context. It’s ideal for visualising data within established biochemical and cellular processes.
+
+### Steps to perform ORA in Reactome:
+
+- Hit the `Analysis Tools` tab
+
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Analysis in Reactome"}
+knitr::include_graphics("images/reactome-tabs.png")
+```
+
+- Choose `Analyse gene list` from the left panel
+
+```{r, echo=FALSE, out.width="20%", fig.align = "center", fig.cap="Analysis Tools in Reactome"}
+knitr::include_graphics("images/reactome-analysis-tools.png")
+```
+
+- Upload list of features on the box or choose a file, hit continue
+
+- Select preferred options:
+
+  \- Project to Human: This option will convert identifiers from non-human species into human equivalents, allowing you to analyse data across species.
+
+  \- Include interactors: This option integrates interactors from IntAct, a protein interaction database. Including interactors broadens the background network, potentially offering deeper insights.
+
+- Hit Analyse!
+
+
+### Steps to perform GSA in Reactome:
+
+- If `Analyse gene expression` was chosen instead, Reactome offers the following gene set analysis:
+
+
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Reactome GSA "}
+knitr::include_graphics("images/reactome-gsea-methods.png")
+```
+
+- Let's try CAMERA as it represents the `camera()` function of `limma` package in `R` for a gene set analysis.
+
+- Choose TMM normalisation to ensure consistency with the input data used in other tools within our workshop.
+
+- Select data type and provide input data
+
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Reactome GSA - data type"}
+knitr::include_graphics("images/reactome-gsea-select-data.png")
+```
+
+- Annotate columns by adding extra info as follows:
+
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Pathway diagram "}
+knitr::include_graphics("images/reactome-gsea-add-column.png")
+```
+- Save dataset and Continue
+
+- You can now browse the results
+
+### Browse the Reactome results
+
+Results can be interactively browsed using the reactome pathway or voronoi visualisation modes: <a target="_blank"><img src="images/reactome-modes.png" alt="Reactome Modes" style="height:35px; vertical-align:middle;"></a>
+
+User can explore the pathway names listed in the table within the `Analysis` tab and they are displayed as popups on the pathway diagrams.
+
+One can also select a pathway of interest by navigating through the left panel or by simply searching for the term in the search box.
+
+The enriched table can be downloaded as shown below:
+
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Table of ORA with Reactome"}
+knitr::include_graphics("images/reactome-download-table.png")
+```
+
+The diagram can be downloaded using this icons: <a target="_blank"><img src="images/reactome-download-diagram.png" alt="Download Diagram" style="height:35px; vertical-align:middle;"></a>
+
+Here is a sample pathway diagram from Reactome GSA.
+
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Pathway diagram - GSA"}
+knitr::include_graphics("images/reactome-PathwaysOverview-expression-data.png")
+```
+
+In case `ssGSEA` was selected, an overall output would look like below:
+
+```{r, echo=FALSE, out.width="70%", fig.align = "center", fig.cap="Expression of top 30 pathways with ssGSEA"}
+knitr::include_graphics("images/reactome-ssGSEA.png")
+```
+
+####  {-}
+
+#### **Question ** {- .rationale}
+
+When running FEA in Reactome, how do you prefer the analysis methods?
+
+  \- PADOG (Pathway Analysis with Down-weighting of Overlapping Genes)
+
+  \- CAMERA (Correlation Adjusted Mean Rank)
+
+  \- ssGSEA (Single Sample Gene Set Enrichment Analysis)
+
+####  {-}

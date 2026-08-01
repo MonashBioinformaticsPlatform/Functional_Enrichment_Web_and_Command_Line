@@ -1,0 +1,147 @@
+# STRING (web)
+
+<!-- ## [STRING](https://string-db.org) -->
+## <a href="https://string-db.org" target="_blank"><img src="images/string-logo.png" alt="STRING Logo" style="height:35px; vertical-align:middle;"></a>
+
+[STRING](https://string-db.org/) (Search Tool for the Retrieval of Interacting Genes/Proteins) is a resource for exploring protein-protein interaction (PPI) networks. It combines experimental data, predictions, and curated information to build networks that highlight functional relationships, helping to reveal shared pathways or biological processes within gene or protein lists.
+
+### Steps to Perform ORA in STRING:
+
+<span style="color:orange;">- Select Multiple proteins tab.</span>
+
+<span style="color:orange;">- Input Gene List:</span> Paste your prepared gene list directly into the input box on the STRING web page or upload a file containing your list.
+
+<span style="color:orange;">- Select Organism:</span> Choose the appropriate organism from the `Organisms` dropdown menu (e.g., *Homo sapiens* for human data). STRING would auto-detect the organism if ENSEMBL IDs provided.
+
+<span style="color:orange;">- Modify Settings:</span> Under `Advanced Settings`, you can modify `Required score` from low (0.15) to highest (0.9) confidence. Similarly `FDR stringency` and `Network type` can be selected.
+
+NOTE: In cases where long list of features is provided, STRING may change some of its settings so that:
+
+ - the nodes will have a simplified (not 3D) design
+ - previews of protein structures are not shown
+ - the network edges show interaction confidence only
+
+### Browse the STRING ORA Results
+
+STRING generates multiple tabs as output, shown here:
+
+<!-- ![](images/string-results-tabs.png){ width=100% } -->
+```{r, echo=FALSE, eval=TRUE, out.width="100%", fig.align = "center", fig.cap="Results tabs in STRING"}
+knitr::include_graphics("images/string-results-tabs.png")
+```
+
+#### Viewers
+
+Under the `Viewers` tab, various visualisation layouts are available, with the Network option being the most notable and widely used.
+
+#### Legend
+
+The `Legend` tab offers a guide to the colors of nodes and edges, along with annotations for each individual query in the input list.
+
+<!-- ![Nodes and edges colour-coded](images/string-legend.png){ width=100% } -->
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Nodes and edges colour-coded"}
+knitr::include_graphics("images/string-legend.png")
+```
+
+#### Settings
+
+In the `Settings` tab of the STRING results, users have the flexibility to adjust existing settings and apply new filters to customise their data view and analysis. This tab you to switch between network types, strengths, data sources, interaction scores and more.
+
+#### Analysis
+
+One of the most essential tabs is the `Analysis` tab, which offers comprehensive functional enrichment analysis from a range of databases. These include Gene Ontology (GO) for biological processes, molecular functions, and cellular components; Pathway enrichment from sources such as KEGG, Reactome, and WikiPathways; and other significant data sources such as Human Phenotype annotations and UniProt for protein function and structure.
+
+Columns of the STRING enrichment table are explained as following:
+
+<!-- ![Enrichment Table Columns](images/Enrichment-Table-Columns.png){ width=40% } -->
+<span style="color:orange;">- Count In Network:</span>
+The first number indicates how many proteins in your network are annotated with a particular term. The second number indicates how many proteins in total (in your network and in the background) have this term assigned. You can click on the numbers to see the network view of the gene sets behind them.
+
+<span style="color:orange;">- Strength:</span>
+Log10(observed / expected). This measure describes how large the enrichment effect is. It’s the ratio between i) the number of proteins in your network that are annotated with a term and ii) the number of proteins that we expect to be annotated with this term in a random network of the same size.
+
+<span style="color:orange;">- Signal:</span>
+The signal is defined as a weighted harmonic mean between the observed/expected ratio and -log(FDR). FDR tends to emphasise larger terms due to their potential for achieving lower p-values, while the observed/expected ratio highlights smaller terms, which have a high foreground to background ratio but cannot achieve low FDR values due to their size. The signal measure seeks to balance both metrics for a more intuitive ordering of enriched terms.
+
+<span style="color:orange;">- False Discovery Rate:</span>
+This measure describes how significant the enrichment is. Shown are p-values corrected for multiple testing within each category using the Benjamini–Hochberg procedure.
+
+STRING visualises terms within each category using a bubble plot, effectively showcasing the significance and size of enriched terms. Additionally, it renders groups of related terms based on a user-defined similarity level, allowing users to identify clusters of functionally related terms within the data. This helps in interpreting complex enrichment results and highlighting key biological processes or pathways that are closely associated.
+
+<!-- ![Functional enrichment visualisation with STRING](images/string-enrichment_KEGG_sim0.7_graph_plus.png){ width=100% } -->
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Functional enrichment visualisation with STRING"}
+knitr::include_graphics("images/string-enrichment_KEGG_sim0.7_graph_plus.png")
+```
+
+Towards the bottom of the `Analysis` page, one can change the background including adding one of their own.
+<!-- ![Statistical background](images/string-statistical-background.png){ width=100% } -->
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Statistical background"}
+knitr::include_graphics("images/string-statistical-background.png")
+```
+
+Finally the enriched terms can be downloaded at the end of the `Analysis` page, either individually per category or all enriched terms together.
+
+#### Exports
+
+The network data can be exported with the `Exports` tab. Also Network data can be directly sent to [Cytoscape](https://cytoscape.org/) ![](images/network-to-Cytoscape.png) for further networking. It is expected to have Cytoscape installed before exporting to it.
+
+#### Clusters
+
+The `Clusters` tab essentially provides three different types of clustering algorithms:
+
+ - k-means clustering: Initialises *k* centroids randomly, assigns each data point to the nearest centroid, recomputes the centroids as the mean of all points in a cluster until centroids do not change significantly.
+
+ - MCL clustering (Markov clustering): is a graph-based algorithm that uses flow simulation to detect clusters in a network by modelling random walks.
+
+ - DBSCAN clustering: is a density-based algorithm that groups points closely packed together while marking points in low-density regions as outliers or noise
+
+<!-- ![](images/string-clusters.png) -->
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Network clustering in STRING"}
+knitr::include_graphics("images/string-clusters.png")
+```
+
+Clusters can be downloaded in `.tsv` format.
+
+#### **Question** {- .rationale}
+What was the overlap in enrichment terms between gProfiler and STRING at FDR ≤ 0.05?
+
+### Steps to Perform GSEA in STRING:
+
+<span style="color:orange;">- Select Proteins with Values/Ranks.</span>
+
+<span style="color:orange;">- Input Gene List:</span> Paste your gene list with a meaningful value for ranking (fold-change, log-pvalue, abundance, ...) directly into the input box on the STRING web page or upload a file containing your list of features and their corresponding values.
+
+<span style="color:orange;">- Select Organism:</span> Same as above.
+
+<span style="color:orange;">- Advanced Setting:</span> FDR stringency and the initial sort order can be set up in advance and hit the Search.
+
+### Browse the STRING GSEA Results
+
+The output differs from ORA. For each gene set, the results include the enrichment score, its direction within the ranked list, the number of overlapping features with the gene set, and the associated FDR.
+
+When a user selects a gene set from the enriched table,
+
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="An example table of WikiPathway gene sets"}
+knitr::include_graphics("images/string-gsea-wikiPathways.png")
+```
+the associated genes are displayed within the ranking list. A table showing these genes along with their original ranking values is also provided.
+
+```{r, echo=FALSE, fig.align = "center", fig.cap="List of genes in the term (WP197) and their positions on the ranked list"}
+knitr::include_graphics("images/string-gsea-ranking-n-table.png")
+```
+
+Additionally, the locations of the corresponding proteins are highlighted in the proteome network:
+
+```{r, echo=FALSE, fig.align = "center", fig.cap="Proteome network"}
+knitr::include_graphics("images/string-gsea-proteome-network.png")
+```
+
+A Functional enrichment visualisation (similar to that of ORA) is provided at below the enriched tables.
+
+Modify `Enrichment display settings` tab before downloading the enriched tables. It is recommended to merge terms with a certain level of similarity to reduce redundancy, especially if there are many overlapping terms.
+
+```{r, echo=FALSE, fig.align = "center", fig.cap="Enrichment display settings"}
+knitr::include_graphics("images/string-enrichement-display-settings.png")
+```
+
+Here is an example output of [GSEA on STRING](https://version-12-0.string-db.org/cgi/globalenrichment?networkId=bKhJ4fXp6sna) from a previous run (the link will expire in future).

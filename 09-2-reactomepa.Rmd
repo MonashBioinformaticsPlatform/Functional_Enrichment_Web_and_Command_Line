@@ -1,0 +1,21 @@
+# ReactomePA
+
+```{r reactomepa-echo-setup, include=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+Earlier in the book you used the [Reactome website](https://reactome.org/) directly to run both ORA and gene set analysis against the Reactome pathway database. [ReactomePA](https://bioconductor.org/packages/release/bioc/html/ReactomePA.html) is the companion Bioconductor R package, providing scripted, reproducible access to the same pathway database, and integrates directly with the `enrichplot` visualisations used elsewhere in the book.
+
+**Note: this chapter is a placeholder.** The walkthrough for `ReactomePA` is still being written and will be added in a future update. In the meantime, here's how to install it:
+
+```{r install reactomepa, eval = FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
+
+BiocManager::install("ReactomePA")
+```
+
+```{r load reactomepa, eval = FALSE}
+library(ReactomePA)
+```
