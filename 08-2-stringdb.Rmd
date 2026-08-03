@@ -1,19 +1,18 @@
 # STRINGdb
 
 ```{r stringdb-echo-setup, include=FALSE}
-knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(eval = TRUE)
 ```
 
-[STRING](https://string-db.org) is a database of known and predicted protein-protein interactions, including both direct (physical) and indirect (functional) associations, drawn from experimental repositories, computational prediction methods, and text-mined publications. Each interaction is given a combined confidence score integrating all of the underlying evidence. STRING v12.0 covers over 59 million proteins from more than 12,500 organisms.
+Earlier in the book you used the [STRING website](https://string-db.org) directly to explore both a protein-protein interaction network and functional enrichment for a gene list. The [`STRINGdb`](https://bioconductor.org/packages/release/bioc/html/STRINGdb.html) R package gives scripted, reproducible access to the same underlying database and, being an R package, integrates directly with your existing gene lists, expression values, and enrichment workflows. STRINGdb uses R's [Reference Classes](https://stat.ethz.ch/R-manual/R-devel/library/methods/html/refClasses.html) system, so most functionality is accessed as *methods* on a `STRINGdb` object (`string_db$method_name(...)`) rather than as standalone functions, and represents the network internally using [igraph](https://igraph.org/r/).
 
-Earlier in the book you used the [STRING website](https://string-db.org) directly to explore both a protein-protein interaction network and functional enrichment for a gene list. The [`STRINGdb`](https://bioconductor.org/packages/release/bioc/html/STRINGdb.html) R/Bioconductor package gives scripted, reproducible access to the same underlying database and, being an R package, integrates directly with your existing gene lists, expression values, and enrichment workflows. STRINGdb uses R's [Reference Classes](https://stat.ethz.ch/R-manual/R-devel/library/methods/html/refClasses.html) system, so most functionality is accessed as *methods* on a `STRINGdb` object (`string_db$method_name(...)`) rather than as standalone functions, and represents the network internally using [igraph](https://igraph.org/r/).
-
-This chapter is based on the [STRINGdb package vignette](https://bioconductor.org/packages/release/bioc/vignettes/STRINGdb/inst/doc/STRINGdb.pdf), reworked to use our own [Pezzini et al. 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) SH-SY5Y neuronal differentiation dataset in place of the vignette's example data, so that you can compare the R output directly against what you saw on the STRING website earlier.
+This chapter is based on the [STRINGdb package vignette](https://bioconductor.org/packages/release/bioc/vignettes/STRINGdb/inst/doc/STRINGdb.pdf), reworked to use our own [Pezzini et al. 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) SH-SY5Y neuronal differentiation dataset. Note that several `STRINGdb` methods (network images, enrichment figures, the payload colouring) query the STRING web server directly, so an internet connection is required.
 
 <p> </p>
 
-**In this chapter we will:**
+## Activity overview
 
+::: {.overview}
 1.  Initialise a `STRINGdb` object for human (NCBI taxonomy ID 9606)
 2.  Load the differential expression results and map gene symbols to STRING identifiers
 3.  Visualise the protein-protein interaction network
@@ -23,10 +22,7 @@ This chapter is based on the [STRINGdb package vignette](https://bioconductor.or
 7.  Retrieve functional annotations for the gene set
 8.  Cluster the network and visualise individual clusters
 9.  Query specific proteins of interest: interactions, interaction partners, paralogs and homologs
-
-All of the data used in this chapter is provided in the `data/` folder of this workshop's materials, so there's nothing extra to download - just read on and run the code chunks below in order (in RStudio, open this same `.Rmd` file directly to run and edit the code yourself). Note that several `STRINGdb` methods (network images, enrichment figures, the payload colouring) query the STRING web server directly, so an internet connection is required.
-
-<p> </p>
+:::
 
 ## Load R packages
 
@@ -36,7 +32,7 @@ library(dplyr)
 library(STRINGdb)
 ```
 
-## 1. Initialise the STRINGdb object
+## Initialise the STRINGdb object
 
 To begin, you should know the NCBI taxonomy identifier of your organism of interest (e.g. `9606` for human, `10090` for mouse). If you don't know it, search [NCBI Taxonomy](https://www.ncbi.nlm.nih.gov/taxonomy) or the [STRING organisms list](https://string-db.org/cgi/input.pl?input_page_active_form=organisms).
 
@@ -52,7 +48,7 @@ string_db <- STRINGdb$new(version = "12.0", species = 9606,
                            link_data = "detailed", input_directory = "")
 ```
 
-## 2. Explore the available methods
+## Explore the available methods
 
 Since `STRINGdb` uses Reference Classes, all its functionality is exposed as methods on the `string_db` object. Two commands are useful for exploring what's available:
 
@@ -63,12 +59,12 @@ STRINGdb$help("get_graph")      # view documentation for a specific method
 
 For every method used below, you can call `STRINGdb$help("method_name")` for the full list of parameters and defaults.
 
-## 3. Load the differential expression data
+## Load the differential expression data
 
 We reuse the same differential expression results behind the `DE_198set` gene list you used for ORA in `g:Profiler` and `STRING` earlier: genes from the Pezzini et al. 2017 SH-SY5Y differentiation experiment, each with a log2 fold change and an FDR-adjusted p-value.
 
 ```{r stringdb-load-de}
-de_full <- read_csv("data/Pezzini2016_SHSY5Ycelldiff_DE_table.csv", show_col_types = FALSE)
+de_full <- read.table("day2_inputData/Pezzini_DE.txt", header = TRUE)
 head(de_full)
 ```
 
@@ -76,35 +72,32 @@ The earlier `DE_198set` gene list was obtained by filtering this table for FDR \
 
 ```{r stringdb-filter-de}
 de_198 <- de_full %>%
-  filter(FDR < 0.0001 & abs(logFC) >= 1) %>%
-  transmute(gene = Gene.Name, pvalue = FDR, logFC = logFC)
+  filter(FDR < 0.0001 & abs(Log2FC) >= 1)
 
 cat("Number of genes passing FDR and fold change filter:", nrow(de_198), "\n")
 head(de_198)
 ```
 
-## 4. Map gene identifiers to STRING IDs
+## Map gene identifiers to STRING IDs
 
 As a first step, we map our gene identifiers to STRING database identifiers using the `map` method. Here we map from HUGO gene symbols, but `map` also supports other common identifiers (e.g. Entrez Gene ID, Ensembl protein, RefSeq transcript, etc).
 
 The `map` method adds a `STRING_id` column to the data frame passed as its first argument.
 
 ```{r stringdb-map-genes}
-de_198_mapped <- string_db$map(de_198, "gene", removeUnmappedRows = TRUE)
+de_198_mapped <- string_db$map(de_198, "Gene.Name", removeUnmappedRows = TRUE)
 head(de_198_mapped)
 ```
 
 If a warning about unmapped genes is printed, this is expected: not every symbol will resolve to a STRING identifier (for example, deprecated gene symbols or non-protein-coding genes). Setting `removeUnmappedRows = FALSE` instead would keep the unmapped rows so you can inspect them manually.
 
-## 5. Visualise the interaction network
+## Visualise the interaction network
 
 We extract the STRING identifiers as our `hits`, and plot the network. The p-value printed above the plot is the probability of observing at least this many interactions among these proteins by chance - the same statistic reported on the STRING website's network page.
 
-```{r stringdb-get-hits}
-hits <- de_198_mapped$STRING_id
-```
-
 ```{r stringdb-plot-network, fig.width=8, fig.height=8}
+hits <- de_198_mapped$STRING_id
+
 string_db$plot_network(hits)
 ```
 
@@ -112,24 +105,20 @@ Compare this network to the one you generated on the STRING website earlier usin
 
 If you want more control over the appearance of the network image, `get_png` and `get_link` expose additional styling options, letting you switch between `evidence`/`confidence` edge styles, hide labels or disconnected proteins, use a flat node design, and adjust label size.
 
-## 6. Payload mechanism: colour by direction of change
+## Payload mechanism: colour by direction of change
 
 STRINGdb supports the "payload" mechanism used on the website to add a coloured halo around network nodes - for example, colouring down-regulated genes green and up-regulated genes red. This works by posting the colour information to the STRING server, then requesting the network image again with the resulting `payload_id`.
 
-```{r stringdb-add-diff-exp-colour}
-de_198_coloured <- string_db$add_diff_exp_color(de_198_mapped, logFcColStr = "logFC")
-```
+```{r stringdb-add-diff-exp-colour, fig.width=8, fig.height=8}
+de_198_coloured <- string_db$add_diff_exp_color(de_198_mapped, logFcColStr = "Log2FC")
 
-```{r stringdb-post-payload}
 payload_id <- string_db$post_payload(de_198_coloured$STRING_id,
                                       colors = de_198_coloured$color)
-```
 
-```{r stringdb-plot-halo-network, fig.width=8, fig.height=8}
 string_db$plot_network(hits, payload_id = payload_id)
 ```
 
-## 7. Functional enrichment
+## Functional enrichment
 
 `get_enrichment` computes enrichment across Gene Ontology (Process, Function, Component), KEGG, Reactome, PubMed publications, UniProt Keywords, and PFAM/InterPro/SMART domains, in a single call. It uses a hypergeometric test with Benjamini-Hochberg FDR correction - the same underlying statistics as the STRING website enrichment tab you used earlier.
 
@@ -151,7 +140,6 @@ enrichment_img <- string_db$get_enrichment_figure(
   hits,
   category = "Component",
   group_by_similarity = 0.8,
-  color_palette = "yellow_pink",
   x_axis = "signal"
 )
 
@@ -159,17 +147,13 @@ grid::grid.newpage()
 grid::grid.raster(enrichment_img, interpolate = FALSE)
 ```
 
-## 8. Setting a custom statistical background
+## Setting a custom statistical background
 
 As discussed earlier in the book, using an appropriate background/universe is important for avoiding false positives in enrichment tests. By default, `get_enrichment` tests against the whole proteome. If your experiment only measured a defined subset of genes (as ours does), you should set that as the background instead:
 
 ```{r stringdb-set-background}
-background_v <- string_db$map(
-  transmute(de_full, gene = Gene.Name),
-  "gene", removeUnmappedRows = TRUE
-)$STRING_id
-
-string_db$set_background(background_v)
+background <- string_db$map(transmute(de_full, gene = Gene.Name), "gene", removeUnmappedRows = TRUE)$STRING_id
+string_db$set_background(background)
 ```
 
 Once a background is set, it is used automatically by subsequent calls to `get_enrichment` on the same `string_db` object - you do not need to create a new object.
@@ -179,9 +163,9 @@ enrichment_background_corrected <- string_db$get_enrichment(hits)
 head(enrichment_background_corrected, n = 20)
 ```
 
-Compare this to the enrichment table from step 7: results are often less dramatic once tested against a realistic background rather than the whole proteome, because the test is now calibrated against the genes that were actually measurable in this experiment.
+Compare this to the enrichment table from the previous step: results are often less dramatic once tested against a realistic background rather than the whole proteome, because the test is now calibrated against the genes that were actually measurable in this experiment.
 
-## 9. Retrieve functional annotations
+## Retrieve functional annotations
 
 If you simply want to know which terms are *assigned* to your proteins, rather than which are statistically enriched, use `get_annotations`. This returns terms from most categories associated with your protein set (KEGG and PubMed are excluded, for licensing and output-size reasons respectively).
 
@@ -190,7 +174,7 @@ annotations <- string_db$get_annotations(hits)
 head(annotations, n = 20)
 ```
 
-## 10. Clustering
+## Clustering
 
 The underlying `igraph` package provides several clustering/community-detection algorithms (`"fastgreedy"`, `"walktrap"`, `"spinglass"`, `"edge.betweenness"`), which `get_clusters` wraps in an easy-to-use function returning a list of clusters.
 
@@ -214,7 +198,7 @@ par(mar = c(0, 0, 0.5, 0))
 string_db$plot_network(clustersList[[4]], add_summary = FALSE)
 ```
 
-## 11. Querying specific proteins of interest
+## Querying specific proteins of interest
 
 `CRABP2` and `SEMA3A` are among the most significantly differentially expressed genes in this dataset (see the DE table above). Let's look at them specifically, using `mp` ("map proteins") - a convenient alternative to `map` for mapping just one or a few gene symbols directly to STRING identifiers:
 
@@ -236,8 +220,7 @@ string_db$get_interactions(c(crabp2, sema3a))
 To retrieve the first-shell interaction partners of one or more proteins from the locally loaded network, use `get_interaction_partners`. The output has the same structure as `get_interactions`.
 
 ```{r stringdb-interaction-partners}
-string_db$get_interaction_partners(c(crabp2, sema3a), limit = 5)[
-  , c("from", "to", "combined_score", "experimental", "from_name", "to_name")]
+string_db$get_interaction_partners(c(crabp2, sema3a), limit = 5)[, c("from", "to", "combined_score", "experimental", "from_name", "to_name")]
 ```
 
 You can restrict to interactions supported by a particular type of evidence - here, only those with experimental support:
@@ -248,38 +231,6 @@ interaction_partners <- string_db$get_interaction_partners(c(crabp2, sema3a), li
 interaction_partners_exp <- subset(interaction_partners, experimental > 0,
                                     select = c("from_name", "to_name", "experimental"))
 interaction_partners_exp
-```
-
-### Paralogs and homologs
-
-STRING stores all-against-all sequence alignments within species, so you can retrieve paralogs of a protein of interest:
-
-```{r stringdb-paralogs}
-string_db$get_paralogs(crabp2)
-```
-
-STRING also stores cross-species best hits (by bitscore). `get_homologs_besthits` retrieves these:
-
-```{r stringdb-homologs-besthits}
-crabp2_besthits <- string_db$get_homologs_besthits(crabp2)
-crabp2_besthits_100 <- subset(crabp2_besthits, bitscore > 100)
-nrow(crabp2_besthits_100)
-head(crabp2_besthits_100, n = 10)
-```
-
-... or restrict to a specific target species, e.g. mouse (taxonomy ID `10090`):
-
-```{r stringdb-homologs-besthits-mouse}
-string_db$get_homologs_besthits(c(crabp2, sema3a), target_species_id = 10090)
-```
-
-## 12. Additional protein information
-
-You can retrieve a table of every protein in the STRING database for your species of interest, including preferred name, protein size, and a short description:
-
-```{r stringdb-all-proteins}
-string_proteins <- string_db$get_proteins()
-head(string_proteins)
 ```
 
 <p> </p>
