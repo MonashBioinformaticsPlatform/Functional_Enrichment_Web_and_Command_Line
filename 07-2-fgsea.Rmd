@@ -101,7 +101,7 @@ fgseaRes <- fgsea(pathways = pathways,
 ```
 The result table contains, per gene set: the enrichment score (`ES`), normalised enrichment score (`NES`), raw and adjusted p-values, and the `leadingEdge` genes driving the enrichment.
 
-```{r fgsea-run}
+```{r}
 head(fgseaRes[order(pval), ])
 ```
 
