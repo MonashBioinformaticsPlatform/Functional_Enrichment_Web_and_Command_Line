@@ -25,7 +25,9 @@ install.packages(c(
   "ggtangle",
   "msigdbr",
   "ontologyIndex",
-  "WebGestaltR"
+  "WebGestaltR",
+  "DT",
+  "ggrepel"
 ))
 ```
 
@@ -48,7 +50,9 @@ BiocManager::install(c(
   "fgsea",
   "BiocParallel",
   "STRINGdb",
-  "ReactomePA"
+  "ReactomePA",
+  "AnnotationDbi",
+  "graphite"
 ))
 ```
 
