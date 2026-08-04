@@ -1,7 +1,7 @@
 # ReactomePA
 
 
-```{r gprofiler2-echo-setup, include=FALSE}
+```{r reactomePA-echo-setup, include=FALSE}
 knitr::opts_chunk$set(
   eval = FALSE,
   echo = TRUE,
