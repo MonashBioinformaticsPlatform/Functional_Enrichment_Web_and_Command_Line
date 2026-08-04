@@ -50,7 +50,7 @@ We will continue with the RNAseq dataset from [Pezzini et al 2017](https://link.
 The complete executable analysis is included below. Run the code chunks interactively while working through the chapter, or render the full Bookdown project to execute the analysis and retain the code, parameters, results, figures, and software-version information in the book output.
 
 
-```{r Load R packages, include=TRUE, eval=TRUE}
+```{r RPA Load R packages, include=TRUE, eval=TRUE}
 library(ReactomePA)
 library(AnnotationDbi)
 library(org.Hs.eg.db)
@@ -66,7 +66,7 @@ library(graphite)
 Bookdown evaluates relative file paths from the book project directory. Confirm that the input files used below are available from that directory, or update the file paths to match your project structure:
 
 
-```{r working directory, include=TRUE, eval=TRUE}
+```{r RPA working directory, include=TRUE, eval=TRUE}
 # Bookdown evaluates relative file paths from the book project directory.
 # Confirm the directory from which the book is being rendered.
 getwd()
@@ -87,7 +87,7 @@ Raw data from [Pezzini et al 2017](https://link.springer.com/article/10.1007/s10
 The input data file can be fetched using its URL by `read.csv()`.  
 
 
-```{r load input data, include=TRUE, eval=TRUE}
+```{r RPA load input data, include=TRUE, eval=TRUE}
 pezzini <- read.csv("https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/data/Pezzini2016_SHSY5Ycelldiff_DE_table.csv", sep=',', header = T)
 colnames(pezzini)
 ```
@@ -128,7 +128,7 @@ Currently the data only has *Ensembl*-style IDs and *HGNC*/*Symbolic*-style name
 We can use the **mapIds()** function from the **AnnotationDbi** package for this.
 
 
-```{r get Entrez IDs, include=TRUE, eval=TRUE}
+```{r RPA get Entrez IDs, include=TRUE, eval=TRUE}
 # to get a list of available keytypes, use: columns(org.Hs.eg.db)
 pezzini$entrez <- mapIds(org.Hs.eg.db, 
                     keys = pezzini$Gene.ID, # Use column "Gene.ID" in "pezzini" (which contains Ensembl gene ids) as query.
@@ -150,7 +150,7 @@ There should be **16** gene IDs that are now duplicated after converting to Entr
 
 To ensure everything runs without errors, let's get rid of NAs/duplicates for Entrez IDs:
 
-```{r, Get rid of duplicates, include=TRUE, eval=TRUE}
+```{r, RPA Get rid of duplicates, include=TRUE, eval=TRUE}
 nrow(pezzini) # rows pre-filter
 pezzini <- pezzini[!is.na(pezzini$entrez), ]      # get rid of rows where Entrez-id was not found
 pezzini <- pezzini[!duplicated(pezzini$entrez), ] # get rid of duplicate rows of Entrez-id (retains first row)
@@ -165,7 +165,7 @@ Note on square-bracket notation ie. `table[row,column]`: here we generate logica
 Let's look at all differentially expressed genes at FDR < 0.01 and log fold change of expression > 2 (regardless of the direction).
 Collect Entrez IDs from the `pezzini$entrez` field, filtering by `pezzini$FDR < 0.01` AND `abs(pezzini$Differentiated)` 
 
-```{r, get DEGs, include=TRUE, eval=TRUE}
+```{r, RPA get DEGs, include=TRUE, eval=TRUE}
 degs <- pezzini$entrez[pezzini$FDR < 0.01 & abs(pezzini$Differentiated) > 2]
 length(degs) # how many DEGs are in this list?
 ```
@@ -177,7 +177,7 @@ We should have **790** genes passing our filters.
 
 Now run the ORA. This may take a couple of minutes. We specify the background gene set using the `universe` argument. 
 
-```{r Run Reactome ORA, include=TRUE, eval=TRUE, cache=TRUE}
+```{r RPA Run Reactome ORA, include=TRUE, eval=TRUE, cache=TRUE}
 RPA <- enrichPathway(gene = degs, 
                      universe = pezzini$entrez,            # use all entrez IDs in "pezzini" as background
                      pvalueCutoff = 1, qvalueCutoff = 1)   # get all results, filter later.
@@ -188,7 +188,7 @@ RPA_df <- as.data.frame(RPA)
 
 Lets look at the top 8 entries:
 
-```{r make pretty table of top entries, include=TRUE, eval=TRUE}
+```{r RPA make pretty table of top entries, include=TRUE, eval=TRUE}
 # No need for 'qvalue' (column 10) as it is redundant with p.adjust.
 # Also, Column 11 is too big, it lists all genes in the overlap. Remove them from display using negative subscripts. 
 datatable(RPA_df[,-c(10,11)]) %>%  formatRound(columns=c('RichFactor', 'FoldEnrichment', 'zScore', 'pvalue'), digits=3)
@@ -204,7 +204,7 @@ We do get quite different results if we only include up- or down- regulated gene
 We can use `ggplot` to plot statistical significance vs. fold-enrichment, and show gene-set size using point size. With `ggrepel` we can also label pathways. We won't go too much into `ggplot` here suffice to say that it is a powerful framework for data visualisation.
 
 
-```{r plot ORA results, include=TRUE, eval=TRUE}
+```{r RPA plot ORA results, include=TRUE, eval=TRUE}
 ggplot(data=RPA_df,
        aes(x = FoldEnrichment, 
            y = -log10(p.adjust),
@@ -238,7 +238,7 @@ When we want to rank genes, we face a conundrum of whether to use the magnitude 
 
 **Note**: Using pi-scores is slightly hacky. More statistically valid ways of combining effect magnitude and significance exist, for example preserving the T- or F-statistics from the orginal DE gene identification in Voom / Edger / DESeq in the output from those tools. Alternatively, the `TREAT` or `CONFECT` tools can run a trade-off between effect size and significance. But we will use pi-scores here as they are easily calculable from the metrics we have in our table of results. 
 
-```{r, calculate pi-scores, include=TRUE, eval=TRUE}
+```{r, RPA calculate pi-scores, include=TRUE, eval=TRUE}
 pezzini$pi <- -log10(pezzini$FDR) * pezzini$Differentiated     # calculate "pi" score
 pezzini <- pezzini[order(pezzini$pi, decreasing = TRUE),]      # sort pezzini table by "pi" score
 plot(x = pezzini$Differentiated, y = pezzini$pi, cex=0.1)      # plot "pi" vs Log-fold change
@@ -251,7 +251,7 @@ plot(x = pezzini$Differentiated, y = pezzini$pi, cex=0.1)      # plot "pi" vs Lo
 We will use ReactomePA's function `gsePathway()`. It accepts input in the form of a named vector of significance metrics, where the names are the geneIDs. 
 
 The following code creates suitable input:
-```{r make gsePA input, include=TRUE, eval=TRUE}
+```{r RPA make gsePA input, include=TRUE, eval=TRUE}
 pi_vals <- pezzini$pi  
 names(pi_vals) <- pezzini$entrez
 head(pi_vals)
@@ -260,7 +260,7 @@ head(pi_vals)
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 Now let's run gsePA. This might take a couple of minutes.
-```{r run gsePA, include=TRUE, eval=TRUE, cache=TRUE}
+```{r RPA run gsePA, include=TRUE, eval=TRUE, cache=TRUE}
 gsePA <- gsePathway(geneList = pi_vals,
                     exponent = 1,
                     pvalThreshold = 0.2)
@@ -271,7 +271,7 @@ gsePA_df <- as.data.frame(gsePA)
 
 #### Browse top pathways:
 
-```{r display gsePA results as table, include=TRUE, eval=TRUE}
+```{r RPA display gsePA results as table, include=TRUE, eval=TRUE}
 # exclude column 11, it lists geneIDs: too much info to display. Also don't need 8 (qvalue)
 datatable(gsePA_df[,-c(8,11)]) %>%  formatRound(columns=c('enrichmentScore', 'NES', 'pvalue', 'log2err'), digits=4)
 ```
@@ -283,7 +283,7 @@ The Normalised Enrichment Score `NES` and the `qvalue`/`p.adjust` fields (here, 
 
 Make barcode plots of 5 most significant pathways
 
-```{r barcode plot top PAs, include=TRUE, eval=TRUE}
+```{r RPA barcode plot top PAs, include=TRUE, eval=TRUE}
 gseaplot2(gsePA, geneSetID = 1:5)
 ```
 
@@ -292,7 +292,7 @@ gseaplot2(gsePA, geneSetID = 1:5)
 
 These are all downregulated pathways: let's also get best UPregulated groups:
 
-```{r barcode plot upreg PAs, include=TRUE, eval=TRUE}
+```{r RPA barcode plot upreg PAs, include=TRUE, eval=TRUE}
 positives <- which(gsePA$NES > 0)
 gseaplot2(gsePA, geneSetID = positives[1:5])
 ```
@@ -310,7 +310,7 @@ We can visualise pathways with the `viewPathway` function, overlaying each node'
 
 Here we will instead use the "pi" values since we have already made a named vector containing them.
 
-```{r display pathways, include=TRUE, eval=TRUE}
+```{r RPA display pathways, include=TRUE, eval=TRUE}
 viewPathway("Downstream signaling of activated FGFR2", 
             readable = TRUE, 
             foldChange = pi_vals,
@@ -332,7 +332,7 @@ Other interesting pathways can be found in the Description field of the gsePathw
 
 Let's say we have a different visualisation tool we want to use. ReactomeDB data can be exported in the form of a `pathway` object of the `graphite` package, and from there it can be exported as table of relationships (edges) between proteins or metabolites (nodes). These relationships are a mix of directed (e.g. in a signalling pathway when one protein acts on another) or undirected (e.g. when a pair of proteins form a complex with each other).
 
-```{r show export table, include=TRUE, eval=TRUE}
+```{r RPA show export table, include=TRUE, eval=TRUE}
 pathName = "Downstream signaling of activated FGFR2"
 pw <- pathways(species = 'hsapiens', "reactome")[[pathName]]  # get pathway from reactome. 
 # by default these will have UniProt protein names: convert to gene names:
@@ -351,13 +351,13 @@ datatable(pw_edges)
 
 We can also capture the version of R and other session details including all loaded packages and versions with the `sessionInfo()` function: 
 
-```{r session info, include=TRUE, eval=TRUE}
+```{r RPA session info, include=TRUE, eval=TRUE}
 sessionInfo()
 ```
 
 
 
-```{r restore working directory, include=FALSE, eval=TRUE}
+```{r RPA restore working directory, include=FALSE, eval=TRUE}
 # Restore the book's working directory so later chapters (and their
 # before_chapter_script, which re-reads _bookdown.yml) resolve their own
 # relative paths correctly.
