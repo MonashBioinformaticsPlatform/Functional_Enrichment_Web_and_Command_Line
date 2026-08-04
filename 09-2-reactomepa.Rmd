@@ -1,21 +1,379 @@
 # ReactomePA
 
-```{r reactomepa-echo-setup, include=FALSE}
-knitr::opts_chunk$set(eval = FALSE)
+
+```{r gprofiler2-echo-setup, include=FALSE}
+knitr::opts_chunk$set(
+  eval = FALSE,
+  echo = TRUE,
+  include = TRUE,
+  results = "markup",
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center"
+)
 ```
 
-Earlier in the book you used the [Reactome website](https://reactome.org/) directly to run both ORA and gene set analysis against the Reactome pathway database. [ReactomePA](https://bioconductor.org/packages/release/bioc/html/ReactomePA.html) is the companion Bioconductor R package, providing scripted, reproducible access to the same pathway database, and integrates directly with the `enrichplot` visualisations used elsewhere in the book.
+Earlier in the book you used the [Reactome website](https://reactome.org/) directly to run both ORA and gene set analysis against the Reactome pathway database. 
 
-**Note: this chapter is a placeholder.** The walkthrough for `ReactomePA` is still being written and will be added in a future update. In the meantime, here's how to install it:
+[ReactomePA](https://bioconductor.org/packages/release/bioc/html/ReactomePA.html) is the companion Bioconductor R package, providing scripted, reproducible access to the same pathway database, and integrates directly with the `enrichplot` visualisations used elsewhere in the book. The `ReactomePA` user guide can be found [here.](https://yulab-smu.top/biomedical-knowledge-mining-book/024-reactome.html) 
 
-```{r install reactomepa, eval = FALSE}
-if (!requireNamespace("BiocManager", quietly = TRUE)) {
-  install.packages("BiocManager")
-}
+Like the web interface,the `ReactomePA` R package can be used for ORA. However, this is more customisable and reproducible in R. The FCS/GSEA-style analyses are also possible using the R package whereas these analyses on the Reactome.org website do not appear to be functional as of July 2026.
 
-BiocManager::install("ReactomePA")
-```
 
-```{r load reactomepa, eval = FALSE}
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## Input data 
+
+We will continue with the RNAseq dataset from [Pezzini et al 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) introduced earlier in the book.
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## Activity overview
+
+::: {.overview}
+1. Load input dataset (a gene matrix with adjusted P values and log2 fold change values)
+2. Change Gene IDs to Entrez IDs (required by Reactome)
+3. Filter for differentially expressed genes (DEGs) and create a gene list R object
+4. Run ORA with `enrichPathway()` function
+5. Visualise the results with `ggplot`
+6. Prepare for `FCS` analysis by generating pi-scores, incorporating significance and fold-change of DE genes.
+7. Run a `FCS` analysis for up-regulated and down-regulated genes using the `gsePathway()` function
+8. Visualise the `FCS` results using barcode plots
+9. Visualise gene regulation magnitude, overlaid on pathway topology
+10. Extract `reactomeDB` data to use with other tools
+:::
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## Analysis workflow
+
+The complete executable analysis is included below. Run the code chunks interactively while working through the chapter, or render the full Bookdown project to execute the analysis and retain the code, parameters, results, figures, and software-version information in the book output.
+
+
+```{r Load R packages, include=TRUE, eval=TRUE}
 library(ReactomePA)
+library(AnnotationDbi)
+library(org.Hs.eg.db)
+library(enrichplot)
+library(ggplot2)
+library(ggrepel)
+library(DT)
+library(graphite)
 ```
+
+## Working directory
+
+Bookdown evaluates relative file paths from the book project directory. Confirm that the input files used below are available from that directory, or update the file paths to match your project structure:
+
+
+```{r working directory, include=TRUE, eval=TRUE}
+# Bookdown evaluates relative file paths from the book project directory.
+# Confirm the directory from which the book is being rendered.
+getwd()
+# root.dir is a book-wide knitr option, not scoped to this chapter, so we
+# save it here and restore it at the end of the chapter (see "Restore
+# working directory" below) - otherwise every later chapter would inherit
+# this chapter's working directory, breaking their relative file paths.
+reactomePA_book_root_dir <- getwd()
+knitr::opts_knit$set(root.dir = "day2_inputData")
+getwd()
+```
+
+
+## 1. Load input data
+
+Raw data from [Pezzini et al 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) was subjected to differential gene expression analysis with [Degust](https://degust.erc.monash.edu/) and the results file saved to `Pezzini_DE.txt`.
+
+The input data file can be fetched using its URL by `read.csv()`.  
+
+
+```{r load input data, include=TRUE, eval=TRUE}
+pezzini <- read.csv("https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/data/Pezzini2016_SHSY5Ycelldiff_DE_table.csv", sep=',', header = T)
+colnames(pezzini)
+```
+
+The dataframe shows genes with fold change and FDR values, along with some normalised counts values for the 6 samples (2 groups with 3 replicates each). 
+
+Look on the environment pane of RStudio, and you can see a description '14420 obs. of 19 variables' - this shows your dataframe consists of 19 columns and 14,420 genes. 
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## 2. Match Ensembl Gene IDs to Entrez Gene IDs
+
+Reactome requires *Entrez*-style gene IDs, which are just numbers.
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+#### Example Human Gene IDs from different DBs
+
+| Ensembl Gene ID | Gene Symbol (HGNC) | Entrez Gene ID |
+|-----------------|--------------------|----------------|
+| ENSG00000141510 | TP53               | 7157           |
+| ENSG00000139618 | BRCA2              | 675            |
+| ENSG00000215252 | GOLGA8B            | **23015**      |
+| ENSG00000175265 | GOLGA8A            | **23015**      |
+| ENSG00000146648 | EGFR               | 1956           |
+| ENSG00000121879 | PIK3CA             | 5290           |
+| ENSG00000148362 | PAXX               | **NA**         |
+| ENSG00000223972 | DDX11L1            | 100287102      |
+| ENSG00000227232 | WASH7P             | 653635         |
+| ENSG00000198786 | MT-ND5             | 4540           |
+
+Note that some Gene IDs do not have a one-to-one mapping to genes in other databases. Some are listed as two separate genes, or can be completely absent. This is also often the case for different releases of the same database.
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+Currently the data only has *Ensembl*-style IDs and *HGNC*/*Symbolic*-style names. The online tool we used converted these automatically, but here we have to do it ourselves.
+
+We can use the **mapIds()** function from the **AnnotationDbi** package for this.
+
+
+```{r get Entrez IDs, include=TRUE, eval=TRUE}
+# to get a list of available keytypes, use: columns(org.Hs.eg.db)
+pezzini$entrez <- mapIds(org.Hs.eg.db, 
+                    keys = pezzini$Gene.ID, # Use column "Gene.ID" in "pezzini" (which contains Ensembl gene ids) as query.
+                    column = "ENTREZID",    # retrieve ENTREZID values associated with the query values
+                    keytype = "ENSEMBL",
+                    multiVals = "first")
+# How many ensembl IDs mapped to NO Entrez IDs?
+sum(is.na(pezzini$entrez))
+# How many ensembl IDs mapped to the same Entrez IDs? Remove NAs because they will be counted as duplicates
+sum(duplicated(pezzini$entrez) & ! is.na(pezzini$entrez)) 
+# What type of data does R think pezzini$entrez is? Should be "character" but sometimes R mistakes it for numeric
+class(pezzini$entrez)
+```
+Note on `$`: `$` is used to indicate one column or field. Here `pezzini$entrez <-` assigns the results into a new column `entrez` in the table `pezzini`. 
+
+There should be **16** gene IDs that are now duplicated after converting to Entrez IDs from Ensembl IDs, and **116** have no Entrez ID at all. This is not unusual since different gene databases will sometimes regard two regions as the same gene while others will split the region into different genes. 
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+To ensure everything runs without errors, let's get rid of NAs/duplicates for Entrez IDs:
+
+```{r, Get rid of duplicates, include=TRUE, eval=TRUE}
+nrow(pezzini) # rows pre-filter
+pezzini <- pezzini[!is.na(pezzini$entrez), ]      # get rid of rows where Entrez-id was not found
+pezzini <- pezzini[!duplicated(pezzini$entrez), ] # get rid of duplicate rows of Entrez-id (retains first row)
+nrow(pezzini) # rows post-filter
+```
+Note on square-bracket notation ie. `table[row,column]`: here we generate logical filters for the rows, and no filter at all for the columns.
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## 3. Create DE gene list for ORA in Reactome
+
+Let's look at all differentially expressed genes at FDR < 0.01 and log fold change of expression > 2 (regardless of the direction).
+Collect Entrez IDs from the `pezzini$entrez` field, filtering by `pezzini$FDR < 0.01` AND `abs(pezzini$Differentiated)` 
+
+```{r, get DEGs, include=TRUE, eval=TRUE}
+degs <- pezzini$entrez[pezzini$FDR < 0.01 & abs(pezzini$Differentiated) > 2]
+length(degs) # how many DEGs are in this list?
+```
+We should have **790** genes passing our filters. 
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## 4. Run ORA in Reactome
+
+Now run the ORA. This may take a couple of minutes. We specify the background gene set using the `universe` argument. 
+
+```{r Run Reactome ORA, include=TRUE, eval=TRUE, cache=TRUE}
+RPA <- enrichPathway(gene = degs, 
+                     universe = pezzini$entrez,            # use all entrez IDs in "pezzini" as background
+                     pvalueCutoff = 1, qvalueCutoff = 1)   # get all results, filter later.
+RPA_df <- as.data.frame(RPA)
+```
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+Lets look at the top 8 entries:
+
+```{r make pretty table of top entries, include=TRUE, eval=TRUE}
+# No need for 'qvalue' (column 10) as it is redundant with p.adjust.
+# Also, Column 11 is too big, it lists all genes in the overlap. Remove them from display using negative subscripts. 
+datatable(RPA_df[,-c(10,11)]) %>%  formatRound(columns=c('RichFactor', 'FoldEnrichment', 'zScore', 'pvalue'), digits=3)
+```
+
+
+We do get quite different results if we only include up- or down- regulated genes. Depending on our hypothesis and how we think the pathways involved may function, we might do this by changing the filter for DEGs above. However, this would take extra computational time so we won't do it here.
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## 5. Plot some results of ORA
+
+We can use `ggplot` to plot statistical significance vs. fold-enrichment, and show gene-set size using point size. With `ggrepel` we can also label pathways. We won't go too much into `ggplot` here suffice to say that it is a powerful framework for data visualisation.
+
+
+```{r plot ORA results, include=TRUE, eval=TRUE}
+ggplot(data=RPA_df,
+       aes(x = FoldEnrichment, 
+           y = -log10(p.adjust),
+           label = Description)) + 
+  geom_point(aes(size=Count), alpha=0.5) + 
+  geom_text_repel(data = RPA_df[ RPA_df$p.adjust < 0.001 ,  ], size=2.2) + 
+  theme_bw()
+```
+
+
+
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## 6. ReactomePA Functional Class Scoring. Pi scores
+
+Rather than drawing an arbitrary threshold to classify genes as either regulated or not, we can assess the distribution of genes in each pathway over a continuous metric related to gene expression, such as fold-change, statistical significance, or signal-to-noise ratio.
+
+The reactome.org website offers some FCS analysis (e.g. using the CAMERA algorithm) but as of July 2026 these features appear not to be working reliably. However, we can perform them in R.
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+#### First, order genes by ranking them by pi-score
+
+When we want to rank genes, we face a conundrum of whether to use the magnitude of the experimental effect or the statistical significance.
+
+**¿Por qué no los dos?**
+
+"pi-score" is a combination of P-value and Log-fold change proposed by [Xiao et. al 2012](https://pmc.ncbi.nlm.nih.gov/articles/PMC3957066/)
+
+**Note**: Using pi-scores is slightly hacky. More statistically valid ways of combining effect magnitude and significance exist, for example preserving the T- or F-statistics from the orginal DE gene identification in Voom / Edger / DESeq in the output from those tools. Alternatively, the `TREAT` or `CONFECT` tools can run a trade-off between effect size and significance. But we will use pi-scores here as they are easily calculable from the metrics we have in our table of results. 
+
+```{r, calculate pi-scores, include=TRUE, eval=TRUE}
+pezzini$pi <- -log10(pezzini$FDR) * pezzini$Differentiated     # calculate "pi" score
+pezzini <- pezzini[order(pezzini$pi, decreasing = TRUE),]      # sort pezzini table by "pi" score
+plot(x = pezzini$Differentiated, y = pezzini$pi, cex=0.1)      # plot "pi" vs Log-fold change
+```
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## 7. Run ReactomePA Functional Class Scoring
+
+We will use ReactomePA's function `gsePathway()`. It accepts input in the form of a named vector of significance metrics, where the names are the geneIDs. 
+
+The following code creates suitable input:
+```{r make gsePA input, include=TRUE, eval=TRUE}
+pi_vals <- pezzini$pi  
+names(pi_vals) <- pezzini$entrez
+head(pi_vals)
+```
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+Now let's run gsePA. This might take a couple of minutes.
+```{r run gsePA, include=TRUE, eval=TRUE, cache=TRUE}
+gsePA <- gsePathway(geneList = pi_vals,
+                    exponent = 1,
+                    pvalThreshold = 0.2)
+gsePA_df <- as.data.frame(gsePA)
+```
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+#### Browse top pathways:
+
+```{r display gsePA results as table, include=TRUE, eval=TRUE}
+# exclude column 11, it lists geneIDs: too much info to display. Also don't need 8 (qvalue)
+datatable(gsePA_df[,-c(8,11)]) %>%  formatRound(columns=c('enrichmentScore', 'NES', 'pvalue', 'log2err'), digits=4)
+```
+The Normalised Enrichment Score `NES` and the `qvalue`/`p.adjust` fields (here, both are just FDR again) represent concepts of effect size and statistical significance, respectively. NES is generated from the raw `enrichmentScore` after normalising for the "expected" enrichment score (obtained by permuting genes).   
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## 8. Visualise gsePA results in barcode plots.
+
+Make barcode plots of 5 most significant pathways
+
+```{r barcode plot top PAs, include=TRUE, eval=TRUE}
+gseaplot2(gsePA, geneSetID = 1:5)
+```
+
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+These are all downregulated pathways: let's also get best UPregulated groups:
+
+```{r barcode plot upreg PAs, include=TRUE, eval=TRUE}
+positives <- which(gsePA$NES > 0)
+gseaplot2(gsePA, geneSetID = positives[1:5])
+```
+
+The barcode plots give a good idea as to how significance is calculated. The grey profile at the bottom represents each gene's ranking value, in this case, pi-scores. They can be negative for the genes at the bottom of the list, and the highest weightings are usually for genes at the very top or bottom of the list, as these are most informative.
+
+The Running Enrichment Score (RES) is a cumulative sum of this metric, for genes within the pathway being analysed, minus the cumulative sum of genes outside the pathway. A random distribution of pathway genes after ranking should produce a largely flat RES. The highest (or lowest) value for the RES represents significant skew of pathway genes to one or both ends of the ranked list.
+
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## 9. Visualise Pathways
+
+We can visualise pathways with the `viewPathway` function, overlaying each node's actual expression change using colour.
+
+Here we will instead use the "pi" values since we have already made a named vector containing them.
+
+```{r display pathways, include=TRUE, eval=TRUE}
+viewPathway("Downstream signaling of activated FGFR2", 
+            readable = TRUE, 
+            foldChange = pi_vals,
+            layout = 'kk')   
+```
+
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+Unlike in the online visualisation, `viewPathway` does not display directionality. This is not as pretty as the web version! But the data is able to be exported to other visualisation tools (e.g. in the `DiagrammeR` package) if needed.
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+Other interesting pathways can be found in the Description field of the gsePathway() output table, e.g. "PI3K/AKT Signaling in Cancer", "Chemokine receptors bind chemokines", "Response to elevated platelet cytosolic Ca2+"
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+## 10. Exporting reactome pathway data
+
+Let's say we have a different visualisation tool we want to use. ReactomeDB data can be exported in the form of a `pathway` object of the `graphite` package, and from there it can be exported as table of relationships (edges) between proteins or metabolites (nodes). These relationships are a mix of directed (e.g. in a signalling pathway when one protein acts on another) or undirected (e.g. when a pair of proteins form a complex with each other).
+
+```{r show export table, include=TRUE, eval=TRUE}
+pathName = "Downstream signaling of activated FGFR2"
+pw <- pathways(species = 'hsapiens', "reactome")[[pathName]]  # get pathway from reactome. 
+# by default these will have UniProt protein names: convert to gene names:
+pw2 <- convertIdentifiers(pw, "symbol")  # Convert UniProt names to HGNC GENE SYMBOLS here
+class(pw2)
+
+# convert to table:
+pw_edges <- graphite::edges(pw2, which = 'mixed') # options for 'which': "proteins", "metabolites", "mixed"
+datatable(pw_edges)
+```
+
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+### R version and R package versions 
+
+We can also capture the version of R and other session details including all loaded packages and versions with the `sessionInfo()` function: 
+
+```{r session info, include=TRUE, eval=TRUE}
+sessionInfo()
+```
+
+
+
+```{r restore working directory, include=FALSE, eval=TRUE}
+# Restore the book's working directory so later chapters (and their
+# before_chapter_script, which re-reads _bookdown.yml) resolve their own
+# relative paths correctly.
+knitr::opts_knit$set(root.dir = reactomePA_book_root_dir)
+```
+
+
+## End of activity summary
+
+::: {.summary}
+- We have extracted a gene list and background gene list from a DE dataset and run ORA with the `reactomePA` `enrichPathway()` function
+- We plotted the data with a `ggplot2` dotplot
+- We have run a `reactomePA` FCS analysis separating up and down regulated genes
+- We plotted the top up- and down- regulated pathways as barcode plots
+- We visualised pathway networks, overlaid with a gene-regulation metric from our experiment
+- We've extracted reactome networks in tabular form
+:::
+
+<p>&nbsp;</p>  <!-- insert blank line -->
