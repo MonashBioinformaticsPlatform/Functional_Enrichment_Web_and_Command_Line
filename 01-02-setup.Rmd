@@ -88,8 +88,8 @@ download.file(
 
 untar("data.tar")
 
-# ## Download workshop.R script. This file contains all the example code for this workshop.
-# download.file(
-#     "https://monashbioinformaticsplatform.github.io/scRNAseq_Workshop_ABACBS_2024/workshop.R", "workshop.R"
-# )
+## Download workshop.R script. This file contains all the example code for this workshop.
+download.file(
+    "https://monashbioinformaticsplatform.github.io/Functional_Enrichment_Web_and_Command_Line/workshop.R", "workshop.R"
+)
 ```
