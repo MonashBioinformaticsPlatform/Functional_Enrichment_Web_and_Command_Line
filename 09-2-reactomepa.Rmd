@@ -345,13 +345,61 @@ pw2 <- convertIdentifiers(pw, "symbol")  # Convert UniProt names to HGNC GENE SY
 class(pw2)
 
 # convert to table:
-pw_edges <- graphite::edges(pw2, which = "proteins") # options for "which": "proteins", "metabolites", "mixed"
+pw_edges <- graphite::edges(pw2, which = "proteins") # options for 'which': "proteins", "metabolites", "mixed".
 # Caution: both igraph and graphite packages have a function called "edges()"! Specify "graphite::edges()" here.
+# NOTE: it is possible to combine all edges: 
+# pw_edges_all <- rbind(pw2@protEdges, pw2@metabolEdges, pw2@mixedEdges) 
+# but this can be a LOT of edges to display!
 datatable(pw_edges)
 ```
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
+
+## Plotting exported network and expression data using ggplot
+
+Visualising data in ggplot is great because you can customise it readily. We can actually preserve directional network relationships too if we are careful.
+
+First, how do we generate x / y node positions for a plot? We can use one of the many methods in `iGraph`  (`layout_with_fr`, `layout_with_kk`, etc.)
+
+```{r make node coords for network plot, include=TRUE}
+ig <- igraph::graph_from_data_frame(pw_edges[,c('src', 'dest')]) # convert to a minimal igraph object
+lay <- igraph::layout_with_kk(ig)  # lay is now just a 2-column table of x and y positions using 'kk' method
+# export "lay" into a dataframe with columns 'node', 'x', and 'y'
+node_layout <- data.frame(node = V(ig)$name, x = lay[,1], y = lay[,2] )
+# merge in node expression data
+node_layout$LFC <- pezzini$Differentiated[ match(node_layout$node, pezzini$Gene.Name)]
+```
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+Now use the node coordinates to define start and end coordinates for the lines, and plot directional and non-directional edges.
+
+```{r plot pretty pathway, include=TRUE}
+# merge coords back into pw_edges by SOURCE node, as 'x' and 'y' 
+pw_edges2 <- merge(pw_edges, node_layout, by.x = 'src', by.y = 'node', all.x=T)  # output as pw_edges2
+# merge coords back into all_edges by DESTINATION node, as 'x_dest' and 'y_dest'
+pw_edges2 <- merge(pw_edges2, node_layout, by.x = 'dest', by.y = 'node', all.x=T, suffixes = c('', '_dest'))
+
+# plot undirected and directed edges as separate layers, so we can use red arrows for the directed edges:
+plt <- ggplot() + 
+  geom_curve(data = pw_edges2[pw_edges2$direction == 'undirected',], 
+               aes(x = x, y = y, xend = x_dest, yend = y_dest ), alpha=0.5, curvature = 0.2) +
+  geom_curve(data = pw_edges2[pw_edges2$direction == 'directed',], 
+               aes(x = x, y = y, xend = x_dest, yend = y_dest ), color='red', alpha = 0.5,
+               arrow = arrow(type='closed', length = unit(0.1, "inches")), curvature = -0.2) +
+  geom_point(data = node_layout, 
+             aes(x = x, y = y), size=2.5) +
+  ggrepel::geom_label_repel(data = node_layout, 
+             aes(x = x, y = y, label = node, fill = LFC), fontface = 'bold', alpha = 0.7) + 
+  scale_fill_gradient2(high = 'red', mid = 'grey', low = 'green') +
+  theme_void()
+print(plt)
+# save plot to a large-ish pdf
+pdf('FGFR2_network.pdf', width = 12, height = 12)
+print(plt)
+dev.off()
+```
 
 ## End of activity summary
 
@@ -362,6 +410,7 @@ datatable(pw_edges)
 - We plotted the top up- and down- regulated pathways as barcode plots
 - We visualised pathway networks, overlaid with a gene-regulation metric from our experiment
 - We extracted reactome networks in tabular form for export
+- We plotted reactome networks in ggplot preserving directional edges
 :::
 
 <p>&nbsp;</p>  <!-- insert blank line -->
