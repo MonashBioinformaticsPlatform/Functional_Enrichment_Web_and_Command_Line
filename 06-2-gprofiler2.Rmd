@@ -72,7 +72,7 @@ getwd()
 # working directory" below) - otherwise every later chapter would inherit
 # this chapter's working directory, breaking their relative file paths.
 gprofiler2_book_root_dir <- getwd()
-knitr::opts_knit$set(root.dir = "day2_inputData")
+knitr::opts_knit$set(root.dir = "data/R_data")
 getwd()
 ```
 
