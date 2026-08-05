@@ -16,7 +16,7 @@ Earlier in the book you used the [Reactome website](https://reactome.org/) web t
 
 [ReactomePA](https://bioconductor.org/packages/release/bioc/html/ReactomePA.html) is the companion Bioconductor R package, providing scripted, reproducible access to the same pathway database, and integrates directly with the `enrichplot` visualisations used elsewhere in the book. The `ReactomePA` user guide can be found [here.](https://yulab-smu.top/biomedical-knowledge-mining-book/024-reactome.html) 
 
-Like the web interface,the `ReactomePA` R package can be used for ORA. However, this is more customisable and reproducible in R. The FCS/GSEA-style analyses are also possible using the R package (whereas these analyses on the Reactome.org website do not appear to be functional as of July 2026).
+Like the web interface, the `ReactomePA` R package can be used for ORA. However, this is more customisable and reproducible in R. The FCS/GSEA-style analyses are also possible using the R package (whereas these analyses on the Reactome.org website do not appear to be functional as of July 2026).
 
 ReactomeDB does not just contain gene-sets but also directional and non-directional relationships between genes / proteins and metabolites in various pathways. This information can be extracted for downstream analysis of biological networks.
 
@@ -223,7 +223,7 @@ ggplot(data=RPA_df,
 <p>&nbsp;</p>  <!-- insert blank line -->
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-## ReactomePA Functional Class Scoring. Pi scores
+## ReactomePA Functional Class Scoring
 
 Rather than drawing an arbitrary threshold to classify genes as either regulated or not, we can assess the distribution of genes in each pathway over a continuous metric related to gene expression, such as fold-change, statistical significance, or signal-to-noise ratio.
 
@@ -345,10 +345,10 @@ pw2 <- convertIdentifiers(pw, "symbol")  # Convert UniProt names to HGNC GENE SY
 class(pw2)
 
 # convert to table:
-pw_edges <- graphite::edges(pw2, which = 'mixed') # options for 'which': "proteins", "metabolites", "mixed"
+pw_edges <- graphite::edges(pw2, which = "proteins") # options for "which": "proteins", "metabolites", "mixed"
+# Caution: both igraph and graphite packages have a function called "edges()"! Specify "graphite::edges()" here.
 datatable(pw_edges)
 ```
-
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
