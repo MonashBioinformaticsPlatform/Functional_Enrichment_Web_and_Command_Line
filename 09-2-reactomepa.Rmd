@@ -62,19 +62,19 @@ library(graphite)
 
 ### Load input data
 
-Raw data from [Pezzini et al 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) was subjected to differential gene expression analysis with [Degust](https://degust.erc.monash.edu/) and the results file saved to `Pezzini_DE.txt`.
+Raw data from [ et al 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) was subjected to differential gene expression analysis with [Degust](https://degust.erc.monash.edu/) and the results file saved to `_DE.txt`.
 
 The input data file can be fetched using its URL by `read.csv()`.  
 
 
 ```{r RPA load input data, include=TRUE}
-pezzini <- read.csv("https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/data/Pezzini2016_SHSY5Ycelldiff_DE_table.csv", sep=',', header = T)
+pezzini <- read.csv("https://raw.githubusercontent.com/MonashBioinformaticsPlatform/Functional_Enrichment_Web_and_Command_Line/refs/heads/main/data/R_data/Pezzini_DE.txt", sep='\t', header = T)
 colnames(pezzini)
 ```
 
-The dataframe shows genes with fold change and FDR values, along with some normalised counts values for the 6 samples (2 groups with 3 replicates each). 
+The dataframe shows genes with fold change and FDR values, along with gene counts values for the 6 samples (2 groups with 3 replicates each). 
 
-Look on the environment pane of RStudio, and you can see a description '14420 obs. of 19 variables' - this shows your dataframe consists of 19 columns and 14,420 genes. 
+Look on the environment pane of RStudio, and you can see a description '14420 obs. of 10 variables' - this shows your dataframe consists of 10 columns and 14,420 genes. 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -147,10 +147,10 @@ Note on square-bracket notation ie. `table[row,column]`: here we generate logica
 ### Create DE gene list for ORA in Reactome
 
 Let's look at all differentially expressed genes at FDR < 0.01 and log fold change of expression > 2 (regardless of the direction).
-Collect Entrez IDs from the `pezzini$entrez` field, filtering by `pezzini$FDR < 0.01` AND `abs(pezzini$Differentiated)` 
+Collect Entrez IDs from the `pezzini$entrez` field, filtering by `pezzini$FDR < 0.01` AND `abs(pezzini$Log2FC)` 
 
 ```{r, RPA get DEGs, include=TRUE}
-degs <- pezzini$entrez[pezzini$FDR < 0.01 & abs(pezzini$Differentiated) > 2]
+degs <- pezzini$entrez[pezzini$FDR < 0.01 & abs(pezzini$Log2FC) > 2]
 length(degs) # how many DEGs are in this list?
 ```
 We should have **790** genes passing our filters. 
@@ -223,9 +223,9 @@ When we want to rank genes, we face a conundrum of whether to use the magnitude 
 **Note**: Using pi-scores is slightly hacky. More statistically valid ways of combining effect magnitude and significance exist, for example preserving the T- or F-statistics from the orginal DE gene identification in Voom / Edger / DESeq in the output from those tools. Alternatively, the `TREAT` or `CONFECT` tools can run a trade-off between effect size and significance. But we will use pi-scores here as they are easily calculable from the metrics we have in our table of results. 
 
 ```{r, RPA calculate pi-scores, include=TRUE}
-pezzini$pi <- -log10(pezzini$FDR) * pezzini$Differentiated     # calculate "pi" score
+pezzini$pi <- -log10(pezzini$FDR) * pezzini$Log2FC     # calculate "pi" score
 pezzini <- pezzini[order(pezzini$pi, decreasing = TRUE),]      # sort pezzini table by "pi" score
-plot(x = pezzini$Differentiated, y = pezzini$pi, cex=0.1)      # plot "pi" vs Log-fold change
+plot(x = pezzini$Log2FC, y = pezzini$pi, cex=0.1)      # plot "pi" vs Log-fold change
 ```
 
 <p>&nbsp;</p>  <!-- insert blank line -->
@@ -349,7 +349,7 @@ lay <- igraph::layout_with_kk(ig)  # lay is now just a 2-column table of x and y
 # export "lay" into a dataframe with columns 'node', 'x', and 'y'
 node_layout <- data.frame(node = V(ig)$name, x = lay[,1], y = lay[,2] )
 # merge in node expression data
-node_layout$LFC <- pezzini$Differentiated[ match(node_layout$node, pezzini$Gene.Name)]
+node_layout$LFC <- pezzini$Log2FC[ match(node_layout$node, pezzini$Gene.Name)]
 ```
 
 <p>&nbsp;</p>  <!-- insert blank line -->
