@@ -46,6 +46,10 @@ jobs:
         run: bookdown::render_book("index.Rmd", quiet = TRUE)
         shell: Rscript {0}
 
+      - name: Generate workshop.R script
+        run: source("make_R_script.R")
+        shell: Rscript {0}
+
       - name: Upload artifact for Pages
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: actions/upload-pages-artifact@v5
