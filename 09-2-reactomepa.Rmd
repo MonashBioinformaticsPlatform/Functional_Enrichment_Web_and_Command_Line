@@ -56,13 +56,14 @@ library(ggplot2)
 library(ggrepel)
 library(DT)
 library(graphite)
+library(igraph)
 ```
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 ### Load input data
 
-Raw data from [ et al 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) was subjected to differential gene expression analysis with [Degust](https://degust.erc.monash.edu/) and the results file saved to `_DE.txt`.
+Raw data from [ et al 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) was subjected to differential gene expression analysis with [Degust](https://degust.erc.monash.edu/) and the results file saved to `Pezzini_DE.txt`.
 
 The input data file can be fetched using its URL by `read.csv()`.  
 
@@ -248,10 +249,10 @@ head(pi_vals)
 Now let's run gsePA. This might take a couple of minutes.
 ```{r RPA run gsePA, include=TRUE}
 gsePA <- gsePathway(geneList = pi_vals,
-                    exponent = 1,
-                    pvalThreshold = 0.2)
+                    pvalueCutoff = 0.2)
 gsePA_df <- as.data.frame(gsePA)
 ```
+By default, pathways are filtered for > 10 nodes and < 500 nodes by `gsePathway()`.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -261,7 +262,7 @@ gsePA_df <- as.data.frame(gsePA)
 # exclude column 11, it lists geneIDs: too much info to display. Also don't need 8 (qvalue)
 datatable(gsePA_df[,-c(8,11)]) %>%  formatRound(columns=c('enrichmentScore', 'NES', 'pvalue', 'log2err'), digits=4)
 ```
-The Normalised Enrichment Score `NES` and the `qvalue`/`p.adjust` fields (here, both are just FDR again) represent concepts of effect size and statistical significance, respectively. NES is generated from the raw `enrichmentScore` after normalising for the "expected" enrichment score (obtained by permuting genes).   
+The Normalised Enrichment Score `NES` and the `qvalue`/`p.adjust` fields (here, both are just FDR again) represent concepts of effect size and statistical significance, respectively.  
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -285,7 +286,7 @@ gseaplot2(gsePA, geneSetID = positives[1:5])
 
 The barcode plots give a good idea as to how significance is calculated. The grey profile at the bottom represents each gene's ranking value, in this case, pi-scores. They can be negative for the genes at the bottom of the list, and the highest weightings are usually for genes at the very top or bottom of the list, as these are most informative.
 
-The Running Enrichment Score (RES) is a cumulative sum of this metric, for genes within the pathway being analysed, minus the cumulative sum of genes outside the pathway. A random distribution of pathway genes after ranking should produce a largely flat RES. The highest (or lowest) value for the RES is the raw Enrichment score. This represents the skew of pathway genes to one or both ends of the ranked list.
+The Running Enrichment Score (RES) is a cumulative sum of this metric, for genes within the pathway being analysed, minus the cumulative sum of genes outside the pathway. A random distribution of pathway genes after ranking should produce a largely flat RES. The highest (or lowest) value for the RES is the raw Enrichment score. This represents the skew of pathway genes to one or both ends of the ranked list. The Normalised Enrichment Score `NES` is generated from the raw `enrichmentScore` after normalising for the "expected" enrichment score (obtained by permuting genes). 
 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
@@ -341,7 +342,7 @@ datatable(pw_edges)
 
 Visualising data in ggplot is great because you can customise it readily. We can actually preserve directional network relationships too if we are careful.
 
-First, how do we generate x / y node positions for a plot? We can use one of the many methods in `iGraph`  (`layout_with_fr`, `layout_with_kk`, etc.)
+First, how do we generate x / y node positions for a plot? We can use one of the many methods in `igraph`  (`layout_with_fr()`, `layout_with_kk()`, etc.)
 
 ```{r make node coords for network plot, include=TRUE}
 ig <- igraph::graph_from_data_frame(pw_edges[,c('src', 'dest')]) # convert to a minimal igraph object
@@ -381,6 +382,10 @@ pdf('FGFR2_network.pdf', width = 12, height = 12)
 print(plt)
 dev.off()
 ```
+This should save the plot to a pdf file in the current working directory.
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
 
 ## End of activity summary
 
