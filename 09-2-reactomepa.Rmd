@@ -60,25 +60,6 @@ library(graphite)
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-**Working directory considerations**
-
-Bookdown evaluates relative file paths from the book project directory. Confirm that the input files used below are available from that directory, or update the file paths to match your project structure:
-
-```{r RPA working directory, include=TRUE}
-# Bookdown evaluates relative file paths from the book project directory.
-# Confirm the directory from which the book is being rendered.
-getwd()
-# root.dir is a book-wide knitr option, not scoped to this chapter, so we
-# save it here and restore it at the end of the chapter (see "Restore
-# working directory" below) - otherwise every later chapter would inherit
-# this chapter's working directory, breaking their relative file paths.
-reactomePA_book_root_dir <- getwd()
-knitr::opts_knit$set(root.dir = "data/R_data")
-getwd()
-```
-
-<p>&nbsp;</p>  <!-- insert blank line -->
-
 ### Load input data
 
 Raw data from [Pezzini et al 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) was subjected to differential gene expression analysis with [Degust](https://degust.erc.monash.edu/) and the results file saved to `Pezzini_DE.txt`.
@@ -424,13 +405,6 @@ It is good practice to capture and record the version of R and other session det
 sessionInfo()
 ```
 
-
-```{r RPA restore working directory, include=FALSE}
-# Restore the book's working directory so later chapters (and their
-# before_chapter_script, which re-reads _bookdown.yml) resolve their own
-# relative paths correctly.
-knitr::opts_knit$set(root.dir = reactomePA_book_root_dir)
-```
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
