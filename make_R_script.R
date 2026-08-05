@@ -81,7 +81,7 @@ get_script <- function(filename) {
         } else if (state == "hidden_code" && str_detect(line, "knitr::opts_knit\\$set\\(root\\.dir")) {
             # This line is otherwise dropped along with the rest of its include=FALSE
             # chunk, but its real-setwd() equivalent is needed so later chapters that
-            # assume the project root (e.g. their own "day2_inputData/..." paths)
+            # assume the project root (e.g. their own "data/R_data/..." paths)
             # resolve correctly once this chapter's chunks are done.
             show(str_replace(line, "knitr::opts_knit\\$set\\(root\\.dir = (.*)\\)", "setwd(\\1)"))
         }

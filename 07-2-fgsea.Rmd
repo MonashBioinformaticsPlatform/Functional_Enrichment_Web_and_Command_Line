@@ -11,7 +11,7 @@ knitr::opts_chunk$set(eval = TRUE)
 ## Input data
 
 We will re-run pre-ranked GSEA against the MSigDB Hallmark gene sets, using the same pre-ranked gene list you used earlier (`Pre_Ranked_List_logFC_SYMBOL`), so we can compare the R output directly against what you saw in the previous chapter, including the `HALLMARK_CHOLESTEROL_HOMEOSTASIS` gene set discussed in the earlier challenge question.  
-All of the data used in this chapter is provided in the `data/` folder of this workshop's materials, so there's nothing extra to download - just read on and run the code chunks below in order.
+All of the data used in this chapter is provided in the `data/R_data/` folder of this workshop's materials, so there's nothing extra to download - just read on and run the code chunks below in order.
 
 <p> </p>
 
@@ -47,7 +47,7 @@ register(SerialParam())
 We load the DE genes table derived from the [Pezzini et al. 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) SH-SY5Y neuronal differentiation dataset. The file has one row per gene, with `Gene_Symbol` and `logFC` columns and other related statistics columns, comparing differentiated against undifferentiated cells (`Pre_Ranked_List_logFC_SYMBOL`).
 
 ```{r fgsea-load-pre-ranked}
-stats_df <- read.table("day2_inputData/Pezzini_DE.txt", header = TRUE)
+stats_df <- read.table("data/R_data/Pezzini_DE.txt", header = TRUE)
 head(stats_df)
 ```
 

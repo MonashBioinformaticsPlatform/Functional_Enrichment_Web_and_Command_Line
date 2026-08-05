@@ -64,7 +64,7 @@ For every method used below, you can call `STRINGdb$help("method_name")` for the
 We reuse the same differential expression results behind the `DE_198set` gene list you used for ORA in `g:Profiler` and `STRING` earlier: genes from the Pezzini et al. 2017 SH-SY5Y differentiation experiment, each with a log2 fold change and an FDR-adjusted p-value.
 
 ```{r stringdb-load-de}
-de_full <- read.table("day2_inputData/Pezzini_DE.txt", header = TRUE)
+de_full <- read.table("data/R_data/Pezzini_DE.txt", header = TRUE)
 head(de_full)
 ```
 
