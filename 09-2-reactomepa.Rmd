@@ -200,7 +200,7 @@ ggplot(data=RPA_df,
 ```
 
 
-
+<!-- ![](images/09-2-reactomePA_Ora_results.png ){ width=100% } -->
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 <p>&nbsp;</p>  <!-- insert blank line -->
@@ -303,7 +303,7 @@ viewPathway("Downstream signaling of activated FGFR2",
             foldChange = pi_vals,
             layout = 'kk')   
 ```
-
+<!-- ![](images/09-2-reactomePA_viewPathway.png ){ width=100% } -->
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -382,10 +382,12 @@ pdf('FGFR2_network.pdf', width = 12, height = 12)
 print(plt)
 dev.off()
 ```
+
+<!-- ![](images/09-2-reactomePA_FGFR2_network.png ){ width=100% } -->
 This should save the plot to a pdf file in the current working directory.
 
-<p>&nbsp;</p>  <!-- insert blank line -->
 
+<p>&nbsp;</p>  <!-- insert blank line -->
 
 ## End of activity summary
 
