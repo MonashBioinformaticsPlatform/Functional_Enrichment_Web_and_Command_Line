@@ -94,7 +94,7 @@ head(data)
 
 The dataframe shows genes with fold change and FDR values, along with some normalised counts values for the 6 samples (2 groups with 3 replicates each). 
 
-Look on the environment pane of RStudio, and you can see a description '14420 obs. of 10 variables' - this shows your dataframe consists of 10 columns and 14,420 genes. 
+Look on the environment pane of RStudio, and you can see a description '14420 obs. of 11 variables' - this shows your dataframe consists of 10 columns and 14,420 genes. 
 
 ## Get ORA gene list
 
