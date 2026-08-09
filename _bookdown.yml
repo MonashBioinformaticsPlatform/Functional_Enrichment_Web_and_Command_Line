@@ -14,10 +14,10 @@ rmd_files:
   - 03-stats.Rmd
   - 04-example-dataset.Rmd
   - 05-genelists.Rmd
-  - 06-1-gprofiler-web.Rmd
-  - 06-2-gprofiler2.Rmd
-  - 07-1-gsea-web.Rmd
-  - 07-2-fgsea.Rmd
+  - 06-1-gsea-web.Rmd
+  - 06-2-fgsea.Rmd
+  - 07-1-gprofiler-web.Rmd
+  - 07-2-gprofiler2.Rmd
   - 08-1-string-web.Rmd
   - 08-2-stringdb.Rmd
   - 09-1-reactome-web.Rmd
