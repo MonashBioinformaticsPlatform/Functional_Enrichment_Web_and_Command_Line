@@ -105,17 +105,17 @@ filenames <- read_yaml("_bookdown.yml", readLines.warn = FALSE)$rmd_files |>
         "05-genelists.Rmd",
         "06-1-gsea-web.Rmd",
         # "06-2-fgsea.Rmd",
-        "07-1-gprofiler-web.Rmd",
-        # "07-2-gprofiler2.Rmd",
-        "08-1-string-web.Rmd",
-        # "08-2-stringdb.Rmd",
+        "07-1-string-web.Rmd",
+        # "07-2-stringdb.Rmd",
+        "08-1-gprofiler-web.Rmd",
+        # "08-2-gprofiler2.Rmd",
         "09-1-reactome-web.Rmd",
         # "09-2-reactomepa.Rmd",
         # "10-clusterprofiler.Rmd",
-        # "10-1-novel-species-FEA.Rmd",
-        "11-uncertainties.Rmd",
-        "12-reporting.Rmd",
-        "13-resources.Rmd"
+        # "11-novel-species-FEA.Rmd",
+        "12-uncertainties.Rmd",
+        "13-reporting.Rmd",
+        "14-resources.Rmd"
     ))
 
 output <- lapply(filenames, get_script) |> unlist()
