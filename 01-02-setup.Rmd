@@ -90,6 +90,10 @@ untar("data.tar")
 
 ## Download workshop.R script. This file contains all the example code for this workshop.
 download.file(
-    "https://monashbioinformaticsplatform.github.io/Functional_Enrichment_Web_and_Command_Line/workshop.R", "workshop.R"
+  "https://monashbioinformaticsplatform.github.io/Functional_Enrichment_Web_and_Command_Line/workshop.R", "workshop.R"
 )
+
+# list downlowded files
+list.files()
+list.files("data")
 ```
