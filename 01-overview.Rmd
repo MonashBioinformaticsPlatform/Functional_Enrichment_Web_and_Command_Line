@@ -26,7 +26,7 @@ This workshop is intended for biologists working with ‘-Omics data’ (e.g., R
 
 The workshop will be held **in person**. Participants are encouraged to bring a **laptop**; however, **no software installation is necessary**.  
 
-Workshop materials and relevant links can be found on the [**Resources**](https://monashbioinformaticsplatform.github.io/Functional_Enrichment_Online_Tools/resources.html) page.
+Workshop materials and relevant links can be found on the [**Resources**](https://monashbioinformaticsplatform.github.io/Functional_Enrichment_Web_and_Command_Line/resources.html) page.
 
 
 BYO coffee :)
@@ -51,17 +51,17 @@ schedule <- tibble::tibble(
     rep("HK", 3),
     # Morning break (10 min)
     "",
-    # HK resumes (gProfiler)
-    "HK",
-    # GI - 1
+    # GI - GSEA (web) + fgsea
     "GI",
-    # Lunch (20 min)
+    # GI - STRING (web) + STRINGdb
+    "GI",
+    # Lunch
     "",
-    # GI - 2
-    "GI",
-    # SA
+    # HK - gProfiler (web) + gprofiler2
+    "HK",
+    # SA - Reactome (web) + ReactomePA
     "SA",
-    # Day 2 prep (new)
+    # Wrap-up / Q&A / preview Day 2
     ""
   ),
   Activity = c(
@@ -70,23 +70,23 @@ schedule <- tibble::tibble(
     "Data acquisition & filtering gene list",
     "Interactive Calculator",
     "Morning break",
-    "gProfiler",
-    "STRING",
+    "GSEA (web) + fgsea",
+    "STRING (web) + STRINGdb",
     "Lunch break",
-    "GSEA",
-    "Reactome",
-    "Software installation & preparation for Day 2"
+    "g:Profiler (web) + gprofiler2",
+    "Reactome (web) + ReactomePA",
+    "Wrap-up / Q&A / preview Day 2"
   ),
   `Time (mins)` = c(
     10, # LP
     35, 10, 15, # HK before break
     10, # Morning break
-    40, # HK: gProfiler
-    40, # GI - 1: STRING
-    45, # Lunch break (extended from 20 -> 45)
-    60, # GI - 2: GSEA
-    60, # SA: Reactome
-    35 # Day 2 prep (new, fills day out to 15:00)
+    60, # GI: GSEA (web) + fgsea
+    50, # GI: STRING (web) + STRINGdb
+    40, # Lunch break
+    60, # HK: g:Profiler (web) + gprofiler2
+    60, # SA: Reactome (web) + ReactomePA
+    10 # Wrap-up / Q&A / preview Day 2
   )
 ) %>%
   mutate(
@@ -113,19 +113,25 @@ start_time_day2 <- ymd_hm("2026-08-13 09:00") # anchors day 2
 
 schedule_day2 <- tibble::tibble(
   Instructor = c(
-    "", # Topic TBD - 1
+    "", # Recap of Day 1 & Day 2 overview
+    "SA", # clusterProfiler and enrichplot
     "", # Morning break
-    ""  # Topic TBD - 2
+    "HK", # Novel species FEA
+    "" # Wrap-up
   ),
   Activity = c(
-    "Topic TBD",
+    "Recap of Day 1 & Day 2 overview",
+    "clusterProfiler and enrichplot",
     "Morning break",
-    "Topic TBD"
+    "Novel species FEA",
+    "Wrap-up: Uncertainties, Reporting & Resources (self-paced) + Q&A"
   ),
   `Time (mins)` = c(
-    80, # Topic TBD - 1
+    10, # Recap
+    65, # SA: clusterProfiler and enrichplot
     15, # Morning break
-    85  # Topic TBD - 2
+    80, # HK: Novel species FEA
+    10 # Wrap-up
   )
 ) %>%
   mutate(
