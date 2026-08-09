@@ -63,7 +63,7 @@ library(tidyr)
 Bookdown evaluates relative file paths from the book project directory. Confirm that the input files used below are available from that directory, or update the file paths to match your project structure:
 
 
-```{r working directory, eval=TRUE}
+```{r working directory, eval=TRUE, include = FALSE}
 # Bookdown evaluates relative file paths from the book project directory.
 # Confirm the directory from which the book is being rendered.
 getwd()
@@ -596,7 +596,7 @@ The input file here is one that we have created, but should match yours as long 
 
 
 ```{r import g:profiler web results}
-web <- read.csv("gProfiler_hsapiens_07-11-2024_11-27-09__intersections.csv")
+web <- read.csv("gProfiler_hsapiens_2026-08-09_05-01-55__intersections.csv")
 head(web)
 ```
 
