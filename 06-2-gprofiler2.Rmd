@@ -225,7 +225,7 @@ table(ora$result$source)
 ```
 
 
-Same as the web tool, we have enrichment results for GP (BP, CC, MF), HP (human phenotype), HPA (human protein atlas), KEGG, MiRNA, Reactome, Transcription Factors, and WikiPathways. 
+Same as the web tool, we have enrichment results for GO (BP, CC, MF), HP (human phenotype), HPA (human protein atlas), KEGG, MiRNA, Reactome, Transcription Factors, and WikiPathways. 
 
 
 
