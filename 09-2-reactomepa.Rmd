@@ -59,7 +59,7 @@ library(graphite)
 library(igraph)
 ```
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>   insert blank line -->
 
 ### Load input data
 
@@ -77,13 +77,13 @@ The dataframe shows genes with fold change and FDR values, along with gene count
 
 Look on the environment pane of RStudio, and you can see a description '14420 obs. of 11 variables' - this shows your dataframe consists of 10 columns and 14,420 genes. 
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>   insert blank line -->
 
 ### Match Ensembl Gene IDs to Entrez Gene IDs
 
 Reactome requires *Entrez*-style gene IDs, which are just numbers.
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>   insert blank line -->
 
 **Example Human Gene IDs from different DBs**
 
@@ -102,7 +102,7 @@ Reactome requires *Entrez*-style gene IDs, which are just numbers.
 
 Note that some Gene IDs do not have a one-to-one mapping to genes in other databases. Some are listed as two separate genes, or can be completely absent. This is also often the case for different releases of the same database.
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>   insert blank line -->
 
 Currently the data only has *Ensembl*-style IDs and *HGNC*/*Symbolic*-style names. The online tool we used converted these automatically, but here we have to do it ourselves.
 
@@ -127,7 +127,7 @@ Note on `$`: `$` is used to indicate one column or field. Here `pezzini$entrez <
 
 There should be **16** gene IDs that are now duplicated after converting to Entrez IDs from Ensembl IDs, and **116** have no Entrez ID at all. This is not unusual since different gene databases will sometimes regard two regions as the same gene while others will split the region into different genes. 
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>   insert blank line -->
 
 **Filtering the data:**
 
@@ -141,7 +141,7 @@ nrow(pezzini) # rows post-filter
 ```
 Note on square-bracket notation ie. `table[row,column]`: here we generate logical filters for the rows, and no filter at all for the columns.
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>   insert blank line -->
 
 ## ORA analysis in ReactomePA
 
@@ -156,7 +156,7 @@ length(degs) # how many DEGs are in this list?
 ```
 We should have **790** genes passing our filters. 
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>   insert blank line -->
 
 ### Run ORA in Reactome
 
@@ -169,7 +169,7 @@ RPA <- enrichPathway(gene = degs,
 RPA_df <- as.data.frame(RPA)
 ```
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>   insert blank line -->
 
 Lets look at the top 8 entries:
 
@@ -182,7 +182,7 @@ datatable(RPA_df[,-c(10,11)]) %>%  formatRound(columns=c('RichFactor', 'FoldEnri
 
 We do get quite different results if we only include up- or down- regulated genes. Depending on our hypothesis and how we think the pathways involved may function, we might do this by changing the filter for DEGs above. However, this would take extra computational time so we won't do it here.
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>   insert blank line -->
 
 ### Plot some results of ORA
 
@@ -200,7 +200,7 @@ ggplot(data=RPA_df,
 ```
 
 
-<!-- ![](images/09-2-reactomePA_Ora_results.png ){ width=100% } -->
+![](images/09-2-reactomePA_Ora_results.png ){ width=100% }
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 <p>&nbsp;</p>  <!-- insert blank line -->
@@ -303,7 +303,7 @@ viewPathway("Downstream signaling of activated FGFR2",
             foldChange = pi_vals,
             layout = 'kk')   
 ```
-<!-- ![](images/09-2-reactomePA_viewPathway.png ){ width=100% } -->
+![](images/09-2-reactomePA_viewPathway.png ){ width=100% }
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -383,7 +383,7 @@ print(plt)
 dev.off()
 ```
 
-<!-- ![](images/09-2-reactomePA_FGFR2_network.png ){ width=100% } -->
+![](images/09-2-reactomePA_FGFR2_network.png ){ width=100% }
 This should save the plot to a pdf file in the current working directory.
 
 
