@@ -29,6 +29,9 @@ always_allow_html: true
 - **Stuart Archer**
   - [stuart.archer@monash.edu](mailto:stuart.archer@monash.edu)
 
+- **Paul Harrison**
+  - [paul.harrison@monash.edu](mailto:paul.harrison@monash.edu)
+
 
 ### Important Links
 
