@@ -6,8 +6,6 @@ knitr::opts_chunk$set(eval = FALSE)
 
 The command-line chapters of this workshop (`gprofiler2`, `clusterProfiler` and `enrichplot`, Novel species FEA, `FGSEA`, and `STRINGdb`) use a number of R packages. On the day, these are already installed on the workshop-provided computers/VMs, so no action is needed. This page is for anyone who wants to run the code on their **own computer**, either during the workshop or afterwards.
 
-**IMPORTANT: If you have an M1 Mac - Make sure you have [gfortran](https://mac.r-project.org/tools/).**
-
 This workshop was built and tested with **R 4.6.1** and **Bioconductor 3.23**. Any recent R release (4.4 or later) with a matching Bioconductor release should work; see the [Bioconductor release/R version table](https://bioconductor.org/about/release-announcements/) if you are installing on an older R version.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
