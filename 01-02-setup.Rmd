@@ -66,8 +66,8 @@ BiocManager::install(c(
 The `clusterProfiler`/`enrichplot` chapter mentions `multienrichjam`, a package that converts ORA results from other tools into `enrichplot`-compatible objects. It is **not required** for this workshop, has a large dependency footprint, and is not installed on the workshop VMs. If you'd like to try it on your own computer:
 
 ```{r install-multienrichjam, eval = FALSE}
-install.packages("remotes")
-remotes::install_github("jmw86069/multienrichjam", dependencies = TRUE)
+# install.packages("remotes")
+# remotes::install_github("jmw86069/multienrichjam", dependencies = TRUE)
 ```
 
 <p>&nbsp;</p>  <!-- insert blank line -->
