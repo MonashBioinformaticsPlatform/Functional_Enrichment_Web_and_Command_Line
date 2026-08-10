@@ -384,10 +384,24 @@ dev.off()
 ```
 
 ![](images/09-2-reactomePA_FGFR2_network.png ){ width=100% }
+
+
 This should save the plot to a pdf file in the current working directory.
 
 
 <p>&nbsp;</p>  <!--  blank line -->
+
+### R version and R package versions 
+
+It is good practice to capture and record the version of R and other session details including all loaded packages and versions with the `sessionInfo()` function: 
+
+```{r RPA session info, include=TRUE}
+sessionInfo()
+```
+
+
+<p>&nbsp;</p>  <!--  blank line -->
+
 
 ## End of activity summary
 
@@ -404,14 +418,4 @@ This should save the plot to a pdf file in the current working directory.
 <p>&nbsp;</p>  <!--  blank line -->
 
 
-### R version and R package versions 
-
-It is good practice to capture and record the version of R and other session details including all loaded packages and versions with the `sessionInfo()` function: 
-
-```{r RPA session info, include=TRUE}
-sessionInfo()
-```
-
-
-<p>&nbsp;</p>  <!--  blank line -->
 
