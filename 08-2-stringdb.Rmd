@@ -215,6 +215,8 @@ sema3a <- string_db$mp("sema3a")
 string_db$get_interactions(c(crabp2, sema3a))
 ```
 
+An empty data frame here is expected, not an error: `CRABP2` and `SEMA3A` are not annotated as directly interacting in STRING, so there is no row to return. `get_interactions` only reports edges that exist directly between the queried proteins; it will not tell you about shared partners or indirect paths between them.
+
 ### Interaction partners
 
 To retrieve the first-shell interaction partners of one or more proteins from the locally loaded network, use `get_interaction_partners`. The output has the same structure as `get_interactions`.

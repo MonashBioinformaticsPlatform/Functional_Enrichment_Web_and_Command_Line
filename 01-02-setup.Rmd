@@ -21,6 +21,7 @@ install.packages(c(
   "gprofiler2",
   "ggupset",
   "ggtangle",
+  "ggridges", # needed by enrichplot::ridgeplot()
   "msigdbr",
   "ontologyIndex",
   "WebGestaltR",
@@ -28,6 +29,8 @@ install.packages(c(
   "ggrepel"
 ))
 ```
+
+**Note on `WebGestaltR`:** it includes Rust source code that gets compiled during installation, so a working Rust toolchain (including `cargo`) is required beforehand. If installation fails with a "cargo command is not available" or similar error, install/update Rust via [rustup](https://www.rust-lang.org/tools/install) rather than an older distro-packaged `cargo`, then retry `install.packages("WebGestaltR")`.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
