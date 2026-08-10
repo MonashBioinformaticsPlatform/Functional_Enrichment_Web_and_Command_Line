@@ -327,18 +327,20 @@ Unfortunately, `enrichplot` is only compatible with the enrichment results from 
 `multienrichjam` has a lot of dependencies and has not been installed on these VMs so we will not be performing this today. However, this functionality and flexibility is pretty cool, so if you wanted to install this on your own computer outside the workshop, below is the code for installing :-)
 
 
+<!--omit-begin-->
 ```{r install multienrichjam, eval = FALSE}
 # github remotes package required:
-install.packages("remotes")
-library(remotes)
+# install.packages("remotes")
+# library(remotes)
 
 # install multienrichjam:
-remotes::install_github("jmw86069/multienrichjam", dependencies = TRUE)
-library(multienrichjam)
+# remotes::install_github("jmw86069/multienrichjam", dependencies = TRUE)
+# library(multienrichjam)
 
 # check function help:
-?enrichDF2enrichResult
+# ?enrichDF2enrichResult
 ```
+<!--omit-end-->
 
 
 #### dotplot
