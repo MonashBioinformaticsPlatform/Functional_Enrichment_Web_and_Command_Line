@@ -69,7 +69,7 @@ How can one perform Under Representation Analysis in gProfiler?
 
 ### Steps to use a ranked gene list in g:Profiler:
 
-g:Profiler's "Ordered query" option lets you analyse a ranked gene list, but it does **not** implement the Subramanian et al. 2005 GSEA algorithm covered in the GSEA (web) chapter earlier in the book. Instead, it runs standard ORA (hypergeometric/Fisher's exact test) on a series of prefixes of your ranked list (top 10, top 20, top 50 genes, and so on) and reports whichever prefix gives the strongest enrichment for each term. It does not use a running-sum enrichment score, does not weight genes by the magnitude of their ranking metric, and does not use permutation testing — so treat it as ORA over an incrementally-growing ranked list, not as an alternative implementation of GSEA.
+g:Profiler's "Ordered query" option lets you analyse a ranked gene list, but it does **not** implement the Subramanian et al. 2005 GSEA algorithm covered in the GSEA (web) chapter later in the book. Instead, it runs standard ORA (hypergeometric/Fisher's exact test) on a series of prefixes of your ranked list (top 10, top 20, top 50 genes, and so on) and reports whichever prefix gives the strongest enrichment for each term. It does not use a running-sum enrichment score, does not weight genes by the magnitude of their ranking metric, and does not use permutation testing — so treat it as ORA over an incrementally-growing ranked list, not as an alternative implementation of GSEA.
 
 <span style="color:orange;">- Prepare Your Pre-ranked List:</span> Steps to provide a ranked gene list are given [here](degust.html).
 
