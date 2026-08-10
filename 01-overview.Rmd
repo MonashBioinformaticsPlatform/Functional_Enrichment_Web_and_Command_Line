@@ -53,12 +53,12 @@ schedule <- tibble::tibble(
     "",
     # HK - gProfiler (web) + gprofiler2
     "HK",
-    # GI - GSEA (web) + fgsea
-    "GI",
+    # SA - GSEA (web) + fgsea
+    "SA",
     # Lunch
     "",
-    # GI - STRING (web) + STRINGdb
-    "GI",
+    # PH - STRING (web) + STRINGdb
+    "PH",
     # SA - Reactome (web) + ReactomePA
     "SA",
     # Wrap-up / Q&A / preview Day 2
@@ -82,9 +82,9 @@ schedule <- tibble::tibble(
     35, 10, 15, # HK before break
     10, # Morning break
     60, # HK: g:Profiler (web) + gprofiler2
-    60, # GI: GSEA (web) + fgsea
+    60, # SA: GSEA (web) + fgsea
     40, # Lunch break
-    50, # GI: STRING (web) + STRINGdb
+    50, # PH: STRING (web) + STRINGdb
     60, # SA: Reactome (web) + ReactomePA
     10 # Wrap-up / Q&A / preview Day 2
   )
@@ -114,7 +114,7 @@ start_time_day2 <- ymd_hm("2026-08-13 09:00") # anchors day 2
 schedule_day2 <- tibble::tibble(
   Instructor = c(
     "", # Recap of Day 1 & Day 2 overview
-    "SA", # clusterProfiler and enrichplot
+    "GI", # clusterProfiler and enrichplot
     "", # Morning break
     "HK", # Novel species FEA
     "" # Wrap-up
@@ -128,7 +128,7 @@ schedule_day2 <- tibble::tibble(
   ),
   `Time (mins)` = c(
     10, # Recap
-    65, # SA: clusterProfiler and enrichplot
+    65, # GI: clusterProfiler and enrichplot
     15, # Morning break
     80, # HK: Novel species FEA
     10 # Wrap-up
@@ -158,3 +158,5 @@ kable(schedule_day2, "html", escape = FALSE) %>%
 -   **HK**: Hossein Valipour Kahrood
 -   **GI**: Giulia Iacono
 -   **SA**: Stuart Archer
+-   **PH**: Paul Harrison
+
