@@ -20,7 +20,7 @@ Like the web interface, the `ReactomePA` R package can be used for ORA. However,
 
 ReactomeDB does not just contain gene-sets but also directional and non-directional relationships between genes / proteins and metabolites in various pathways. This information can be extracted for downstream analysis of biological networks.
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 **Activity overview**
 
@@ -37,7 +37,7 @@ ReactomeDB does not just contain gene-sets but also directional and non-directio
 10. Export `reactomeDB` data for use with other tools
 :::
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 ## Set-up for analysis with ReactomePA
 
@@ -59,7 +59,7 @@ library(graphite)
 library(igraph)
 ```
 
-<p>&nbsp;</p>   insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 ### Load input data
 
@@ -77,13 +77,13 @@ The dataframe shows genes with fold change and FDR values, along with gene count
 
 Look on the environment pane of RStudio, and you can see a description '14420 obs. of 11 variables' - this shows your dataframe consists of 10 columns and 14,420 genes. 
 
-<p>&nbsp;</p>   insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 ### Match Ensembl Gene IDs to Entrez Gene IDs
 
 Reactome requires *Entrez*-style gene IDs, which are just numbers.
 
-<p>&nbsp;</p>   insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 **Example Human Gene IDs from different DBs**
 
@@ -102,7 +102,7 @@ Reactome requires *Entrez*-style gene IDs, which are just numbers.
 
 Note that some Gene IDs do not have a one-to-one mapping to genes in other databases. Some are listed as two separate genes, or can be completely absent. This is also often the case for different releases of the same database.
 
-<p>&nbsp;</p>   insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 Currently the data only has *Ensembl*-style IDs and *HGNC*/*Symbolic*-style names. The online tool we used converted these automatically, but here we have to do it ourselves.
 
@@ -127,7 +127,7 @@ Note on `$`: `$` is used to indicate one column or field. Here `pezzini$entrez <
 
 There should be **16** gene IDs that are now duplicated after converting to Entrez IDs from Ensembl IDs, and **116** have no Entrez ID at all. This is not unusual since different gene databases will sometimes regard two regions as the same gene while others will split the region into different genes. 
 
-<p>&nbsp;</p>   insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 **Filtering the data:**
 
@@ -141,7 +141,7 @@ nrow(pezzini) # rows post-filter
 ```
 Note on square-bracket notation ie. `table[row,column]`: here we generate logical filters for the rows, and no filter at all for the columns.
 
-<p>&nbsp;</p>   insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 ## ORA analysis in ReactomePA
 
@@ -156,7 +156,7 @@ length(degs) # how many DEGs are in this list?
 ```
 We should have **790** genes passing our filters. 
 
-<p>&nbsp;</p>   insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 ### Run ORA in Reactome
 
@@ -169,7 +169,7 @@ RPA <- enrichPathway(gene = degs,
 RPA_df <- as.data.frame(RPA)
 ```
 
-<p>&nbsp;</p>   insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 Lets look at the top 8 entries:
 
@@ -182,7 +182,7 @@ datatable(RPA_df[,-c(10,11)]) %>%  formatRound(columns=c('RichFactor', 'FoldEnri
 
 We do get quite different results if we only include up- or down- regulated genes. Depending on our hypothesis and how we think the pathways involved may function, we might do this by changing the filter for DEGs above. However, this would take extra computational time so we won't do it here.
 
-<p>&nbsp;</p>   insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 ### Plot some results of ORA
 
@@ -202,8 +202,8 @@ ggplot(data=RPA_df,
 
 ![](images/09-2-reactomePA_Ora_results.png ){ width=100% }
 
-<p>&nbsp;</p>  <!-- insert blank line -->
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 ## ReactomePA Functional Class Scoring
 
@@ -211,7 +211,7 @@ Rather than drawing an arbitrary threshold to classify genes as either regulated
 
 The reactome.org website offers some FCS analysis (e.g. using the CAMERA algorithm) but as of July 2026 these features appear not to be working reliably. However, we can perform them in R.
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 ### Generate a gene ranking metric
 
@@ -229,7 +229,7 @@ pezzini <- pezzini[order(pezzini$pi, decreasing = TRUE),]      # sort pezzini ta
 plot(x = pezzini$Log2FC, y = pezzini$pi, cex=0.1)      # plot "pi" vs Log-fold change
 ```
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 ### Generate gsePathway input
 
@@ -242,7 +242,7 @@ names(pi_vals) <- pezzini$entrez
 head(pi_vals)
 ```
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 ### Run ReactomePA Functional Class Scoring
 
@@ -254,7 +254,7 @@ gsePA_df <- as.data.frame(gsePA)
 ```
 By default, pathways are filtered for > 10 nodes and < 500 nodes by `gsePathway()`.
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 ### Browse top pathways
 
@@ -264,7 +264,7 @@ datatable(gsePA_df[,-c(8,11)]) %>%  formatRound(columns=c('enrichmentScore', 'NE
 ```
 The Normalised Enrichment Score `NES` and the `qvalue`/`p.adjust` fields (here, both are just FDR again) represent concepts of effect size and statistical significance, respectively.  
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 ### Visualise gsePA results in barcode plots.
 
@@ -275,7 +275,7 @@ gseaplot2(gsePA, geneSetID = 1:5)
 ```
 
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 These are all downregulated pathways: let's also get best UPregulated groups:
 
@@ -289,7 +289,7 @@ The barcode plots give a good idea as to how significance is calculated. The gre
 The Running Enrichment Score (RES) is a cumulative sum of this metric, for genes within the pathway being analysed, minus the cumulative sum of genes outside the pathway. A random distribution of pathway genes after ranking should produce a largely flat RES. The highest (or lowest) value for the RES is the raw Enrichment score. This represents the skew of pathway genes to one or both ends of the ranked list. The Normalised Enrichment Score `NES` is generated from the raw `enrichmentScore` after normalising for the "expected" enrichment score (obtained by permuting genes). 
 
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 ## Visualise ReactomeDB Pathways
 
@@ -305,15 +305,15 @@ viewPathway("Downstream signaling of activated FGFR2",
 ```
 ![](images/09-2-reactomePA_viewPathway.png ){ width=100% }
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 Unlike in the online visualisation, `viewPathway` does not display directionality. This is not as pretty as the web version! But the data is able to be exported to other visualisation tools (e.g. in the `DiagrammeR` package) if needed.
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 Other interesting pathways can be found in the Description field of the gsePathway() output table, e.g. "PI3K/AKT Signaling in Cancer", "Chemokine receptors bind chemokines", "Response to elevated platelet cytosolic Ca2+"
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 ## Exporting reactome pathway data
 
@@ -335,7 +335,7 @@ pw_edges <- graphite::edges(pw2, which = "proteins") # options for 'which': "pro
 datatable(pw_edges)
 ```
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 
 ## Plotting exported network and expression data using ggplot
@@ -353,7 +353,7 @@ node_layout <- data.frame(node = V(ig)$name, x = lay[,1], y = lay[,2] )
 node_layout$LFC <- pezzini$Log2FC[ match(node_layout$node, pezzini$Gene.Name)]
 ```
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 Now use the node coordinates to define start and end coordinates for the lines, and plot directional and non-directional edges.
 
@@ -387,7 +387,7 @@ dev.off()
 This should save the plot to a pdf file in the current working directory.
 
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 ## End of activity summary
 
@@ -401,7 +401,7 @@ This should save the plot to a pdf file in the current working directory.
 - We plotted reactome networks in ggplot preserving directional edges
 :::
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
 
 ### R version and R package versions 
@@ -413,5 +413,5 @@ sessionInfo()
 ```
 
 
-<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!--  blank line -->
 
