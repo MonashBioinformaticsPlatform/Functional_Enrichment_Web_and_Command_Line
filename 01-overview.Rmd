@@ -51,14 +51,14 @@ schedule <- tibble::tibble(
     rep("HK", 3),
     # Morning break (10 min)
     "",
+    # HK - gProfiler (web) + gprofiler2
+    "HK",
     # GI - GSEA (web) + fgsea
-    "GI",
-    # GI - STRING (web) + STRINGdb
     "GI",
     # Lunch
     "",
-    # HK - gProfiler (web) + gprofiler2
-    "HK",
+    # GI - STRING (web) + STRINGdb
+    "GI",
     # SA - Reactome (web) + ReactomePA
     "SA",
     # Wrap-up / Q&A / preview Day 2
@@ -70,10 +70,10 @@ schedule <- tibble::tibble(
     "Data acquisition & filtering gene list",
     "Interactive Calculator",
     "Morning break",
-    "GSEA (web) + fgsea",
-    "STRING (web) + STRINGdb",
-    "Lunch break",
     "g:Profiler (web) + gprofiler2",
+    "GSEA (web) + fgsea",
+    "Lunch break",
+    "STRING (web) + STRINGdb",
     "Reactome (web) + ReactomePA",
     "Wrap-up / Q&A / preview Day 2"
   ),
@@ -81,10 +81,10 @@ schedule <- tibble::tibble(
     10, # LP
     35, 10, 15, # HK before break
     10, # Morning break
-    60, # GI: GSEA (web) + fgsea
-    50, # GI: STRING (web) + STRINGdb
-    40, # Lunch break
     60, # HK: g:Profiler (web) + gprofiler2
+    60, # GI: GSEA (web) + fgsea
+    40, # Lunch break
+    50, # GI: STRING (web) + STRINGdb
     60, # SA: Reactome (web) + ReactomePA
     10 # Wrap-up / Q&A / preview Day 2
   )
