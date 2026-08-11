@@ -1,53 +1,64 @@
-# GSEA (web)
+# GSEA (Standalone App)
 
 <!-- ## FEA in [GenePattern](https://www.genepattern.org/#gsc.tab=0) -->
-## <a href="https://www.gsea-msigdb.org/gsea/downloads.jsp" target="_blank"><img src="images/GSEA-logo.gif" alt="MSigDB GSEA Logo" style="height:35px; vertical-align:middle;"></a> or <a href="https://www.genepattern.org/#gsc.tab=0" target="_blank"><img src="images/GenePattern-logo.png" alt="GenePattern Logo" style="height:35px; vertical-align:middle;"></a>
-[GenePattern](https://www.genepattern.org/), an online platform developed by the Broad Institute, offers a suite of tools for analyzing and visualizing genomic data, making bioinformatics accessible to researchers through a user-friendly, no-programming interface. Among its supported tools is Gene Set Enrichment Analysis (GSEA), which implements [MSigDB GSEA](https://www.gsea-msigdb.org/gsea/index.jsp) analysis for identifying enriched gene sets in genomic data.
+<a href="https://www.gsea-msigdb.org/gsea/downloads.jsp" target="_blank"><img src="images/GSEA-logo.gif" alt="MSigDB GSEA Logo" style="height:35px; vertical-align:middle;"></a>
 
-[MSigDB](https://www.gsea-msigdb.org/gsea/index.jsp) (Molecular Signatures Database) is a collection of gene sets for Gene Set Enrichment Analysis, representing pathways and gene signatures linked to biological states or diseases. It helps identify enriched gene sets, aiding the analysis of gene expression changes and key pathways in experimental data.
-
-### Steps to Locate GSEA Module in GenePattern:
-
-- Click on the Run button and then the Public Server
-
-<!-- ![](images/GenePattern-Run.png) -->
-```{r, echo=FALSE, fig.align = "center", fig.cap="Navigate to Public Server"}
-knitr::include_graphics("images/GenePattern-Run.png")
-```
+The Broad Institute has developed a widely used stand-alone app for FCS, <a href="https://www.gsea-msigdb.org/gsea/index.jsp">GSEA.</a> They also host an extensive collection of gene-sets, the [ Molecular Signatures Database (MSigDB).](https://www.gsea-msigdb.org/gsea/index.jsp) This is a collection of gene sets representing pathways and gene signatures linked to biological states or diseases.
 
 
-- Sign in to GenePattern or Enter as Guest
-
-- Under `Modules` tab hit `Browse Modules`
-
-- Find gsea in the Browse Modules by Category page and hit GSEA
-
-<!-- ![](images/Browse_Modules_gsea.png){ width=100% } -->
-```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Browse GSEA module in GenePattern"}
-knitr::include_graphics("images/Browse_Modules_gsea.png")
-```
-
-
-### Steps to Perform GSEA:
+## Running the Broad GSEA software
 <!-- https://cloud.genepattern.org/gp/pages/index.jsf?jobid=613752&openVisualizers=true&openNewWindow=false -->
 
-1. Basic Parameters
+The GSEA app can search and download appropriate data-sets from the Broad, including gene-set databases as well as some other tables for converting gene IDs. It is free, however you must register as a user at the Broad Institute.
 
-\- Create both `.gct` and `.cls` files following [this scrit in R](degust.html)
+It can identify gene sets enriched in some experimentally determined significance / ranking metric, without any requirement to draw an arbitrary significance threshold. 
 
-\- Load the `.gct` input file in the `expression dataset` tab and `.cls` file in the `phenotype labels` tab
 
-\- Select a `.gmt` file (Gene Matrix Transposed) from the `gene sets database` tab
+### Input files
 
-\- Set permutation under `number of permutations` tab
+GSEA can run in one of two modes, **standard**, where a normalised per-gene expression value for each sample is given; or  **pre-ranked**, where a single value of some kind of significance score has already been calculated per gene.
 
-\- Type of the permutation to be set under `permutation type` tab
+For **standard** mode, required input files are:
 
-\- Select an appropriate DNA Chip annotation file from `chip platform file` tab
+\- A table telling GSEA which samples belong to which condition in an accepted format like `.cls`.
 
-\- Name the output file in `output file name` tab
+\- Normalised gene expression values such as CPM, TPM, or FPKM values, in an accepted format like `.gct` or `.res`.
 
-2. Advanced Parameters
+For **pre-ranked** mode, required input files are:
+
+\- Experimental gene-expression data, either "pre-ranked" (each gene contains one pre-calculated numerical metric of significance
+
+For **both** modes, also required are:
+
+\- Gene-set information e.g. in a `.gmt` file.
+
+\- Gene ID look-up information e.g. in a `chip` file, to relate the gene IDs in the experimental data to IDs in the gene-set tables. 
+
+Alternative input file formats are also accepted as described <a href="https://www.genepattern.org/file-formats-guide/#_Creating_Input_Files_GCT"> here. </a>
+
+### Basic Parameters
+
+\- Create both `.gct` and `.cls` files following [this script in R](degust.html)
+
+\- Under the "load data" menu, import the `.gct` (gene expression data) and `.cls` (phenotype labels) files
+
+\- Click `run GSEA` (or to use your pre-calculated metric, `run GSEAPreranked`)
+
+\- Select your `.gct` file from the `expression dataset` tab
+
+\- Select your `.gct` file from the `phenotype labels` tab
+
+\- Select a `.gmt` file (Gene Matrix Transposed) from the `gene sets database` tab (downloads from Broad)
+
+\- Select an appropriate Gene ID look-up table (DNA Chip annotation file) from `chip platform` tab. Here we have ensembl IDs so `Human_Ensembl_Gene_ID_MSigDB.v2026.1.Hs.chip` should work to convert to Gene-Symbol names to match the gene set database IDs.
+
+\- Set permutation number under `number of permutations` tab
+
+\- Type of the permutation to be set under `permutation type` tab (usually "gene set" unless you have many replicates)
+
+\- Name the output name and folder in `analysis name` and `save results in this folder` tabs
+
+### Advanced Parameters
 
 \- Scoring Scheme:
 
@@ -64,15 +75,18 @@ knitr::include_graphics("images/Browse_Modules_gsea.png")
 \- Minimum and Maximum size of gene sets can be set using `max gene set size` and `min gene set size` tabs
 <!-- <GeneSetName> <Description> <Gene1> <Gene2> <Gene3> ... -->
 
-#### Browse the GSEA results
+### Browse the GSEA results
 
 Once the job has been queued and successfully run, the output will be listed on the left panel under `Jobs` tab:
 
 ```{r, echo=FALSE, fig.align = "center", fig.cap="Job status in GenePattern"}
-knitr::include_graphics("images/GenePattern-Jobs.png")
+#knitr::include_graphics("images/GenePattern-Jobs.png")
 ```
+![](images/GenePattern-Jobs.png ){ width=100% }
 
 Of the most important files is the `.zip` file that was earlier specified under `output file name` tab in Basic parameters section which includes all the results. The results can also be navigated using the single files listed under the job id.
+
+A good place to start is the `index.html` file which should contain an html menu where we can navigate to whichever results are of interest.
 
 For Pezzini experiment, two `html` files generated for each of up- and down-regulated gene sets, something like:
 
