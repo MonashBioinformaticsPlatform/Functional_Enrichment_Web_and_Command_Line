@@ -47,8 +47,8 @@ schedule <- tibble::tibble(
   Instructor = c(
     # LP (10 min)
     "LP",
-    # HK (3 items before break)
-    rep("HK", 3),
+    # HK (2 items before break)
+    rep("HK", 2),
     # Morning break (10 min)
     "",
     # HK - gProfiler (web) + gprofiler2
@@ -67,7 +67,6 @@ schedule <- tibble::tibble(
   Activity = c(
     "Welcome and housekeeping",
     "Introduction to functional enrichment analysis",
-    "Data acquisition & filtering gene list",
     "Interactive Calculator",
     "Morning break",
     "g:Profiler (web) + gprofiler2",
@@ -79,7 +78,7 @@ schedule <- tibble::tibble(
   ),
   `Time (mins)` = c(
     10, # LP
-    35, 10, 15, # HK before break
+    45, 15, # HK before break
     10, # Morning break
     60, # HK: g:Profiler (web) + gprofiler2
     60, # SA: GSEA (web) + fgsea
