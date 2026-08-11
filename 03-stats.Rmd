@@ -152,31 +152,15 @@ You can adjust various factors and see their effect on the enrichment p-values.
 
 ### **Questions** {- .rationale}
 1. If 24 of the 300 differentially expressed genes are annotated with the 500-gene term of interest. Is it significant at p=0.05?
-<details>
-<summary>Show</summary>
-No, corrected pval=0.087
-</details>
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 2. What about with a smaller background of 5000 genes (e.g. proteomic datasets)?
-<details>
-<summary>Show</summary>
-Even less so - corrected pval=1
-</details>
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 3. Or, testing against a smaller database of terms; 2000 terms instead of 10000? With the original 16000 gene background.
-<details>
-<summary>Show</summary>
-Yes, now corrected pval=0.017
-</details>
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 4. 19 out of 200 differentially expressed genes (9.5%), need to hit for a 500-gene term (3.1% of all genes) to be significant at (p=0.048). How many hits would be needed for a more specific 30-gene term?
-<details>
-<summary>Show</summary>
-5 hits - 2.5% of the differentially expressed genes vs 0.19% of all genes
-</details>
 
 ####  {-}
 
